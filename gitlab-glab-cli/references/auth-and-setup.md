@@ -69,6 +69,24 @@ The docs also note:
 - `--use-keyring` stores the token in the OS keyring instead of the config file.
 - `GLAB_CONFIG_DIR` overrides the config directory.
 
+For self-managed GitLab, treat `glab auth status` as a helpful signal but not the final authority. If `auth status` reports `Invalid token provided`, verify with direct API calls before concluding auth is broken:
+
+```bash
+glab api user --hostname gitlab.example.org
+glab api version --hostname gitlab.example.org
+glab api personal_access_tokens/self --hostname gitlab.example.org
+```
+
+If those return `200` or valid JSON, the token and API access are working even if `auth status` prints a warning.
+
+If login behaves strangely after `glab auth login --stdin`, inspect `~/.config/glab-cli/config.yml` for malformed token serialization. One observed failure mode is a token written with a YAML null tag, for example:
+
+```yaml
+token: !!null glpat-...
+```
+
+That should be treated as a broken config entry and corrected by re-running login or fixing the stored value.
+
 ## Environment variables worth checking
 
 - `GITLAB_HOST` or `GL_HOST`: target GitLab host, especially for self-managed instances.
@@ -92,5 +110,6 @@ Use this only for commands that support job-token auth.
 
 1. Authenticate with `glab auth login`.
 2. Verify the repo host or pass `--hostname`.
-3. For scripted use, set `GITLAB_TOKEN` and `NO_PROMPT=true`.
-4. For CI, prefer job-token-aware commands or `glab api` where compatible.
+3. Verify auth with `glab api user` and, for PAT-backed auth, `glab api personal_access_tokens/self`.
+4. For scripted use, set `GITLAB_TOKEN` and `NO_PROMPT=true`.
+5. For CI, prefer job-token-aware commands or `glab api` where compatible.

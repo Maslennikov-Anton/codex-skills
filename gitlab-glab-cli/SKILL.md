@@ -36,13 +36,14 @@ Use this skill when the task is about working with GitLab through the official `
    - GitLab Dedicated;
    - self-managed GitLab.
 3. If auth might be missing, start with [references/auth-and-setup.md](references/auth-and-setup.md).
-4. If a higher-level `glab` command exists, prefer it over raw API calls.
-5. If `glab` does not expose the exact operation cleanly, fall back to `glab api`.
-6. If the command is repo-context-sensitive, confirm whether execution is:
+4. If auth on a self-managed GitLab behaves inconsistently, also open [references/troubleshooting.md](references/troubleshooting.md) before concluding the token is invalid.
+5. If a higher-level `glab` command exists, prefer it over raw API calls.
+6. If `glab` does not expose the exact operation cleanly, fall back to `glab api`.
+7. If the command is repo-context-sensitive, confirm whether execution is:
    - inside the target Git repository;
    - with `-R/--repo`;
    - with `--hostname` for cross-host work.
-7. For automations and scripts, prefer non-interactive flags and env vars over prompts.
+8. For automations and scripts, prefer non-interactive flags and env vars over prompts.
 
 ## Which reference to open
 
