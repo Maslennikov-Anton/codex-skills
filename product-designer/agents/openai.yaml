@@ -1,0 +1,4 @@
+interface:
+  display_name: "Product Designer"
+  short_description: "UX, user flows и визуальная концепция интерфейса."
+  default_prompt: "Используй $product-designer, чтобы проработать UX, user flow, структуру экранов и визуальное направление интерфейса."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Delivery Manager"
+  short_description: "Планирование поставки, зависимости и риски."
+  default_prompt: "Используй $delivery-manager, чтобы собрать delivery plan, зависимости, риски и критерии готовности релиза."

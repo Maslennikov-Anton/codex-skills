@@ -1,0 +1,4 @@
+interface:
+  display_name: "Frontend Engineer"
+  short_description: "Клиентские интерфейсы, UI-архитектура и UX-реализация."
+  default_prompt: "Используй $frontend-engineer, чтобы реализовать интерфейс, компонентную структуру и интеграцию frontend с API."

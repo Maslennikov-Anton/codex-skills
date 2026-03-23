@@ -1,0 +1,4 @@
+interface:
+  display_name: "Solution Architect"
+  short_description: "Архитектура решения, интеграции и trade-offs."
+  default_prompt: "Используй $solution-architect, чтобы спроектировать архитектуру решения, контракты интеграций и ключевые технические компромиссы."

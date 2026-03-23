@@ -1,0 +1,4 @@
+interface:
+  display_name: "Team Engineering Style"
+  short_description: "Локальные стандарты и эволюция skills."
+  default_prompt: "Используй $team-engineering-style, чтобы обновить локальные инженерные стандарты и правила развития skills."

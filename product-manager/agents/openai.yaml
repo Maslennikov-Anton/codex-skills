@@ -1,0 +1,4 @@
+interface:
+  display_name: "Product Manager"
+  short_description: "Продуктовая стратегия, приоритеты и MVP."
+  default_prompt: "Используй $product-manager, чтобы проработать vision, scope, MVP, backlog и продуктовые критерии успеха."

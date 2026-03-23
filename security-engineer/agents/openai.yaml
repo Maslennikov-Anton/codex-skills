@@ -1,0 +1,4 @@
+interface:
+  display_name: "Security Engineer"
+  short_description: "Security review, threat model и hardening."
+  default_prompt: "Используй $security-engineer, чтобы провести security review, threat modeling и определить меры защиты."
