@@ -39,9 +39,12 @@ description: >
 8. Для сценария test case считай обязательным правило: у каждого шага должен быть явно прописан ожидаемый результат шага. Не оставляй шаги без expected result.
 9. Для manual scenario в Allure 5.23.0 используй как write-endpoint `POST /api/testcase/{id}/scenario`, но не считай `GET /api/testcase/{id}/scenario` единственным источником истины: этот endpoint deprecated.
 10. Для проверки того, что карточка test case действительно видит шаги и expected result, используй `GET /api/testcase/{id}/overview` и смотри `scenario.steps[].expectedResult`.
-11. Если после обновления UI-модели текст шагов в редакторе или low-level дереве пустеет, синхронизируй low-level model через `GET /api/testcase/{id}/step` и `PATCH /api/testcase/step/{stepId}`.
-12. Для повторяемых операций со сценарием предпочитай helper-команду `testcase-sync-scenario`, потому что она обновляет обе модели согласованно и после записи перепроверяет `overview`.
-13. Для загрузки результатов не придумывай raw upload flow самостоятельно; предпочитай `allurectl` или официальные CI plugins.
+11. Для этого UI expected result шага в редакторе хранится не как plain field у root-step, а как дочерний step под контейнером `expectedResultId` из `GET /api/testcase/{id}/step`.
+12. Если пользователь редактирует expected result в UI, фронтенд отправляет `POST /api/testcase/step?withExpectedResult=false` с `parentId=<expectedResultId>` и `bodyJson`, то есть создает дочерний step внутри expected-result container.
+13. Если после обновления UI-модели текст шагов в редакторе или low-level дереве пустеет, синхронизируй low-level model через `GET /api/testcase/{id}/step` и `PATCH /api/testcase/step/{stepId}`.
+14. Для повторяемых операций со сценарием предпочитай helper-команду `testcase-sync-scenario`, потому что она обновляет обе модели согласованно и после записи перепроверяет `overview`.
+15. Для записи expected result шага в том виде, который реально видит UI, используй helper-команду `testcase-set-step-expected-result`.
+16. Для загрузки результатов не придумывай raw upload flow самостоятельно; предпочитай `allurectl` или официальные CI plugins.
 
 ## Минимальный auth flow
 
@@ -63,6 +66,7 @@ scripts/allure_testops_api.sh testcase-set-status 1811 -2 -1
 scripts/allure_testops_api.sh testcase-scenario-get 1811
 scripts/allure_testops_api.sh testcase-step-tree 1811
 scripts/allure_testops_api.sh testcase-sync-scenario 1811 /tmp/scenario.json
+scripts/allure_testops_api.sh testcase-set-step-expected-result 1811 0 "Ожидаемый результат первого шага"
 ```
 
 ## Какие references открывать
@@ -83,6 +87,10 @@ scripts/allure_testops_api.sh testcase-sync-scenario 1811 /tmp/scenario.json
 - Для Allure 5.23.0 не считай `/api/testcase/{id}/step` источником истины для manual scenario в UI.
 - Для проверки фактического содержимого карточки test case предпочитай `/api/testcase/{id}/overview`, потому что он возвращает `scenario` так, как его собирает backend для UI.
 - `GET /api/testcase/{id}/scenario` deprecated и подходит только как вспомогательная проверка, но не как финальный критерий того, что UI увидит expected result.
+- Для этого конкретного UI plain `expectedResult` в `overview` недостаточен, чтобы expected result появился в редакторе шагов.
+- Ожидаемый результат шага в редакторе materialize-ится как дочерний step под узлом `expectedResultId` в low-level дереве `GET /api/testcase/{id}/step`.
+- Не пытайся полагаться только на `PATCH /api/testcase/step/{stepId}?withExpectedResult=true`: на этом инстансе он обновляет `body` шага, но не materialize-ит UI-visible expected result.
+- Если нужно, чтобы expected result гарантированно появился в UI, создай или обнови дочерний step под `expectedResultId`.
 - После обновления `/api/testcase/{id}/scenario` перепроверяй, не потерялся ли текст шагов в `/api/testcase/{id}/step`. Если потерялся, синхронизируй `body` корневых шагов из `name` UI-сценария.
 - После любых изменений сценария перепроверяй `GET /api/testcase/{id}/overview` и убеждайся, что `scenario.steps[].expectedResult` заполнен.
 - Перед patch test case по умолчанию сначала читай текущий объект и меняй только те поля, которые пользователь явно запросил изменить.

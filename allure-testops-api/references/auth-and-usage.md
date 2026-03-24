@@ -66,6 +66,7 @@ scripts/allure_testops_api.sh testcase-set-status 1811 -2 -1
 5. Для сценария считай обязательным правило: у каждого шага должен быть ожидаемый результат шага.
 6. Для manual scenario используй UI-модель `POST /api/testcase/{id}/scenario`, а не только low-level step API.
 7. После записи UI-модели перепроверяй low-level дерево `/api/testcase/{id}/step`, чтобы не потерять текст шагов.
+8. Если expected result должен быть виден именно в UI-редакторе шагов, записывай его как дочерний step под `expectedResultId`, а не только как `expectedResult` field в `overview` или `scenario`.
 
 ## Практика изменения test case
 
@@ -105,13 +106,36 @@ scripts/allure_testops_api.sh testcase-scenario-get 1811
 scripts/allure_testops_api.sh testcase-step-tree 1811
 ```
 
+Для записи expected result шага в том формате, который реально использует UI:
+
+```bash
+scripts/allure_testops_api.sh testcase-set-step-expected-result 1811 0 "Карточка демонстрационного тест-кейса открыта."
+scripts/allure_testops_api.sh testcase-set-step-expected-result 1811 1 "Обязательные поля и шаги сценария заполнены."
+```
+
 Для согласованной записи сценария в обе модели:
 
 ```bash
 scripts/allure_testops_api.sh testcase-sync-scenario 1811 /tmp/scenario.json
 ```
 
+Практический порядок для manual scenario, если нужно, чтобы UI показывал шаг и ожидаемый результат:
+
+1. Запиши или обнови UI-модель:
+
+```bash
+scripts/allure_testops_api.sh testcase-sync-scenario 1811 /tmp/scenario.json
+```
+
+2. Для каждого шага отдельно положи UI-visible expected result:
+
+```bash
+scripts/allure_testops_api.sh testcase-set-step-expected-result 1811 0 "Карточка демонстрационного тест-кейса открыта."
+scripts/allure_testops_api.sh testcase-set-step-expected-result 1811 1 "Обязательные поля и шаги сценария заполнены."
+```
+
 ## Важные замечания
 
 - Срок жизни Bearer JWT ограничен конфигурацией инстанса.
+- На этом инстансе UI ожидает, что expected result будет дочерним step внутри контейнера `expectedResultId`. Просто заполнить `overview.scenario.steps[].expectedResult` недостаточно.
 - Raw upload тестовых результатов не считается стабильным публичным workflow; по умолчанию предпочитай `allurectl` или официальные CI plugins.

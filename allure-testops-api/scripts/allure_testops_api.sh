@@ -115,6 +115,89 @@ testcase_step_tree() {
   api_call GET "/api/testcase/$1/step"
 }
 
+testcase_set_step_expected_result() {
+  if [[ $# -ne 3 ]]; then
+    echo "Usage: $0 testcase-set-step-expected-result TESTCASE_ID STEP_INDEX EXPECTED_RESULT_TEXT" >&2
+    exit 2
+  fi
+
+  local testcase_id="$1"
+  local step_index="$2"
+  local expected_text="$3"
+  local step_tree_json
+  local root_step_id
+  local expected_result_id
+  local expected_children
+  local old_child_id
+  local payload
+
+  step_tree_json="$(api_call GET "/api/testcase/${testcase_id}/step")"
+
+  root_step_id="$(printf '%s' "${step_tree_json}" | python3 -c '
+import json, sys
+obj = json.load(sys.stdin)
+index = int(sys.argv[1])
+children = obj["root"]["children"]
+if index < 0 or index >= len(children):
+    raise SystemExit(f"Step index {index} is out of range")
+print(children[index])
+' "${step_index}")"
+
+  expected_result_id="$(printf '%s' "${step_tree_json}" | python3 -c '
+import json, sys
+obj = json.load(sys.stdin)
+step_id = sys.argv[1]
+step = obj["scenarioSteps"][step_id]
+expected_id = step.get("expectedResultId")
+if not expected_id:
+    raise SystemExit(f"Root step {step_id} has no expectedResultId")
+print(expected_id)
+' "${root_step_id}")"
+
+  expected_children="$(printf '%s' "${step_tree_json}" | python3 -c '
+import json, sys
+obj = json.load(sys.stdin)
+step_id = sys.argv[1]
+for child_id in obj["scenarioSteps"].get(step_id, {}).get("children", []) or []:
+    print(child_id)
+' "${expected_result_id}")"
+
+  if [[ -n "${expected_children}" ]]; then
+    while IFS= read -r old_child_id; do
+      [[ -z "${old_child_id}" ]] && continue
+      api_call DELETE "/api/testcase/step/${old_child_id}" >/dev/null
+    done <<< "${expected_children}"
+  fi
+
+  payload="$(python3 - "${expected_result_id}" "${testcase_id}" "${expected_text}" <<'PY'
+import json, sys
+parent_id = int(sys.argv[1])
+testcase_id = int(sys.argv[2])
+text = sys.argv[3]
+print(json.dumps({
+    "bodyJson": {
+        "type": "doc",
+        "content": [
+            {
+                "type": "paragraph",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": text,
+                    }
+                ],
+            }
+        ],
+    },
+    "parentId": parent_id,
+    "testCaseId": testcase_id,
+}, ensure_ascii=False))
+PY
+)"
+
+  api_call POST "/api/testcase/step" "?withExpectedResult=false" "${payload}"
+}
+
 normalize_scenario_file() {
   local file_path="$1"
   python3 - "$file_path" <<'PY'
@@ -234,6 +317,10 @@ case "${1:-}" in
     shift
     testcase_sync_scenario "$@"
     ;;
+  testcase-set-step-expected-result)
+    shift
+    testcase_set_step_expected_result "$@"
+    ;;
   GET|POST|PUT|PATCH|DELETE)
     api_call "$@"
     ;;
@@ -248,6 +335,7 @@ case "${1:-}" in
     echo "  $0 testcase-scenario-get TESTCASE_ID" >&2
     echo "  $0 testcase-step-tree TESTCASE_ID" >&2
     echo "  $0 testcase-sync-scenario TESTCASE_ID SCENARIO_JSON_FILE" >&2
+    echo "  $0 testcase-set-step-expected-result TESTCASE_ID STEP_INDEX EXPECTED_RESULT_TEXT" >&2
     echo "  $0 METHOD PATH [QUERY] [JSON_BODY]" >&2
     exit 2
     ;;
