@@ -63,7 +63,9 @@ scripts/allure_testops_api.sh testcase-set-status 1811 -2 -1
    - `scenario`
    - `expectedResult`
 
-5. Для сценария считай обязательным правило: у каждого шага должен быть ожидаемый результат шага. Если API-форма не позволяет задать его в одном запросе на создание шага, делай дополнительный `PATCH` шага и закрывай операцию только после этого.
+5. Для сценария считай обязательным правило: у каждого шага должен быть ожидаемый результат шага.
+6. Для manual scenario используй UI-модель `POST /api/testcase/{id}/scenario`, а не только low-level step API.
+7. После записи UI-модели перепроверяй low-level дерево `/api/testcase/{id}/step`, чтобы не потерять текст шагов.
 
 ## Практика изменения test case
 
@@ -88,6 +90,26 @@ scripts/allure_testops_api.sh PATCH /api/testcase/1811 '' '{"statusId":-2,"workf
 2. Сохранить обязательные поля.
 3. Изменить только нужные поля.
 4. Проверить итоговый объект повторным `GET`.
+
+## Практика работы со сценарием
+
+Для чтения UI-сценария:
+
+```bash
+scripts/allure_testops_api.sh testcase-scenario-get 1811
+```
+
+Для чтения low-level дерева шагов:
+
+```bash
+scripts/allure_testops_api.sh testcase-step-tree 1811
+```
+
+Для согласованной записи сценария в обе модели:
+
+```bash
+scripts/allure_testops_api.sh testcase-sync-scenario 1811 /tmp/scenario.json
+```
 
 ## Важные замечания
 
