@@ -78,6 +78,7 @@ Every SKILL.md consists of:
 
 - **Frontmatter** (YAML): Contains `name` and `description` fields. These are the only fields that Codex reads to determine when the skill gets used, thus it is very important to be clear and comprehensive in describing what the skill is, and when it should be used.
 - **Body** (Markdown): Instructions and guidance for using the skill. Only loaded AFTER the skill triggers (if at all).
+- By local default, write the entire skill in Russian unless the user explicitly requests another language. This applies to `description`, the Markdown body, bundled references, bundled comments meant for humans, and user-facing metadata in `agents/openai.yaml`.
 
 #### Agents metadata (recommended)
 
@@ -87,6 +88,7 @@ Every SKILL.md consists of:
 - Generate deterministically by passing the values as `--interface key=value` to `scripts/generate_openai_yaml.py` or `scripts/init_skill.py`
 - On updates: validate `agents/openai.yaml` still matches SKILL.md; regenerate if stale
 - Only include other optional interface fields (icons, brand color) if explicitly provided
+- By local default, keep `display_name`, `short_description`, and `default_prompt` in Russian together with the rest of the skill
 - See references/openai_yaml.md for field definitions and examples
 
 #### Bundled Resources (optional)
@@ -364,6 +366,7 @@ Write the YAML frontmatter with `name` and `description`:
 
 - `name`: The skill name
 - `description`: This is the primary triggering mechanism for your skill, and helps Codex understand when to use the skill.
+- By local default, write `description` in Russian and keep it natural enough that another Russian-language Codex instance can route to the skill without translation.
   - Include both what the Skill does and specific triggers/contexts for when to use it.
   - Include all "when to use" information here - Not in the body. The body is only loaded after triggering, so "When to Use This Skill" sections in the body are not helpful to Codex.
   - Example description for a `docx` skill: "Comprehensive document creation, editing, and analysis with support for tracked changes, comments, formatting preservation, and text extraction. Use when Codex needs to work with professional documents (.docx files) for: (1) Creating new documents, (2) Modifying or editing content, (3) Working with tracked changes, (4) Adding comments, or any other document tasks"
