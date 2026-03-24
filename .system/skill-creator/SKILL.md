@@ -1,29 +1,29 @@
 ---
 name: skill-creator
-description: Guide for creating effective skills. This skill should be used when users want to create a new skill (or update an existing skill) that extends Codex's capabilities with specialized knowledge, workflows, or tool integrations.
+description: Руководство по созданию эффективных skill-ов. Использовать, когда пользователь хочет создать новый skill или обновить существующий skill, который расширяет возможности Codex за счет специализированных знаний, workflow или tool integrations.
 metadata:
-  short-description: Create or update a skill
+  short-description: Создание или обновление skill-а
 ---
 
-# Skill Creator
+# Создание Skill-ов
 
-This skill provides guidance for creating effective skills.
+Этот skill задает правила и практики для создания эффективных skill-ов.
 
-## About Skills
+## О Skill-ах
 
-Skills are modular, self-contained folders that extend Codex's capabilities by providing
-specialized knowledge, workflows, and tools. Think of them as "onboarding guides" for specific
-domains or tasks—they transform Codex from a general-purpose agent into a specialized agent
-equipped with procedural knowledge that no model can fully possess.
+Skill-ы это модульные самодостаточные папки, которые расширяют возможности Codex за счет
+специализированных знаний, workflow и инструментов. Воспринимай их как "onboarding guides"
+для конкретных доменов или задач: они превращают Codex из универсального агента в
+специализированного агента с процедурными знаниями, которые невозможно целиком держать в модели.
 
-### What Skills Provide
+### Что дают Skill-ы
 
-1. Specialized workflows - Multi-step procedures for specific domains
-2. Tool integrations - Instructions for working with specific file formats or APIs
-3. Domain expertise - Company-specific knowledge, schemas, business logic
-4. Bundled resources - Scripts, references, and assets for complex and repetitive tasks
+1. Specialized workflows - многошаговые процедуры для конкретных доменов
+2. Tool integrations - инструкции по работе с определенными форматами файлов и API
+3. Domain expertise - знания о компании, схемах данных и бизнес-логике
+4. Bundled resources - scripts, references и assets для сложных и повторяемых задач
 
-## Core Principles
+## Базовые принципы
 
 ### Concise is Key
 

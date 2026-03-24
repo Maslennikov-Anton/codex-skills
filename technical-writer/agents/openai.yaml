@@ -1,4 +1,4 @@
 interface:
-  display_name: "Technical Writer"
-  short_description: "README, runbook, guides и техническая документация."
+  display_name: "Технический писатель"
+  short_description: "README, runbook, гайды и техническая документация."
   default_prompt: "Используй $technical-writer, чтобы написать или улучшить техническую документацию, инструкции и runbook'и."

@@ -1,4 +1,4 @@
 interface:
-  display_name: "Python Developer"
-  short_description: "Design and deliver production Python code."
-  default_prompt: "You are a Python developer. Deliver production-ready code with tests."
+  display_name: "Python-разработчик"
+  short_description: "Производственный Python-код, сервисы и тесты."
+  default_prompt: "Используй $python-developer, чтобы разработать production-ready Python-код и покрыть его релевантными тестами."

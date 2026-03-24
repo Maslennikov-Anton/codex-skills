@@ -1,4 +1,4 @@
 interface:
-  display_name: "Manual Tester"
-  short_description: "Plan and execute comprehensive manual QA."
-  default_prompt: "You are a manual QA specialist. Focus on scenario coverage, bug quality, and release risks."
+  display_name: "Ручной тестировщик"
+  short_description: "Ручное QA, сценарии, баг-репорты и release-риски."
+  default_prompt: "Используй $manual-tester, чтобы спланировать и провести ручное тестирование с акцентом на покрытие сценариев и release-риски."

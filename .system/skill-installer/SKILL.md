@@ -1,37 +1,37 @@
 ---
 name: skill-installer
-description: Install Codex skills into $CODEX_HOME/skills from a curated list or a GitHub repo path. Use when a user asks to list installable skills, install a curated skill, or install a skill from another repo (including private repos).
+description: Устанавливать Codex skills в `$CODEX_HOME/skills` из curated-списка или по пути в GitHub-репозитории. Использовать, когда пользователь просит показать доступные skill-ы, установить skill из curated-списка или поставить skill из другого репозитория, включая private repo.
 metadata:
-  short-description: Install curated skills from openai/skills or other repos
+  short-description: Установка curated skill-ов из openai/skills и других репозиториев
 ---
 
-# Skill Installer
+# Установка Skill-ов
 
-Helps install skills. By default these are from https://github.com/openai/skills/tree/main/skills/.curated, but users can also provide other locations. Experimental skills live in https://github.com/openai/skills/tree/main/skills/.experimental and can be installed the same way.
+Помогает устанавливать skill-ы. По умолчанию речь идет о https://github.com/openai/skills/tree/main/skills/.curated, но пользователь может указать и другие источники. Экспериментальные skill-ы лежат в https://github.com/openai/skills/tree/main/skills/.experimental и ставятся аналогично.
 
-Use the helper scripts based on the task:
-- List skills when the user asks what is available, or if the user uses this skill without specifying what to do. Default listing is `.curated`, but you can pass `--path skills/.experimental` when they ask about experimental skills.
-- Install from the curated list when the user provides a skill name.
-- Install from another repo when the user provides a GitHub repo/path (including private repos).
+Используй helper scripts в зависимости от задачи:
+- Показывай список skill-ов, когда пользователь спрашивает, что доступно, или вызывает этот skill без конкретного действия. По умолчанию показывай `.curated`, а для экспериментальных skill-ов используй `--path skills/.experimental`.
+- Устанавливай из curated-списка, когда пользователь дал имя skill-а.
+- Устанавливай из другого репозитория, когда пользователь передал путь или repo в GitHub, включая private repo.
 
-Install skills with the helper scripts.
+Устанавливай skill-ы через helper scripts.
 
-## Communication
+## Коммуникация
 
-When listing skills, output approximately as follows, depending on the context of the user's request. If they ask about experimental skills, list from `.experimental` instead of `.curated` and label the source accordingly:
+Когда показываешь список skill-ов, форматируй ответ примерно так. Если пользователь спрашивает про экспериментальные skill-ы, показывай `.experimental` вместо `.curated` и явно помечай источник:
 """
-Skills from {repo}:
+Skills из {repo}:
 1. skill-1
-2. skill-2 (already installed)
+2. skill-2 (уже установлен)
 3. ...
-Which ones would you like installed?
+Какие из них установить?
 """
 
-After installing a skill, tell the user: "Restart Codex to pick up new skills."
+После установки skill-а сообщай пользователю: "Перезапусти Codex, чтобы он подхватил новые skill-ы."
 
-## Scripts
+## Скрипты
 
-All of these scripts use network, so when running in the sandbox, request escalation when running them.
+Все эти скрипты используют сеть, поэтому при запуске в sandbox запрашивай escalation.
 
 - `scripts/list-skills.py` (prints skills list with installed annotations)
 - `scripts/list-skills.py --format json`
@@ -40,19 +40,19 @@ All of these scripts use network, so when running in the sandbox, request escala
 - `scripts/install-skill-from-github.py --url https://github.com/<owner>/<repo>/tree/<ref>/<path>`
 - Example (experimental skill): `scripts/install-skill-from-github.py --repo openai/skills --path skills/.experimental/<skill-name>`
 
-## Behavior and Options
+## Поведение и опции
 
-- Defaults to direct download for public GitHub repos.
-- If download fails with auth/permission errors, falls back to git sparse checkout.
-- Aborts if the destination skill directory already exists.
-- Installs into `$CODEX_HOME/skills/<skill-name>` (defaults to `~/.codex/skills`).
-- Multiple `--path` values install multiple skills in one run, each named from the path basename unless `--name` is supplied.
-- Options: `--ref <ref>` (default `main`), `--dest <path>`, `--method auto|download|git`.
+- Для публичных GitHub repo по умолчанию использует прямую загрузку.
+- Если загрузка падает из-за auth/permission errors, переключается на git sparse checkout.
+- Прерывается, если целевая директория skill-а уже существует.
+- Устанавливает в `$CODEX_HOME/skills/<skill-name>`; по умолчанию это `~/.codex/skills`.
+- Несколько значений `--path` позволяют установить несколько skill-ов за один запуск; имя берется из basename пути, если не передан `--name`.
+- Опции: `--ref <ref>` (по умолчанию `main`), `--dest <path>`, `--method auto|download|git`.
 
-## Notes
+## Заметки
 
-- Curated listing is fetched from `https://github.com/openai/skills/tree/main/skills/.curated` via the GitHub API. If it is unavailable, explain the error and exit.
-- Private GitHub repos can be accessed via existing git credentials or optional `GITHUB_TOKEN`/`GH_TOKEN` for download.
-- Git fallback tries HTTPS first, then SSH.
-- The skills at https://github.com/openai/skills/tree/main/skills/.system are preinstalled, so no need to help users install those. If they ask, just explain this. If they insist, you can download and overwrite.
-- Installed annotations come from `$CODEX_HOME/skills`.
+- Curated-список подтягивается через GitHub API из `https://github.com/openai/skills/tree/main/skills/.curated`. Если он недоступен, объясни ошибку и остановись.
+- Для private GitHub repo можно использовать существующие git credentials или опциональные `GITHUB_TOKEN`/`GH_TOKEN`.
+- Git fallback сначала пробует HTTPS, затем SSH.
+- Skill-ы из https://github.com/openai/skills/tree/main/skills/.system уже предустановлены, поэтому обычно не нужно помогать пользователю ставить их отдельно. Если пользователь настаивает, можно скачать и перезаписать.
+- Пометки об уже установленных skill-ах берутся из `$CODEX_HOME/skills`.

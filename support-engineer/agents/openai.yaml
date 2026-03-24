@@ -1,4 +1,4 @@
 interface:
-  display_name: "Support Engineer"
+  display_name: "Инженер поддержки"
   short_description: "Инциденты, воспроизведение проблем и эксплуатационное сопровождение."
   default_prompt: "Используй $support-engineer, чтобы локализовать проблему, собрать evidence и подготовить корректную эскалацию или workaround."

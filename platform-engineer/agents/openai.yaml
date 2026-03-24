@@ -1,4 +1,4 @@
 interface:
-  display_name: "Platform Engineer"
-  short_description: "Внутренняя платформа, DX и reusable capabilities."
-  default_prompt: "Используй $platform-engineer, чтобы улучшить внутреннюю платформу, developer experience и reusable инженерные capabilities."
+  display_name: "Платформенный инженер"
+  short_description: "Внутренняя платформа, DX и переиспользуемые capabilities."
+  default_prompt: "Используй $platform-engineer, чтобы улучшить внутреннюю платформу, developer experience и переиспользуемые инженерные capabilities."

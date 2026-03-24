@@ -1,20 +1,21 @@
 ---
 name: create-agent-adapter
 description: >
-  Technical guide for creating a new Paperclip agent adapter. Use when building
-  a new adapter package, adding support for a new AI coding tool (e.g. a new
-  CLI agent, API-based agent, or custom process), or when modifying the adapter
-  system. Covers the required interfaces, module structure, registration points,
-  and conventions derived from the existing claude-local and codex-local adapters.
+  Техническое руководство по созданию нового Paperclip agent adapter. Использовать,
+  когда нужно собрать новый пакет адаптера, добавить поддержку нового AI coding tool
+  например CLI-агента, API-based agent или custom process, либо изменить саму
+  adapter system. Покрывает обязательные интерфейсы, структуру модулей,
+  точки регистрации и соглашения, выведенные из существующих адаптеров
+  claude-local и codex-local.
 ---
 
-# Creating a Paperclip Agent Adapter
+# Создание Agent Adapter для Paperclip
 
-An adapter bridges Paperclip's orchestration layer to a specific AI agent runtime (Claude Code, Codex CLI, a custom process, an HTTP endpoint, etc.). Each adapter is a self-contained package that provides implementations for **three consumers**: the server, the UI, and the CLI.
+Adapter связывает orchestration layer в Paperclip с конкретным runtime AI-агента: Claude Code, Codex CLI, custom process, HTTP endpoint и так далее. Каждый adapter это самодостаточный пакет, который дает реализации для **трех consumers**: server, UI и CLI.
 
 ---
 
-## 1. Architecture Overview
+## 1. Обзор архитектуры
 
 ```
 packages/adapters/<name>/
@@ -35,7 +36,7 @@ packages/adapters/<name>/
   tsconfig.json
 ```
 
-Three separate registries consume adapter modules:
+Модули адаптера подключаются тремя отдельными registry:
 
 | Registry | Location | Interface |
 |----------|----------|-----------|
@@ -45,11 +46,11 @@ Three separate registries consume adapter modules:
 
 ---
 
-## 2. Shared Types (`@paperclipai/adapter-utils`)
+## 2. Общие типы (`@paperclipai/adapter-utils`)
 
-All adapter interfaces live in `packages/adapter-utils/src/types.ts`. Import from `@paperclipai/adapter-utils` (types) or `@paperclipai/adapter-utils/server-utils` (runtime helpers).
+Все интерфейсы адаптера живут в `packages/adapter-utils/src/types.ts`. Импортируй их из `@paperclipai/adapter-utils` для типов или из `@paperclipai/adapter-utils/server-utils` для runtime-helpers.
 
-### Core Interfaces
+### Базовые интерфейсы
 
 ```ts
 // The execute function signature — every adapter must implement this

@@ -1,6 +1,6 @@
 interface:
-  display_name: "Skill Creator"
-  short_description: "Create or update a skill"
+  display_name: "Создание Skill"
+  short_description: "Создание и обновление skill-ов"
   icon_small: "./assets/skill-creator-small.svg"
   icon_large: "./assets/skill-creator.png"
-  default_prompt: "Use $skill-creator to create or update a Codex skill with the right structure and validation."
+  default_prompt: "Используй $skill-creator, чтобы создать или обновить skill для Codex с корректной структурой и проверкой."

@@ -1,4 +1,4 @@
 interface:
-  display_name: "Data Analyst"
+  display_name: "Дата-аналитик"
   short_description: "Метрики продукта, анализ поведения и выводы по данным."
   default_prompt: "Используй $data-analyst, чтобы проанализировать метрики, пользовательское поведение и эффект изменений по данным."

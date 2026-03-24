@@ -1,4 +1,4 @@
 interface:
-  display_name: "Database Engineer"
+  display_name: "Инженер БД"
   short_description: "Схемы БД, миграции и SQL-производительность."
   default_prompt: "Используй $database-engineer, чтобы спроектировать схему БД, миграции, ограничения и оптимизацию SQL-доступа."

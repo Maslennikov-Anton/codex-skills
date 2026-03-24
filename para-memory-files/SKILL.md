@@ -1,27 +1,28 @@
 ---
 name: para-memory-files
 description: >
-  File-based memory system using Tiago Forte's PARA method. Use this skill whenever
-  you need to store, retrieve, update, or organize knowledge across sessions. Covers
-  three memory layers: (1) Knowledge graph in PARA folders with atomic YAML facts,
-  (2) Daily notes as raw timeline, (3) Tacit knowledge about user patterns. Also
-  handles planning files, memory decay, weekly synthesis, and recall via qmd.
-  Trigger on any memory operation: saving facts, writing daily notes, creating
-  entities, running weekly synthesis, recalling past context, or managing plans.
+  Файловая система памяти по методу PARA Тьяго Форте. Использовать этот skill
+  всегда, когда нужно сохранять, извлекать, обновлять или организовывать знания
+  между сессиями. Покрывает три слоя памяти: (1) knowledge graph в PARA-папках
+  с атомарными YAML-фактами, (2) daily notes как сырая временная шкала,
+  (3) tacit knowledge о пользовательских паттернах. Также покрывает planning
+  files, memory decay, weekly synthesis и recall через qmd. Триггерится на любой
+  memory operation: сохранение фактов, ведение daily notes, создание entities,
+  weekly synthesis, recall прошлого контекста и управление планами.
 ---
 
-# PARA Memory Files
+# Файловая PARA-память
 
-Persistent, file-based memory organized by Tiago Forte's PARA method. Three layers: a knowledge graph, daily notes, and tacit knowledge. All paths are relative to `$AGENT_HOME`.
+Постоянная файловая память, организованная по методу PARA Тьяго Форте. Три слоя: knowledge graph, daily notes и tacit knowledge. Все пути заданы относительно `$AGENT_HOME`.
 
-## Three Memory Layers
+## Три слоя памяти
 
-### Layer 1: Knowledge Graph (`$AGENT_HOME/life/` -- PARA)
+### Слой 1: Knowledge Graph (`$AGENT_HOME/life/` -- PARA)
 
-Entity-based storage. Each entity gets a folder with two tiers:
+Хранилище на основе сущностей. Для каждой entity создается папка с двумя уровнями:
 
-1. `summary.md` -- quick context, load first.
-2. `items.yaml` -- atomic facts, load on demand.
+1. `summary.md` -- быстрый контекст, читать в первую очередь.
+2. `items.yaml` -- атомарные факты, читать по мере необходимости.
 
 ```text
 $AGENT_HOME/life/
@@ -38,56 +39,56 @@ $AGENT_HOME/life/
   index.md
 ```
 
-**PARA rules:**
+**Правила PARA:**
 
-- **Projects** -- active work with a goal or deadline. Move to archives when complete.
-- **Areas** -- ongoing (people, companies, responsibilities). No end date.
-- **Resources** -- reference material, topics of interest.
-- **Archives** -- inactive items from any category.
+- **Projects** -- активная работа с целью или дедлайном. После завершения переносить в archives.
+- **Areas** -- постоянные области ответственности: люди, компании, обязанности. Без даты окончания.
+- **Resources** -- справочные материалы и интересующие темы.
+- **Archives** -- неактивные элементы из любой категории.
 
-**Fact rules:**
+**Правила фактов:**
 
-- Save durable facts immediately to `items.yaml`.
-- Weekly: rewrite `summary.md` from active facts.
-- Never delete facts. Supersede instead (`status: superseded`, add `superseded_by`).
-- When an entity goes inactive, move its folder to `$AGENT_HOME/life/archives/`.
+- Устойчивые факты сразу сохраняй в `items.yaml`.
+- Раз в неделю переписывай `summary.md` на основе активных фактов.
+- Никогда не удаляй факты. Вместо этого помечай их как superseded (`status: superseded`, добавляй `superseded_by`).
+- Когда entity перестает быть активной, переносить ее папку в `$AGENT_HOME/life/archives/`.
 
-**When to create an entity:**
+**Когда создавать entity:**
 
-- Mentioned 3+ times, OR
-- Direct relationship to the user (family, coworker, partner, client), OR
-- Significant project or company in the user's life.
-- Otherwise, note it in daily notes.
+- Сущность упоминалась 3+ раза, ИЛИ
+- Она напрямую связана с пользователем: семья, коллега, партнер, клиент, ИЛИ
+- Это значимый проект или компания в жизни пользователя.
+- В остальных случаях просто зафиксируй это в daily notes.
 
-For the atomic fact YAML schema and memory decay rules, see [references/schemas.md](references/schemas.md).
+Схему атомарных YAML-фактов и правила memory decay смотри в [references/schemas.md](references/schemas.md).
 
-### Layer 2: Daily Notes (`$AGENT_HOME/memory/YYYY-MM-DD.md`)
+### Слой 2: Daily Notes (`$AGENT_HOME/memory/YYYY-MM-DD.md`)
 
-Raw timeline of events -- the "when" layer.
+Сырая временная шкала событий -- слой "когда".
 
-- Write continuously during conversations.
-- Extract durable facts to Layer 1 during heartbeats.
+- Пиши туда по ходу разговоров.
+- Во время heartbeats выноси устойчивые факты в Layer 1.
 
-### Layer 3: Tacit Knowledge (`$AGENT_HOME/MEMORY.md`)
+### Слой 3: Tacit Knowledge (`$AGENT_HOME/MEMORY.md`)
 
-How the user operates -- patterns, preferences, lessons learned.
+Как пользователь действует -- паттерны, предпочтения, извлеченные уроки.
 
-- Not facts about the world; facts about the user.
-- Update whenever you learn new operating patterns.
+- Это не факты о мире, а факты о пользователе.
+- Обновляй слой всякий раз, когда узнаешь новые operating patterns.
 
-## Write It Down -- No Mental Notes
+## Записывай, а не держи в голове
 
-Memory does not survive session restarts. Files do.
+Память не переживает перезапуск сессии. Файлы переживают.
 
-- Want to remember something -> WRITE IT TO A FILE.
-- "Remember this" -> update `$AGENT_HOME/memory/YYYY-MM-DD.md` or the relevant entity file.
-- Learn a lesson -> update AGENTS.md, TOOLS.md, or the relevant skill file.
-- Make a mistake -> document it so future-you does not repeat it.
-- On-disk text files are always better than holding it in temporary context.
+- Хочешь что-то запомнить -> ЗАПИШИ ЭТО В ФАЙЛ.
+- "Запомни это" -> обнови `$AGENT_HOME/memory/YYYY-MM-DD.md` или нужный entity-файл.
+- Извлек урок -> обнови `AGENTS.md`, `TOOLS.md` или релевантный skill-файл.
+- Ошибся -> задокументируй, чтобы future-you не повторил это.
+- Текстовые файлы на диске всегда лучше, чем временный контекст в голове.
 
-## Memory Recall -- Use qmd
+## Вспоминание памяти -- через qmd
 
-Use `qmd` rather than grepping files:
+Используй `qmd`, а не обычный grep по файлам:
 
 ```bash
 qmd query "what happened at Christmas"   # Semantic search with reranking
@@ -95,10 +96,10 @@ qmd search "specific phrase"              # BM25 keyword search
 qmd vsearch "conceptual question"         # Pure vector similarity
 ```
 
-Index your personal folder: `qmd index $AGENT_HOME`
+Индексируй свою папку памяти командой `qmd index $AGENT_HOME`
 
-Vectors + BM25 + reranking finds things even when the wording differs.
+Вектора + BM25 + reranking помогают находить вещи даже при другой формулировке.
 
-## Planning
+## Планирование
 
-Keep plans in timestamped files in `plans/` at the project root (outside personal memory so other agents can access them). Use `qmd` to search plans. Plans go stale -- if a newer plan exists, do not confuse yourself with an older version. If you notice staleness, update the file to note what it is supersededBy.
+Храни планы в timestamped-файлах в `plans/` в корне проекта, вне personal memory, чтобы к ним могли обращаться и другие агенты. Для поиска по планам используй `qmd`. Планы устаревают: если существует более новый план, не путай его со старой версией. Если заметил устаревание, обнови файл и укажи, чем он superseded.
