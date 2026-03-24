@@ -37,10 +37,11 @@ description: >
 6. Перед записью всегда получай текущий объект, а для операций со статусом test case дополнительно получай его workflow и список допустимых статусов этого workflow.
 7. При создании или изменении test case считай обязательными для заполнения поля: `description`, `precondition`, `scenario`, `expectedResult`.
 8. Для сценария test case считай обязательным правило: у каждого шага должен быть явно прописан ожидаемый результат шага. Не оставляй шаги без expected result.
-9. Для manual scenario в Allure 5.23.0 используй как источник истины UI-модель `POST /api/testcase/{id}/scenario` с шагами `name + expectedResult`.
-10. Если после обновления UI-модели текст шагов в редакторе или low-level дереве пустеет, синхронизируй low-level model через `GET /api/testcase/{id}/step` и `PATCH /api/testcase/step/{stepId}`.
-11. Для повторяемых операций со сценарием предпочитай helper-команду `testcase-sync-scenario`, потому что она обновляет обе модели согласованно.
-12. Для загрузки результатов не придумывай raw upload flow самостоятельно; предпочитай `allurectl` или официальные CI plugins.
+9. Для manual scenario в Allure 5.23.0 используй как write-endpoint `POST /api/testcase/{id}/scenario`, но не считай `GET /api/testcase/{id}/scenario` единственным источником истины: этот endpoint deprecated.
+10. Для проверки того, что карточка test case действительно видит шаги и expected result, используй `GET /api/testcase/{id}/overview` и смотри `scenario.steps[].expectedResult`.
+11. Если после обновления UI-модели текст шагов в редакторе или low-level дереве пустеет, синхронизируй low-level model через `GET /api/testcase/{id}/step` и `PATCH /api/testcase/step/{stepId}`.
+12. Для повторяемых операций со сценарием предпочитай helper-команду `testcase-sync-scenario`, потому что она обновляет обе модели согласованно и после записи перепроверяет `overview`.
+13. Для загрузки результатов не придумывай raw upload flow самостоятельно; предпочитай `allurectl` или официальные CI plugins.
 
 ## Минимальный auth flow
 
@@ -56,6 +57,7 @@ scripts/allure_testops_api.sh auth
 scripts/allure_testops_api.sh GET /api/rs/project '?page=0&size=10'
 scripts/allure_testops_api.sh GET /api/rs/testcase '?projectId=3&page=0&size=10'
 scripts/allure_testops_api.sh testcase-get 1811
+scripts/allure_testops_api.sh testcase-overview-get 1811
 scripts/allure_testops_api.sh testcase-workflow 1811
 scripts/allure_testops_api.sh testcase-set-status 1811 -2 -1
 scripts/allure_testops_api.sh testcase-scenario-get 1811
@@ -78,7 +80,10 @@ scripts/allure_testops_api.sh testcase-sync-scenario 1811 /tmp/scenario.json
 - Перед изменением статуса test case сначала получай `workflow` кейса и допустимые статусы этого workflow, а потом выполняй `PATCH`.
 - Для create/update test case не допускай пустых `description`, `precondition`, `scenario` и `expectedResult`.
 - Для каждого шага сценария обеспечивай expected result этого шага.
-- Для Allure 5.23.0 не считай `/api/testcase/{id}/step` источником истины для manual scenario в UI. UI-сценарий живет в `/api/testcase/{id}/scenario`.
+- Для Allure 5.23.0 не считай `/api/testcase/{id}/step` источником истины для manual scenario в UI.
+- Для проверки фактического содержимого карточки test case предпочитай `/api/testcase/{id}/overview`, потому что он возвращает `scenario` так, как его собирает backend для UI.
+- `GET /api/testcase/{id}/scenario` deprecated и подходит только как вспомогательная проверка, но не как финальный критерий того, что UI увидит expected result.
 - После обновления `/api/testcase/{id}/scenario` перепроверяй, не потерялся ли текст шагов в `/api/testcase/{id}/step`. Если потерялся, синхронизируй `body` корневых шагов из `name` UI-сценария.
+- После любых изменений сценария перепроверяй `GET /api/testcase/{id}/overview` и убеждайся, что `scenario.steps[].expectedResult` заполнен.
 - Перед patch test case по умолчанию сначала читай текущий объект и меняй только те поля, которые пользователь явно запросил изменить.
 - Считай загрузку raw test results неподдерживаемой для hand-rolled интеграций, если пользователь явно не настаивает; по умолчанию предпочитай `allurectl`.

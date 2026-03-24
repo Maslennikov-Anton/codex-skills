@@ -70,6 +70,14 @@ testcase_get() {
   api_call GET "/api/testcase/$1"
 }
 
+testcase_overview_get() {
+  if [[ $# -ne 1 ]]; then
+    echo "Usage: $0 testcase-overview-get TESTCASE_ID" >&2
+    exit 2
+  fi
+  api_call GET "/api/testcase/$1/overview"
+}
+
 testcase_workflow() {
   if [[ $# -ne 1 ]]; then
     echo "Usage: $0 testcase-workflow TESTCASE_ID" >&2
@@ -188,7 +196,7 @@ PY
     api_call PATCH "/api/testcase/step/${step_id}" "" "${payload}" >/dev/null
   done
 
-  api_call GET "/api/testcase/${testcase_id}/scenario"
+  api_call GET "/api/testcase/${testcase_id}/overview"
 }
 
 case "${1:-}" in
@@ -201,6 +209,10 @@ case "${1:-}" in
   testcase-get)
     shift
     testcase_get "$@"
+    ;;
+  testcase-overview-get)
+    shift
+    testcase_overview_get "$@"
     ;;
   testcase-workflow)
     shift
@@ -230,6 +242,7 @@ case "${1:-}" in
     echo "  $0 auth" >&2
     echo "  $0 jwt" >&2
     echo "  $0 testcase-get TESTCASE_ID" >&2
+    echo "  $0 testcase-overview-get TESTCASE_ID" >&2
     echo "  $0 testcase-workflow TESTCASE_ID" >&2
     echo "  $0 testcase-set-status TESTCASE_ID STATUS_ID WORKFLOW_ID" >&2
     echo "  $0 testcase-scenario-get TESTCASE_ID" >&2
