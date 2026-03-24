@@ -6,13 +6,14 @@ description: "Use when the user asks how to build with OpenAI products or APIs a
 
 # OpenAI Docs
 
-Provide authoritative, current guidance from OpenAI developer docs using the developers.openai.com MCP server. Always prioritize the developer docs MCP tools over web.run for OpenAI-related questions. This skill may also load targeted files from `references/` for model-selection and GPT-5.4-specific requests, but current OpenAI docs remain authoritative. Only if the MCP server is installed and returns no meaningful results should you fall back to web search.
+Provide authoritative, current guidance from official OpenAI documentation. If OpenAI docs MCP tools are available in the environment, use them first. If they are not available, or they return no meaningful results, use targeted web search restricted to official OpenAI domains. This skill may also load targeted files from `references/` for model-selection and GPT-5.4-specific requests, but current OpenAI docs remain authoritative.
 
 ## Quick start
 
-- Use `mcp__openaiDeveloperDocs__search_openai_docs` to find the most relevant doc pages.
-- Use `mcp__openaiDeveloperDocs__fetch_openai_doc` to pull exact sections and quote/paraphrase accurately.
+- If OpenAI docs MCP tools are available, use `mcp__openaiDeveloperDocs__search_openai_docs` to find the most relevant doc pages.
+- If OpenAI docs MCP tools are available, use `mcp__openaiDeveloperDocs__fetch_openai_doc` to pull exact sections and quote/paraphrase accurately.
 - Use `mcp__openaiDeveloperDocs__list_openai_docs` only when you need to browse or discover pages without a clear query.
+- If MCP tools are unavailable, use targeted web search restricted to `developers.openai.com` and `platform.openai.com`.
 - Load only the relevant file from `references/` when the question is about model selection or a GPT-5.4 upgrade.
 
 ## OpenAI product snapshots
@@ -25,15 +26,20 @@ Provide authoritative, current guidance from OpenAI developer docs using the dev
 6. Realtime API: Build low-latency, multimodal experiences including natural speech-to-speech conversations.
 7. Agents SDK: A toolkit for building agentic apps where a model can use tools and context, hand off to other agents, stream partial results, and keep a full trace.
 
-## If MCP server is missing
+## Tool availability
 
-If MCP tools fail or no OpenAI docs resources are available:
+Choose the first branch that applies:
 
-1. Run the install command yourself: `codex mcp add openaiDeveloperDocs --url https://developers.openai.com/mcp`
-2. If it fails due to permissions/sandboxing, immediately retry the same command with escalated permissions and include a 1-sentence justification for approval. Do not ask the user to run it yet.
-3. Only if the escalated attempt fails, ask the user to run the install command.
+1. If OpenAI docs MCP tools are available, use them first.
+2. If MCP tools are unavailable in the current environment, go straight to restricted web search on official OpenAI domains.
+3. If MCP tools should exist but appear broken, use restricted web search for the current answer and only then consider repairing the MCP setup.
+
+If the explicit task is to install or repair the MCP server itself:
+
+1. Run `codex mcp add openaiDeveloperDocs --url https://developers.openai.com/mcp`.
+2. If it fails due to permissions or sandboxing, retry with escalated permissions and a short justification.
+3. Only if that still fails, ask the user to run the install command.
 4. Ask the user to restart Codex.
-5. Re-run the doc search/fetch after restart.
 
 ## Workflow
 
@@ -41,8 +47,10 @@ If MCP tools fail or no OpenAI docs resources are available:
 2. If it is a model-selection request, load `references/latest-model.md`.
 3. If it is an explicit GPT-5.4 upgrade request, load `references/upgrading-to-gpt-5p4.md`.
 4. If the upgrade may require prompt changes, or the workflow is research-heavy, tool-heavy, coding-oriented, multi-agent, or long-running, also load `references/gpt-5p4-prompting-guide.md`.
-5. Search docs with a precise query.
-6. Fetch the best page and the exact section needed (use `anchor` when possible).
+5. Retrieve current docs from the best available source:
+   - MCP fetch when MCP tools are available;
+   - otherwise restricted web search and direct page fetch on official OpenAI domains.
+6. Read only the exact section needed.
 7. For GPT-5.4 upgrade reviews, always make the per-usage-site output explicit: target model, starting reasoning recommendation, `phase` assessment when relevant, prompt blocks, and compatibility status.
 8. Answer with concise guidance and cite the doc source, using the reference files only as helper context.
 
@@ -64,6 +72,7 @@ Read only what you need:
 
 ## Tooling notes
 
-- Always use MCP doc tools before any web search for OpenAI-related questions.
-- If the MCP server is installed but returns no meaningful results, then use web search as a fallback.
-- When falling back to web search, restrict to official OpenAI domains (developers.openai.com, platform.openai.com) and cite sources.
+- Prefer MCP doc tools when they are actually available in the environment.
+- Do not block on MCP setup for an ordinary docs question if official web sources are available.
+- When using web search, restrict to official OpenAI domains (`developers.openai.com`, `platform.openai.com`) and cite sources.
+- Treat bundled `references/` files as convenience context only; re-verify volatile guidance against live official docs before answering.

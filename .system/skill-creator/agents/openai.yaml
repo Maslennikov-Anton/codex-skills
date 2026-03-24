@@ -3,3 +3,4 @@ interface:
   short_description: "Create or update a skill"
   icon_small: "./assets/skill-creator-small.svg"
   icon_large: "./assets/skill-creator.png"
+  default_prompt: "Use $skill-creator to create or update a Codex skill with the right structure and validation."
