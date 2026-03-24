@@ -9,7 +9,7 @@ import yaml
 
 MAX_SKILL_NAME_LENGTH = 64
 RESOURCE_LINK_RE = re.compile(
-    r"\b(?P<path>(?:references|scripts|assets)/[^)\s`]+)"
+    r"\b(?P<path>(?:references|scripts|assets)/[^)\s`\]]+)"
 )
 
 

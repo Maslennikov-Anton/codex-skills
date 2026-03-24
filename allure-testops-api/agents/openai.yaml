@@ -1,0 +1,4 @@
+interface:
+  display_name: "Allure TestOps API"
+  short_description: "HTTP API Allure TestOps, test case-ы и workflow статусов."
+  default_prompt: "Используй $allure-testops-api, чтобы аутентифицироваться в Allure TestOps, прочитать или изменить test case и корректно отработать workflow со статусами."
