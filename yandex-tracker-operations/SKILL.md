@@ -1,26 +1,24 @@
 ---
 name: yandex-tracker-operations
 description: >
-  Работать с Yandex Tracker end to end: аутентификация, очереди, поля, issues,
-  комментарии, вложения, transitions и API-вызовы. Использовать, когда
-  пользователю нужна операционная или инженерная работа с Yandex Tracker через
-  shell scripts, HTTP requests или автоматизацию. По умолчанию предпочитать
-  локальный helper script и повторяемые CLI/API workflows, а не разовые ручные
-  запросы.
+  Работать с Yandex Tracker end to end: очереди, поля, issue workflows,
+  комментарии, вложения, transitions, аутентификация и API-вызовы.
+  Использовать, когда пользователю нужна операционная или инженерная работа с
+  Yandex Tracker через shell scripts, HTTP requests или автоматизацию. По
+  умолчанию предпочитать локальный helper script и повторяемые operational
+  workflows, а не разовые ручные запросы.
 ---
 
 # Yandex Tracker Operations
 
-Используй этот skill, когда задача связана с Yandex Tracker как доменом, а не только с одним HTTP endpoint.
+Используй этот skill, когда задача связана с Yandex Tracker как доменом: очередями, issue workflows, transitions и операционной работой, а не только с одним HTTP endpoint.
 
 ## Что покрывает этот skill
 
-- Аутентификацию и проверку доступа.
-- Discovery очередей, полей и workflow.
-- Чтение, поиск, создание и обновление issues.
-- Комментарии, вложения и transitions.
+- Операционные сценарии вокруг очередей, issues и workflow.
+- Аутентификацию, проверку доступа и discovery полей.
+- Комментарии, вложения, transitions и повторяемые shell/API workflows.
 - Разбор типовых API errors и конфликтов данных.
-- Повторяемые shell/API workflows через локальный helper script.
 
 ## Предпочтительный toolchain
 
