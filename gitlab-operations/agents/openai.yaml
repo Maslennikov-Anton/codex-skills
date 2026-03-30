@@ -1,0 +1,4 @@
+interface:
+  display_name: "GitLab Operations"
+  short_description: "GitLab: repo, MR, pipeline, API и CI/CD."
+  default_prompt: "Используй $gitlab-operations, чтобы выполнить GitLab-задачу через preferred path: glab, glab api или, если нужно, прямой API."
