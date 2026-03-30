@@ -1,4 +1,4 @@
 interface:
   display_name: "Инженер автотестов"
-  short_description: "Надежная автоматизация тестирования и CI-интеграция."
-  default_prompt: "Используй $autotest-engineer, чтобы спроектировать и реализовать надежные автотесты и интеграцию с CI."
+  short_description: "Test architecture, надежные автотесты и CI/reporting."
+  default_prompt: "Используй $autotest-engineer, чтобы спроектировать test architecture, реализовать стабильные автотесты и встроить их в CI/reporting."

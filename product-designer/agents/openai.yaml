@@ -1,4 +1,4 @@
 interface:
   display_name: "Продуктовый дизайнер"
-  short_description: "User flow, UX-концепция и handoff."
-  default_prompt: "Используй $product-designer, чтобы проработать user flow, wireframes, UX-решения и handoff для реализации."
+  short_description: "User flow, UX-концепция и handoff до реализации."
+  default_prompt: "Используй $product-designer, чтобы проработать user flow, wireframes, UX-решения и handoff до реализации интерфейса."

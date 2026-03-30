@@ -1,4 +1,4 @@
 interface:
   display_name: "Frontend-инженер"
-  short_description: "Реализация UI, компоненты и API-интеграция."
-  default_prompt: "Используй $frontend-engineer, чтобы реализовать или изменить интерфейс, компонентную структуру и интеграцию с API."
+  short_description: "Код интерфейса, компоненты и API-интеграция."
+  default_prompt: "Используй $frontend-engineer, чтобы реализовать интерфейс в коде, собрать компонентную структуру и интеграцию с API."
