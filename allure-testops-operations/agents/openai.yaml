@@ -1,0 +1,4 @@
+interface:
+  display_name: "Allure TestOps Operations"
+  short_description: "Allure TestOps: allurectl, API, launch и test case."
+  default_prompt: "Используй $allure-testops-operations, чтобы выполнить задачу в Allure TestOps через preferred path: allurectl для upload flow или API для discovery и объектных операций."
