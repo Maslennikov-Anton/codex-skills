@@ -1,4 +1,4 @@
 interface:
-  display_name: "Architecture Decision Records"
+  display_name: "Архитектурные решения (ADR)"
   short_description: "ADR для фиксации архитектурных решений, вариантов и trade-offs."
   default_prompt: "Используй $architecture-decision-records, чтобы оформить значимое архитектурное решение в виде ADR с контекстом, вариантами, rationale и последствиями."
