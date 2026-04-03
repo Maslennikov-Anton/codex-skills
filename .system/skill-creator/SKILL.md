@@ -1,29 +1,29 @@
 ---
 name: skill-creator
-description: Руководство по созданию эффективных skill-ов. Использовать, когда пользователь хочет создать новый skill или обновить существующий skill, который расширяет возможности Codex за счет специализированных знаний, workflow или tool integrations.
+description: Guide for creating effective skills. This skill should be used when users want to create a new skill (or update an existing skill) that extends Codex's capabilities with specialized knowledge, workflows, or tool integrations.
 metadata:
-  short-description: Создание или обновление skill-а
+  short-description: Create or update a skill
 ---
 
-# Создание Skill-ов
+# Skill Creator
 
-Этот skill задает правила и практики для создания эффективных skill-ов.
+This skill provides guidance for creating effective skills.
 
-## О Skill-ах
+## About Skills
 
-Skill-ы это модульные самодостаточные папки, которые расширяют возможности Codex за счет
-специализированных знаний, workflow и инструментов. Воспринимай их как "onboarding guides"
-для конкретных доменов или задач: они превращают Codex из универсального агента в
-специализированного агента с процедурными знаниями, которые невозможно целиком держать в модели.
+Skills are modular, self-contained folders that extend Codex's capabilities by providing
+specialized knowledge, workflows, and tools. Think of them as "onboarding guides" for specific
+domains or tasks—they transform Codex from a general-purpose agent into a specialized agent
+equipped with procedural knowledge that no model can fully possess.
 
-### Что дают Skill-ы
+### What Skills Provide
 
-1. Specialized workflows - многошаговые процедуры для конкретных доменов
-2. Tool integrations - инструкции по работе с определенными форматами файлов и API
-3. Domain expertise - знания о компании, схемах данных и бизнес-логике
-4. Bundled resources - scripts, references и assets для сложных и повторяемых задач
+1. Specialized workflows - Multi-step procedures for specific domains
+2. Tool integrations - Instructions for working with specific file formats or APIs
+3. Domain expertise - Company-specific knowledge, schemas, business logic
+4. Bundled resources - Scripts, references, and assets for complex and repetitive tasks
 
-## Базовые принципы
+## Core Principles
 
 ### Concise is Key
 
@@ -78,7 +78,6 @@ Every SKILL.md consists of:
 
 - **Frontmatter** (YAML): Contains `name` and `description` fields. These are the only fields that Codex reads to determine when the skill gets used, thus it is very important to be clear and comprehensive in describing what the skill is, and when it should be used.
 - **Body** (Markdown): Instructions and guidance for using the skill. Only loaded AFTER the skill triggers (if at all).
-- By local default, write the entire skill in Russian unless the user explicitly requests another language. This applies to `description`, the Markdown body, bundled references, bundled comments meant for humans, and user-facing metadata in `agents/openai.yaml`.
 
 #### Agents metadata (recommended)
 
@@ -88,7 +87,6 @@ Every SKILL.md consists of:
 - Generate deterministically by passing the values as `--interface key=value` to `scripts/generate_openai_yaml.py` or `scripts/init_skill.py`
 - On updates: validate `agents/openai.yaml` still matches SKILL.md; regenerate if stale
 - Only include other optional interface fields (icons, brand color) if explicitly provided
-- By local default, keep `display_name`, `short_description`, and `default_prompt` in Russian together with the rest of the skill
 - See references/openai_yaml.md for field definitions and examples
 
 #### Bundled Resources (optional)
@@ -98,7 +96,7 @@ Every SKILL.md consists of:
 Executable code (Python/Bash/etc.) for tasks that require deterministic reliability or are repeatedly rewritten.
 
 - **When to include**: When the same code is being rewritten repeatedly or deterministic reliability is needed
-- **Example**: `tooling/rotate_pdf.py` for PDF rotation tasks
+- **Example**: `scripts/rotate_pdf.py` for PDF rotation tasks
 - **Benefits**: Token efficient, deterministic, may be executed without loading into context
 - **Note**: Scripts may still need to be read by Codex for patching or environment-specific adjustments
 
@@ -107,7 +105,7 @@ Executable code (Python/Bash/etc.) for tasks that require deterministic reliabil
 Documentation and reference material intended to be loaded as needed into context to inform Codex's process and thinking.
 
 - **When to include**: For documentation that Codex should reference while working
-- **Examples**: `docs/finance.md` for financial schemas, `docs/mnda.md` for company NDA template, `docs/policies.md` for company policies, `docs/api_docs.md` for API specifications
+- **Examples**: `references/finance.md` for financial schemas, `references/mnda.md` for company NDA template, `references/policies.md` for company policies, `references/api_docs.md` for API specifications
 - **Use cases**: Database schemas, API documentation, domain knowledge, company policies, detailed workflow guides
 - **Benefits**: Keeps SKILL.md lean, loaded only when Codex determines it's needed
 - **Best practice**: If files are large (>10k words), include grep search patterns in SKILL.md
@@ -118,7 +116,7 @@ Documentation and reference material intended to be loaded as needed into contex
 Files not intended to be loaded into context, but rather used within the output Codex produces.
 
 - **When to include**: When the skill needs files that will be used in the final output
-- **Examples**: `branding/logo.png` for brand assets, `templates/slides.pptx` for PowerPoint templates, `templates/frontend-template/` for HTML/React boilerplate, `branding/font.ttf` for typography
+- **Examples**: `assets/logo.png` for brand assets, `assets/slides.pptx` for PowerPoint templates, `assets/frontend-template/` for HTML/React boilerplate, `assets/font.ttf` for typography
 - **Use cases**: Templates, images, icons, boilerplate code, fonts, sample documents that get copied or modified
 - **Benefits**: Separates output resources from documentation, enables Codex to use files without loading them into context
 
@@ -271,17 +269,17 @@ To turn concrete examples into an effective skill, analyze each example by:
 Example: When building a `pdf-editor` skill to handle queries like "Help me rotate this PDF," the analysis shows:
 
 1. Rotating a PDF requires re-writing the same code each time
-2. A `tooling/rotate_pdf.py` script would be helpful to store in the skill
+2. A `scripts/rotate_pdf.py` script would be helpful to store in the skill
 
 Example: When designing a `frontend-webapp-builder` skill for queries like "Build me a todo app" or "Build me a dashboard to track my steps," the analysis shows:
 
 1. Writing a frontend webapp requires the same boilerplate HTML/React each time
-2. A `templates/hello-world/` directory containing the boilerplate HTML/React project files would be helpful to store in the skill
+2. An `assets/hello-world/` template containing the boilerplate HTML/React project files would be helpful to store in the skill
 
 Example: When building a `big-query` skill to handle queries like "How many users have logged in today?" the analysis shows:
 
 1. Querying BigQuery requires re-discovering the table schemas and relationships each time
-2. A `docs/schema.md` file documenting the table schemas would be helpful to store in the skill
+2. A `references/schema.md` file documenting the table schemas would be helpful to store in the skill
 
 To establish the skill's contents, analyze each concrete example to create a list of the reusable resources to include: scripts, references, and assets.
 
@@ -341,21 +339,6 @@ Added scripts must be tested by actually running them to ensure there are no bug
 
 If you used `--examples`, delete any placeholder files that are not needed for the skill. Only create resource directories that are actually required.
 
-Keep resource references mechanically correct. If `SKILL.md` points to `references/...`, `scripts/...`, or `assets/...`, those paths must exist relative to the skill root. If `agents/openai.yaml` exists, keep its interface fields aligned with the current `SKILL.md`.
-
-### Step 5: Validate the Skill
-
-Run `scripts/quick_validate.py` after creating or editing a skill.
-
-The validator is expected to catch:
-
-- invalid or incomplete `SKILL.md` frontmatter;
-- broken `references/...`, `scripts/...`, and `assets/...` paths mentioned in `SKILL.md`;
-- malformed `agents/openai.yaml`;
-- missing required `interface` fields in `agents/openai.yaml` when that file exists.
-
-Use it as a fast structural gate, not as a substitute for real usage testing. After the validator passes, still run representative scripts and read the exact references you expect another agent to use.
-
 #### Update SKILL.md
 
 **Writing Guidelines:** Always use imperative/infinitive form.
@@ -366,7 +349,6 @@ Write the YAML frontmatter with `name` and `description`:
 
 - `name`: The skill name
 - `description`: This is the primary triggering mechanism for your skill, and helps Codex understand when to use the skill.
-- By local default, write `description` in Russian and keep it natural enough that another Russian-language Codex instance can route to the skill without translation.
   - Include both what the Skill does and specific triggers/contexts for when to use it.
   - Include all "when to use" information here - Not in the body. The body is only loaded after triggering, so "When to Use This Skill" sections in the body are not helpful to Codex.
   - Example description for a `docx` skill: "Comprehensive document creation, editing, and analysis with support for tracked changes, comments, formatting preservation, and text extraction. Use when Codex needs to work with professional documents (.docx files) for: (1) Creating new documents, (2) Modifying or editing content, (3) Working with tracked changes, (4) Adding comments, or any other document tasks"

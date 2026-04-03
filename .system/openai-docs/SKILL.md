@@ -1,20 +1,19 @@
 ---
 name: "openai-docs"
-description: "Использовать, когда пользователь спрашивает, как работать с продуктами или API OpenAI, и нужна актуальная официальная документация с цитатами, помощь в выборе текущей модели под задачу или явное guidance по обновлению до GPT-5.4 и адаптации prompt-ов; по возможности использовать OpenAI docs MCP tools, reference-файлы считать только вспомогательным контекстом, а fallback-поиск ограничивать официальными доменами OpenAI."
+description: "Use when the user asks how to build with OpenAI products or APIs and needs up-to-date official documentation with citations, help choosing the latest model for a use case, or explicit GPT-5.4 upgrade and prompt-upgrade guidance; prioritize OpenAI docs MCP tools, use bundled references only as helper context, and restrict any fallback browsing to official OpenAI domains."
 ---
 
 
-# Документация OpenAI
+# OpenAI Docs
 
-Давай авторитетные и актуальные рекомендации по официальной документации OpenAI. Если в окружении доступны OpenAI docs MCP tools, используй их в первую очередь. Если они недоступны или не дают содержательного результата, используй точечный web-поиск только по официальным доменам OpenAI. Этот skill может дополнительно подключать нужные файлы из `references/` для выбора модели и запросов про GPT-5.4, но источником истины всегда остается актуальная документация OpenAI.
+Provide authoritative, current guidance from OpenAI developer docs using the developers.openai.com MCP server. Always prioritize the developer docs MCP tools over web.run for OpenAI-related questions. This skill may also load targeted files from `references/` for model-selection and GPT-5.4-specific requests, but current OpenAI docs remain authoritative. Only if the MCP server is installed and returns no meaningful results should you fall back to web search.
 
-## Быстрый старт
+## Quick start
 
-- Если доступны OpenAI docs MCP tools, используй `mcp__openaiDeveloperDocs__search_openai_docs`, чтобы найти наиболее релевантные страницы.
-- Если доступны OpenAI docs MCP tools, используй `mcp__openaiDeveloperDocs__fetch_openai_doc`, чтобы получить точные разделы и аккуратно цитировать или пересказывать их.
-- `mcp__openaiDeveloperDocs__list_openai_docs` используй только тогда, когда нужно просмотреть структуру документации без точного поискового запроса.
-- Если MCP tools недоступны, используй точечный web-поиск по `developers.openai.com` и `platform.openai.com`.
-- Загружай только тот файл из `references/`, который реально нужен для вопроса о выборе модели или обновлении до GPT-5.4.
+- Use `mcp__openaiDeveloperDocs__search_openai_docs` to find the most relevant doc pages.
+- Use `mcp__openaiDeveloperDocs__fetch_openai_doc` to pull exact sections and quote/paraphrase accurately.
+- Use `mcp__openaiDeveloperDocs__list_openai_docs` only when you need to browse or discover pages without a clear query.
+- Load only the relevant file from `references/` when the question is about model selection or a GPT-5.4 upgrade.
 
 ## OpenAI product snapshots
 
@@ -26,53 +25,45 @@ description: "Использовать, когда пользователь сп
 6. Realtime API: Build low-latency, multimodal experiences including natural speech-to-speech conversations.
 7. Agents SDK: A toolkit for building agentic apps where a model can use tools and context, hand off to other agents, stream partial results, and keep a full trace.
 
-## Доступность инструментов
+## If MCP server is missing
 
-Выбирай первую подходящую ветку:
+If MCP tools fail or no OpenAI docs resources are available:
 
-1. Если OpenAI docs MCP tools доступны, используй их первыми.
-2. Если MCP tools недоступны в текущем окружении, сразу переходи к ограниченному web-поиску по официальным доменам OpenAI.
-3. Если MCP tools должны быть доступны, но выглядят сломанными, сначала ответь через официальный web-поиск, а уже потом рассматривай восстановление MCP-настройки.
-
-Если явная задача состоит в установке или починке MCP-сервера:
-
-1. Выполни `codex mcp add openaiDeveloperDocs --url https://developers.openai.com/mcp`.
-2. Если команда падает из-за permissions или sandboxing, повтори с escalated permissions и коротким justification.
-3. Только если это тоже не сработало, попроси пользователя запустить команду самостоятельно.
-4. Попроси пользователя перезапустить Codex.
+1. Run the install command yourself: `codex mcp add openaiDeveloperDocs --url https://developers.openai.com/mcp`
+2. If it fails due to permissions/sandboxing, immediately retry the same command with escalated permissions and include a 1-sentence justification for approval. Do not ask the user to run it yet.
+3. Only if the escalated attempt fails, ask the user to run the install command.
+4. Ask the user to restart Codex.
+5. Re-run the doc search/fetch after restart.
 
 ## Workflow
 
-1. Уточни, о каком продукте идет речь и нужен ли общий lookup по документации, выбор модели, обновление до GPT-5.4 или адаптация prompt-ов под GPT-5.4.
-2. Если это запрос на выбор модели, загрузи `references/latest-model.md`.
-3. Если это явный запрос на обновление до GPT-5.4, загрузи `references/upgrading-to-gpt-5p4.md`.
-4. Если обновление может потребовать изменений prompt-а или workflow research-heavy, tool-heavy, coding-oriented, multi-agent либо long-running, дополнительно загрузи `references/gpt-5p4-prompting-guide.md`.
-5. Получи актуальные docs из лучшего доступного источника:
-   - через MCP fetch, если MCP tools доступны;
-   - иначе через ограниченный web-поиск и прямое чтение страниц на официальных доменах OpenAI.
-6. Читай только тот раздел, который реально нужен для ответа.
-7. Для ревью обновления до GPT-5.4 всегда делай явный вывод по каждому usage site: target model, starting reasoning recommendation, `phase` assessment при необходимости, prompt blocks и compatibility status.
-8. Отвечай кратко и со ссылкой на источник, используя reference-файлы только как вспомогательный контекст.
+1. Clarify the product scope and whether the request is general docs lookup, model selection, a GPT-5.4 upgrade, or a GPT-5.4 prompt upgrade.
+2. If it is a model-selection request, load `references/latest-model.md`.
+3. If it is an explicit GPT-5.4 upgrade request, load `references/upgrading-to-gpt-5p4.md`.
+4. If the upgrade may require prompt changes, or the workflow is research-heavy, tool-heavy, coding-oriented, multi-agent, or long-running, also load `references/gpt-5p4-prompting-guide.md`.
+5. Search docs with a precise query.
+6. Fetch the best page and the exact section needed (use `anchor` when possible).
+7. For GPT-5.4 upgrade reviews, always make the per-usage-site output explicit: target model, starting reasoning recommendation, `phase` assessment when relevant, prompt blocks, and compatibility status.
+8. Answer with concise guidance and cite the doc source, using the reference files only as helper context.
 
-## Карта reference-файлов
+## Reference map
 
-Читай только то, что реально нужно:
+Read only what you need:
 
-- `references/latest-model.md` -> вопросы про выбор модели и "best/latest/current model"; каждую рекомендацию перед ответом сверяй с актуальными OpenAI docs.
-- `references/upgrading-to-gpt-5p4.md` -> только для явных запросов на обновление до GPT-5.4 и planning такого обновления; checklist и compatibility guidance обязательно сверяй с актуальными OpenAI docs.
-- `references/gpt-5p4-prompting-guide.md` -> для переписывания prompt-ов и изменения prompt-behavior под GPT-5.4; guidance по prompt-ам тоже перепроверяй по актуальным OpenAI docs.
+- `references/latest-model.md` -> model-selection and "best/latest/current model" questions; verify every recommendation against current OpenAI docs before answering.
+- `references/upgrading-to-gpt-5p4.md` -> only for explicit GPT-5.4 upgrade and upgrade-planning requests; verify the checklist and compatibility guidance against current OpenAI docs before answering.
+- `references/gpt-5p4-prompting-guide.md` -> prompt rewrites and prompt-behavior upgrades for GPT-5.4; verify prompting guidance against current OpenAI docs before answering.
 
-## Правила качества
+## Quality rules
 
-- Считай OpenAI docs источником истины и не спекулируй там, где подтверждения нет.
-- Держи цитаты короткими и в рамках policy; по умолчанию предпочитай пересказ с цитированием.
-- Если несколько страниц расходятся, явно укажи различие и процитируй обе.
-- Reference-файлы здесь только как convenience-guides; для volatile guidance вроде рекомендуемых моделей, upgrade-инструкций и prompting-advice всегда побеждают текущие OpenAI docs.
-- Если docs не покрывают потребность пользователя, прямо скажи об этом и предложи следующий шаг.
+- Treat OpenAI docs as the source of truth; avoid speculation.
+- Keep quotes short and within policy limits; prefer paraphrase with citations.
+- If multiple pages differ, call out the difference and cite both.
+- Reference files are convenience guides only; for volatile guidance such as recommended models, upgrade instructions, or prompting advice, current OpenAI docs always win.
+- If docs do not cover the user’s need, say so and offer next steps.
 
-## Заметки по инструментам
+## Tooling notes
 
-- Предпочитай MCP doc tools, когда они реально доступны в окружении.
-- Не блокируй обычный docs-вопрос из-за отсутствия MCP, если доступны официальные web-источники.
-- При использовании web-поиска ограничивайся официальными доменами OpenAI (`developers.openai.com`, `platform.openai.com`) и обязательно цитируй источники.
-- Считай bundled `references/` только вспомогательным контекстом; volatile guidance перед ответом перепроверяй по живой официальной документации.
+- Always use MCP doc tools before any web search for OpenAI-related questions.
+- If the MCP server is installed but returns no meaningful results, then use web search as a fallback.
+- When falling back to web search, restrict to official OpenAI domains (developers.openai.com, platform.openai.com) and cite sources.

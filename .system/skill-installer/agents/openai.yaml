@@ -1,6 +1,5 @@
 interface:
-  display_name: "Установка Skill"
-  short_description: "Установка curated skill-ов из openai/skills и других репозиториев"
+  display_name: "Skill Installer"
+  short_description: "Install curated skills from openai/skills or other repos"
   icon_small: "./assets/skill-installer-small.svg"
   icon_large: "./assets/skill-installer.png"
-  default_prompt: "Используй $skill-installer, чтобы показать доступные skill-ы или установить нужный skill из curated-списка либо другого репозитория."

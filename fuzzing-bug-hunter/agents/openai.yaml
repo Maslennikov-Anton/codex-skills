@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fuzzing Bug Hunter"
+  short_description: "Find bugs via matrix fuzzing"
+  default_prompt: "Use $fuzzing-bug-hunter to run matrix fuzzing, isolate new defect families, and turn findings into reproducible regression cases."

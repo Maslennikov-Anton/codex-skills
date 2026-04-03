@@ -1,23 +1,23 @@
-# Поля `openai.yaml` (полный пример и описания)
+# openai.yaml fields (full example + descriptions)
 
-`agents/openai.yaml` это расширенный product-specific config, который предназначен для чтения машиной или harness, а не самим агентом. В папке `agents/` могут лежать и другие product-specific config-файлы.
+`agents/openai.yaml` is an extended, product-specific config intended for the machine/harness to read, not the agent. Other product-specific config can also live in the `agents/` folder.
 
-## Полный пример
+## Full example
 
 ```yaml
 interface:
-  display_name: "Необязательное пользовательское имя"
-  short_description: "Необязательное пользовательское описание"
+  display_name: "Optional user-facing name"
+  short_description: "Optional user-facing description"
   icon_small: "./assets/small-400px.png"
   icon_large: "./assets/large-logo.svg"
   brand_color: "#3B82F6"
-  default_prompt: "Необязательный prompt-обрамляющий текст для использования skill-а"
+  default_prompt: "Optional surrounding prompt to use the skill with"
 
 dependencies:
   tools:
     - type: "mcp"
       value: "github"
-      description: "MCP-сервер GitHub"
+      description: "GitHub MCP server"
       transport: "streamable_http"
       url: "https://api.githubcopilot.com/mcp/"
 
@@ -25,25 +25,25 @@ policy:
   allow_implicit_invocation: true
 ```
 
-## Описания полей и ограничения
+## Field descriptions and constraints
 
-Ограничения верхнего уровня:
+Top-level constraints:
 
-- Заключай все строковые значения в кавычки.
-- Ключи оставляй без кавычек.
-- Для `interface.default_prompt` генерируй полезный короткий пример стартового prompt-а на основе skill-а, обычно в одно предложение. Он должен явно упоминать skill как `$skill-name`.
-- По локальному правилу `interface.display_name`, `interface.short_description` и `interface.default_prompt` должны быть на русском, если пользователь явно не запросил другой язык.
+- Quote all string values.
+- Keep keys unquoted.
+- For `interface.default_prompt`: generate a helpful, short (typically 1 sentence) example starting prompt based on the skill. It must explicitly mention the skill as `$skill-name` (e.g., "Use $skill-name-here to draft a concise weekly status update.").
 
-- `interface.display_name`: пользовательский заголовок, который показывается в UI-списках skill-ов и на chips.
-- `interface.short_description`: короткое пользовательское описание для быстрого сканирования, обычно 25-64 символа.
-- `interface.icon_small`: путь к маленькому icon asset, относительный к skill dir. По умолчанию использовать `./assets/` и хранить иконки в папке `assets/`.
-- `interface.icon_large`: путь к большому logo asset, относительный к skill dir. По умолчанию использовать `./assets/` и хранить иконки в папке `assets/`.
-- `interface.brand_color`: hex-цвет для UI accent-ов, например badges.
-- `interface.default_prompt`: prompt snippet по умолчанию, который вставляется при вызове skill-а.
-- `dependencies.tools[].type`: категория зависимости. Сейчас поддерживается только `mcp`.
-- `dependencies.tools[].value`: идентификатор инструмента или зависимости.
-- `dependencies.tools[].description`: человекочитаемое описание зависимости.
-- `dependencies.tools[].transport`: тип подключения, когда `type` равен `mcp`.
-- `dependencies.tools[].url`: URL MCP-сервера, когда `type` равен `mcp`.
-- `policy.allow_implicit_invocation`: если `false`, skill по умолчанию не подмешивается в model context, но его все еще можно вызвать явно через `$skill`.
-  По умолчанию значение равно `true`.
+- `interface.display_name`: Human-facing title shown in UI skill lists and chips.
+- `interface.short_description`: Human-facing short UI blurb (25–64 chars) for quick scanning.
+- `interface.icon_small`: Path to a small icon asset (relative to skill dir). Default to `./assets/` and place icons in the skill's `assets/` folder.
+- `interface.icon_large`: Path to a larger logo asset (relative to skill dir). Default to `./assets/` and place icons in the skill's `assets/` folder.
+- `interface.brand_color`: Hex color used for UI accents (e.g., badges).
+- `interface.default_prompt`: Default prompt snippet inserted when invoking the skill.
+- `dependencies.tools[].type`: Dependency category. Only `mcp` is supported for now.
+- `dependencies.tools[].value`: Identifier of the tool or dependency.
+- `dependencies.tools[].description`: Human-readable explanation of the dependency.
+- `dependencies.tools[].transport`: Connection type when `type` is `mcp`.
+- `dependencies.tools[].url`: MCP server URL when `type` is `mcp`.
+- `policy.allow_implicit_invocation`: When false, the skill is not injected into
+  the model context by default, but can still be invoked explicitly via `$skill`.
+  Defaults to true.
