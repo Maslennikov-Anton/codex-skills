@@ -27,6 +27,18 @@ description: Автоматизировать и тестировать лока
 /home/ant/codex-skills/ssh-configurator-automation/scripts/backend-reset.sh
 ```
 
+Построить machine-readable registry manual test cases:
+
+```bash
+/home/ant/codex-skills/ssh-configurator-automation/scripts/build_case_registry.py
+```
+
+Собрать markdown-отчёт из registry:
+
+```bash
+/home/ant/codex-skills/ssh-configurator-automation/scripts/render_case_registry_report.py
+```
+
 Остановить backend и закрыть debug frontend после завершения работы:
 
 ```bash
@@ -222,6 +234,30 @@ description: Автоматизировать и тестировать лока
 - умеет выполнять подготовку rename-сценария для `network-files` без фактического запуска rename
 - умеет выполнять page-specific selection flow для `keys` через выбор первой строки и проверку доступности `Удалить ключ`
 - умеет выполнять page-specific selection flow для `vm/xmls` и `vm/images`, включая чтение списка, попытку выбора и проверку rename/delete state
+
+### `scripts/build_case_registry.py`
+
+Строит machine-readable registry manual test cases из Allure TestOps:
+
+- читает выборку по `Application` и `Story`
+- подтягивает `overview`, `testcase` и `scenario`
+- импортирует прошлую разметку из markdown-отчёта, если он есть
+- нормализует статус в рабочие категории:
+  - `automation-pass`
+  - `in_progress`
+  - `needs-new-backend`
+  - `needs-new-helper`
+  - `needs-fixture`
+  - `needs-human-judgement`
+  - `todo`
+
+Использовать как source of truth для покрытия.
+
+### `scripts/render_case_registry_report.py`
+
+Рендерит markdown-отчёт из machine-readable registry.
+
+Использовать, когда нужно быстро получить человекочитаемую сводку без ручной правки таблиц.
 
 ## Как расширять skill
 
