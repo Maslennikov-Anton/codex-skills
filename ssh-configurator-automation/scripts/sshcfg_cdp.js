@@ -551,6 +551,67 @@ async function prepareNetworkFileRename(client, fileName, newName) {
   };
 }
 
+async function renameNetworkFile(client, fileName, newName) {
+  const prepared = await prepareNetworkFileRename(client, fileName, newName);
+  if (!prepared.ok) {
+    return {
+      ok: false,
+      reason: "prepare-network-file-rename failed",
+      prepared,
+    };
+  }
+
+  await openConsole(client);
+  const beforeConsole = await readConsole(client);
+  const triggerResult = await clickText(client, "Переименовать");
+  await sleep(client, 1200);
+  const afterConsole = await readConsole(client);
+  const state = await readNetworkFilesState(client);
+  const newItems = afterConsole.items.slice(beforeConsole.count);
+  const matchedItem = [...newItems].reverse().find((item) => item.command === "rename_file") || null;
+  const hasRenamedRow = state.rows.some((row) => row.join(" | ").includes(newName));
+  const oldRowStillPresent = state.rows.some((row) => row.join(" | ").includes(fileName));
+
+  return {
+    ok: Boolean(triggerResult?.ok) && Boolean(matchedItem) && hasRenamedRow && !oldRowStillPresent,
+    prepared,
+    triggerResult,
+    matchedCommand: matchedItem ? matchedItem.command : null,
+    matchedItem,
+    state,
+  };
+}
+
+async function deleteNetworkFile(client, fileName) {
+  const selected = await selectNetworkFile(client, fileName);
+  if (!selected.ok) {
+    return {
+      ok: false,
+      reason: "select-network-file failed",
+      selected,
+    };
+  }
+
+  await openConsole(client);
+  const beforeConsole = await readConsole(client);
+  const triggerResult = await clickAccordionButtonIndex(client, "Список файлов сетевой конфигурации", 1);
+  await sleep(client, 1200);
+  const afterConsole = await readConsole(client);
+  const state = await readNetworkFilesState(client);
+  const newItems = afterConsole.items.slice(beforeConsole.count);
+  const matchedItem = [...newItems].reverse().find((item) => item.command === "delete_file") || null;
+  const fileStillPresent = state.rows.some((row) => row.join(" | ").includes(fileName));
+
+  return {
+    ok: Boolean(triggerResult?.ok) && Boolean(matchedItem) && !fileStillPresent,
+    selected,
+    triggerResult,
+    matchedCommand: matchedItem ? matchedItem.command : null,
+    matchedItem,
+    state,
+  };
+}
+
 async function selectFirstKey(client) {
   const { connectResult, closeSettingsResult } = await ensureConnectedAndClean(client);
   const routeState = await gotoRoute(client, "/keys");
@@ -1511,7 +1572,7 @@ async function run() {
   const [, , command, ...args] = process.argv;
   if (!command) {
     console.error(
-      "Usage: sshcfg_cdp.js <list-elements|goto|snapshot|read-tables|read-selections|read-network-files-state|read-keys-state|read-vm-xmls-state|read-vm-images-state|open-console|read-console|open-settings|switch-settings-tab|read-settings-state|inspect-settings-vue|read-connection-form|read-status|discover-services|set-locale|set-host|click-connect|click-text|click-title|connect-minimal|disconnect|select-app-row|select-prime-row|select-network-file|prepare-network-file-rename|select-first-key|delete-selected-key|select-xml-file|select-image-file|list-safe-actions|run-safe-action|assert-command|inventory-safe-routes> [args]",
+      "Usage: sshcfg_cdp.js <list-elements|goto|snapshot|read-tables|read-selections|read-network-files-state|read-keys-state|read-vm-xmls-state|read-vm-images-state|open-console|read-console|open-settings|switch-settings-tab|read-settings-state|inspect-settings-vue|inspect-settings-dom|read-connection-form|read-status|discover-services|set-locale|set-host|click-connect|click-text|click-title|connect-minimal|disconnect|select-app-row|select-prime-row|select-network-file|prepare-network-file-rename|rename-network-file|delete-network-file|select-first-key|delete-selected-key|select-xml-file|select-image-file|list-safe-actions|run-safe-action|assert-command|inventory-safe-routes> [args]",
     );
     process.exit(2);
   }
@@ -1602,6 +1663,19 @@ async function run() {
       const newName = args[1];
       if (!fileName || !newName) throw new Error("prepare-network-file-rename requires fileName and newName");
       return prepareNetworkFileRename(client, fileName, newName);
+    }
+
+    if (command === "rename-network-file") {
+      const fileName = args[0];
+      const newName = args[1];
+      if (!fileName || !newName) throw new Error("rename-network-file requires fileName and newName");
+      return renameNetworkFile(client, fileName, newName);
+    }
+
+    if (command === "delete-network-file") {
+      const fileName = args[0];
+      if (!fileName) throw new Error("delete-network-file requires fileName");
+      return deleteNetworkFile(client, fileName);
     }
 
     if (command === "select-first-key") {

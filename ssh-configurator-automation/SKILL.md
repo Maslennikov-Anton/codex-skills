@@ -73,6 +73,8 @@ description: Автоматизировать и тестировать лока
 /home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js read-status
 /home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js discover-services
 /home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js set-locale en
+/home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js rename-network-file 9995-manual.network 9995-manual-renamed.network
+/home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js delete-network-file 9995-manual-renamed.network
 ```
 
 Актуальное наблюдение по текущей сборке:
@@ -227,6 +229,8 @@ description: Автоматизировать и тестировать лока
 - `select-prime-row <rowText> [tableIndex]`
 - `select-network-file <fileName>`
 - `prepare-network-file-rename <fileName> <newName>`
+- `rename-network-file <fileName> <newName>`
+- `delete-network-file <fileName>`
 - `select-first-key`
 - `delete-selected-key`
 - `select-xml-file <fileName>`
@@ -246,6 +250,7 @@ description: Автоматизировать и тестировать лока
 - при необходимости использует fallback-цепочку закрытия: header event click -> native click -> panel toggle
 - умеет повторно воспроизводить минимальный рабочий сценарий подключения
 - умеет извлекать строки HTML/PrimeVue-таблиц после `list/show` действий
+- для части mutating screen-ов умеет подтверждать результат по post-action state таблицы, даже если консольное evidence на этом экране не ловится стабильно
 - умеет открывать встроенную консоль приложения и читать последние log entries
 - умеет выполнять проверенные `safe-read` сценарии по именованным action key
 - умеет проверять, какая именно backend-команда реально попала в console log после действия
