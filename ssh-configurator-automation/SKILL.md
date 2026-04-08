@@ -87,7 +87,12 @@ description: Автоматизировать и тестировать лока
 ## Операционный Контекст
 
 - frontend `ssh-configurator` в тестовом цикле поднимает агент, а не пользователь вручную, если не оговорено иное
-- рабочая папка для backlog, coverage-артефактов и промежуточных отчётов: `/home/ant/wco`
+- постоянный workspace для долгой работы по конфигуратору: `/home/ant/configurator-work`
+- внутри workspace использовать подпапки по направлениям:
+  - `backlog`
+  - `coverage`
+  - `fixtures`
+  - `notes`
 - текущий базовый backend-образ для тестов: `/home/ant/libvirtimages/vcont_plc.qcow2`
 - текущий рабочий libvirt-домен для этого backend-контура: `plc1`
 - текущий рабочий overlay для тестового цикла: `/home/ant/libvirtimages/vcont_plc.plc1.overlay.qcow2`
