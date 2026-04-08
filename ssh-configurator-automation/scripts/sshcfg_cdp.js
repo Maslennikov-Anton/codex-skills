@@ -426,7 +426,12 @@ async function readKeysFormState(client) {
     return {
       route: location.hash,
       ipAddress: ipInput ? String(ipInput.value || '') : null,
+      ipInputClass: ipInput ? (ipInput.className || '').toString() : '',
       newUserKey: newKeyInput ? String(newKeyInput.value || '') : null,
+      newUserKeyClass: newKeyInput ? (newKeyInput.className || '').toString() : '',
+      errorTexts: [...document.querySelectorAll('article.page-content .error-text, article.page-content small')]
+        .map((el) => (el.innerText || el.textContent || '').trim())
+        .filter(Boolean),
       buttons,
     };
   })()`);
@@ -820,6 +825,81 @@ async function selectFirstKey(client) {
     },
     selectResult,
     state
+  };
+}
+
+async function selectKeyRowByIndex(client, rowIndex = 0) {
+  return client.evaluate(`(() => {
+    const rowIndex = ${Number(rowIndex)};
+    const fireClick = (el) => {
+      for (const type of ['pointerdown', 'mousedown', 'mouseup', 'click']) {
+        el.dispatchEvent(new MouseEvent(type, { bubbles: true, cancelable: true, view: window }));
+      }
+    };
+    const rows = [...document.querySelectorAll('.p-datatable tbody tr')]
+      .filter((tr) => !(tr.className || '').toString().includes('empty'));
+    const row = rows[rowIndex] || null;
+    if (!row) {
+      return {
+        ok: false,
+        reason: 'key row not found',
+        rowIndex,
+        rowCount: rows.length,
+      };
+    }
+    fireClick(row);
+    return {
+      ok: true,
+      rowIndex,
+      cls: row.className,
+      ariaSelected: row.getAttribute('aria-selected'),
+    };
+  })()`);
+}
+
+async function deleteKeyRowByIndex(client, rowIndex = 0) {
+  const { connectResult, closeSettingsResult } = await ensureConnectedAndClean(client);
+  const routeState = await gotoRoute(client, "/keys");
+  const listResult = await runSafeAction(client, "keys.list-user-keys");
+  const selectResult = await selectKeyRowByIndex(client, rowIndex);
+  await sleep(client, 250);
+  const preState = await readKeysState(client);
+  if (!selectResult.ok || preState.deleteEnabled !== true) {
+    return {
+      ok: false,
+      reason: 'key selection failed',
+      route: routeState.route,
+      connectResult,
+      closeSettingsResult,
+      listResult,
+      selectResult,
+      preState,
+    };
+  }
+  await openConsole(client);
+  const beforeConsole = await readConsole(client);
+  const triggerResult = await deleteSelectedKey(client);
+  await sleep(client, 1200);
+  const afterConsole = await readConsole(client);
+  const postListResult = await runSafeAction(client, "keys.list-user-keys");
+  const matched = [...afterConsole.items.slice(beforeConsole.count)].reverse()
+    .find((item) => item.command === "delete_user_key") || null;
+  const postState = await readKeysState(client);
+  const beforeCount = Number(preState.rowCount || 0);
+  const afterCount = Number(postState.rowCount || 0);
+  return {
+    ok: Boolean(triggerResult?.ok) && afterCount < beforeCount,
+    route: routeState.route,
+    connectResult,
+    closeSettingsResult,
+    listResult,
+    selectResult,
+    preState,
+    triggerResult,
+    matchedCommand: matched ? matched.command : null,
+    matchedItem: matched,
+    postListResult,
+    postState,
   };
 }
 
@@ -1745,7 +1825,7 @@ async function run() {
   const [, , command, ...args] = process.argv;
   if (!command) {
     console.error(
-      "Usage: sshcfg_cdp.js <list-elements|goto|snapshot|read-tables|read-selections|read-network-files-state|read-keys-state|read-keys-form-state|read-prompt-state|submit-prompt|read-vm-xmls-state|read-vm-images-state|open-console|read-console|open-settings|switch-settings-tab|read-settings-state|inspect-settings-vue|inspect-settings-dom|read-connection-form|read-status|discover-services|set-locale|set-host|click-connect|click-text|click-title|connect-minimal|disconnect|select-app-row|select-prime-row|select-network-file|prepare-network-file-rename|rename-network-file|delete-network-file|select-first-key|delete-selected-key|add-user-key|refresh-known-hosts|generate-key|reconnect-after-known-hosts-refresh|select-xml-file|select-image-file|list-safe-actions|run-safe-action|assert-command|inventory-safe-routes> [args]",
+      "Usage: sshcfg_cdp.js <list-elements|goto|snapshot|read-tables|read-selections|read-network-files-state|read-keys-state|read-keys-form-state|set-keys-inputs|read-prompt-state|submit-prompt|read-vm-xmls-state|read-vm-images-state|open-console|read-console|open-settings|switch-settings-tab|read-settings-state|inspect-settings-vue|inspect-settings-dom|read-connection-form|read-status|discover-services|set-locale|set-host|click-connect|click-text|click-title|connect-minimal|disconnect|select-app-row|select-prime-row|select-network-file|prepare-network-file-rename|rename-network-file|delete-network-file|select-first-key|select-key-row|delete-selected-key|delete-key-row|add-user-key|refresh-known-hosts|generate-key|reconnect-after-known-hosts-refresh|select-xml-file|select-image-file|list-safe-actions|run-safe-action|assert-command|inventory-safe-routes> [args]",
     );
     process.exit(2);
   }
@@ -1773,6 +1853,12 @@ async function run() {
     if (command === "read-network-files-state") return readNetworkFilesState(client);
     if (command === "read-keys-state") return readKeysState(client);
     if (command === "read-keys-form-state") return readKeysFormState(client);
+    if (command === "set-keys-inputs") {
+      return setKeysInputValues(client, {
+        ipAddress: args[0] ?? null,
+        newUserKey: args.length > 1 ? args.slice(1).join(" ") : null,
+      });
+    }
     if (command === "read-prompt-state") return readPromptState(client);
     if (command === "submit-prompt") {
       const value = args.join(" ");
@@ -1861,8 +1947,18 @@ async function run() {
       return selectFirstKey(client);
     }
 
+    if (command === "select-key-row") {
+      const rowIndex = args[0] ? Number(args[0]) : 0;
+      return selectKeyRowByIndex(client, rowIndex);
+    }
+
     if (command === "delete-selected-key") {
       return deleteSelectedKey(client);
+    }
+
+    if (command === "delete-key-row") {
+      const rowIndex = args[0] ? Number(args[0]) : 0;
+      return deleteKeyRowByIndex(client, rowIndex);
     }
 
     if (command === "add-user-key") {

@@ -237,7 +237,9 @@ description: Автоматизировать и тестировать лока
 - `read-keys-form-state`
 - `submit-prompt <value>`
 - `select-first-key`
+- `select-key-row <rowIndex>`
 - `delete-selected-key`
+- `delete-key-row <rowIndex>`
 - `add-user-key <publicKey>`
 - `refresh-known-hosts <ipAddress>`
 - `generate-key`
@@ -262,7 +264,9 @@ description: Автоматизировать и тестировать лока
 - умеет извлекать строки HTML/PrimeVue-таблиц после `list/show` действий
 - для части mutating screen-ов умеет подтверждать результат по post-action state таблицы, даже если консольное evidence на этом экране не ловится стабильно
 - для `Keys` умеет подтверждать `add_user_key` через последующий `list_user_keys`
+- для `Keys` умеет удалять конкретную строку таблицы по индексу и подтверждать результат через уменьшение числа строк и последующий `list_user_keys`
 - для `refresh_known_hosts` умеет подтверждать командный эффект, но ожидаемый fingerprint prompt на reconnect в текущем приложении не воспроизводится автоматически
+- для невалидного IP в `Keys` фактическое поведение UI сейчас такое: кнопка `Удалить ключи в known_hosts` disable-ится без отдельного error message
 - для `generate_key` умеет проходить интерактивные prompt-ы через `TheDialogPrompt`
 - подтверждено, что `generate_key` исполняется внутри удалённой SSH shell-сессии и не меняет локальный `/home/ant/.ssh`
 - умеет открывать встроенную консоль приложения и читать последние log entries
