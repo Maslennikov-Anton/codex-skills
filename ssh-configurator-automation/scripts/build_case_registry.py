@@ -30,7 +30,6 @@ KNOWN_HELPERS = {
     1774: "node /home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js refresh-known-hosts 192.168.122.250",
     1773: "node /home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js set-keys-inputs 999.999.999.999",
     1691: "node /home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js assert-command diagnostics.check-systemd-journald",
-    1688: "node /home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js select-first-key",
     1686: "node /home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js assert-command keys.list-user-keys",
     1661: "node /home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js assert-command network.files.list",
     1655: "node /home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js assert-command network.settings.reload-details",
@@ -73,6 +72,74 @@ def api_get(base_url: str, headers: dict, path: str) -> dict:
     req = urllib.request.Request(f"{base_url}{path}", headers=headers)
     with urllib.request.urlopen(req, timeout=60) as response:
         return json.load(response)
+
+
+def normalize_step_list(raw_steps: list[dict]) -> list[dict]:
+    normalized = []
+    for step in raw_steps:
+        if not isinstance(step, dict):
+            continue
+        name = (step.get("name") or step.get("body") or "").strip()
+        expected_result = (step.get("expectedResult") or "").strip()
+        children = normalize_step_list(step.get("steps", []))
+        if name or expected_result or children:
+            normalized.append(
+                {
+                    "name": name,
+                    "expectedResult": expected_result,
+                    "steps": children,
+                }
+            )
+    return normalized
+
+
+def build_steps_from_step_tree(step_tree: dict) -> list[dict]:
+    scenario_steps = step_tree.get("scenarioSteps", {})
+    shared_steps = step_tree.get("sharedSteps", {})
+    shared_step_steps = step_tree.get("sharedStepScenarioSteps", {})
+
+    def resolve_node(step_id: int) -> dict | None:
+        node = scenario_steps.get(str(step_id)) or scenario_steps.get(step_id)
+        if node:
+            return {
+                "name": (node.get("body") or "").strip(),
+                "expectedResult": "",
+                "steps": [child for child in (resolve_node(child_id) for child_id in node.get("children", [])) if child],
+            }
+        shared = shared_steps.get(str(step_id)) or shared_steps.get(step_id)
+        if shared:
+            children = []
+            for child_id in shared.get("children", []):
+                child = shared_step_steps.get(str(child_id)) or shared_step_steps.get(child_id)
+                if child:
+                    children.append(
+                        {
+                            "name": (child.get("body") or "").strip(),
+                            "expectedResult": "",
+                            "steps": [],
+                        }
+                    )
+            return {
+                "name": (shared.get("name") or shared.get("body") or "").strip(),
+                "expectedResult": "",
+                "steps": children,
+            }
+        return None
+
+    root = step_tree.get("root", {})
+    return [node for node in (resolve_node(step_id) for step_id in root.get("children", [])) if node]
+
+
+def extract_steps(overview: dict, scenario: dict, step_tree: dict) -> list[dict]:
+    overview_steps = normalize_step_list(overview.get("scenario", {}).get("steps", []))
+    if overview_steps:
+        return overview_steps
+
+    scenario_steps = normalize_step_list(scenario.get("steps", []))
+    if scenario_steps:
+        return scenario_steps
+
+    return normalize_step_list(build_steps_from_step_tree(step_tree))
 
 
 def parse_markdown_report(path: Path) -> dict:
@@ -268,6 +335,7 @@ def main() -> int:
             return None
         testcase = api_get(base_url, headers, f"/api/testcase/{case_id}")
         scenario = api_get(base_url, headers, f"/api/testcase/{case_id}/scenario")
+        step_tree = api_get(base_url, headers, f"/api/testcase/{case_id}/step")
         return {
             "id": overview["id"],
             "name": overview["name"],
@@ -277,7 +345,7 @@ def main() -> int:
             "description": testcase.get("description", ""),
             "precondition": testcase.get("precondition", ""),
             "expectedResult": testcase.get("expectedResult", ""),
-            "steps": scenario.get("steps", []),
+            "steps": extract_steps(overview, scenario, step_tree),
         }
 
     loaded_cases = []
