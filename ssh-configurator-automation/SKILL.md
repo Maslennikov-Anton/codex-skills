@@ -75,6 +75,12 @@ description: Автоматизировать и тестировать лока
 /home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js set-locale en
 ```
 
+Актуальное наблюдение по текущей сборке:
+
+- таб `Конфигурация` в `TheSettings.vue` сейчас содержит только selector языка интерфейса
+- элементы `Импортировать` и `Экспортировать` в текущем source/runtime DOM не подтверждены
+- manual TC на import/export считать кандидатами на product-gap до отдельного подтверждения из другой сборки или актуализированных требований
+
 Установить SSH host:
 
 ```bash
