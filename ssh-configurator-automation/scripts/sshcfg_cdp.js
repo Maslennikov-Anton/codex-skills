@@ -883,7 +883,16 @@ async function readConsole(client) {
 async function openSettings(client) {
   return client.evaluate(`(() => new Promise(async (resolve) => {
     const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-    if (!document.querySelector('#host-input')) {
+    const findSettingsDialog = () => {
+      const dialogs = [...document.querySelectorAll('.p-dialog')];
+      return dialogs.find((el) => {
+        const text = (el.innerText || el.textContent || '');
+        const style = window.getComputedStyle(el);
+        const visible = style.display !== 'none' && style.visibility !== 'hidden' && style.pointerEvents !== 'none';
+        return text.includes('Настройки SSH') && visible;
+      }) || null;
+    };
+    if (!findSettingsDialog()) {
       const button = document.querySelectorAll('.panel .utility-buttons .btn')[1];
       if (!button) {
         resolve({ ok: false, reason: 'settings panel button not found', route: location.hash });
@@ -896,6 +905,7 @@ async function openSettings(client) {
       ok: true,
       route: location.hash,
       hostInputPresent: Boolean(document.querySelector('#host-input')),
+      dialogOpen: Boolean(findSettingsDialog()),
       dialogTitle: [...document.querySelectorAll('.p-dialog-title, .p-dialog-header')]
         .map((el) => (el.innerText || el.textContent || '').trim())
         .find(Boolean) || ''
@@ -1024,6 +1034,220 @@ async function readStatus(client) {
         const match = bodyText.match(/Тип сервера:\\s*([^\\n]+)/);
         return match ? match[1].trim() : '';
       })(),
+    };
+  })()`);
+}
+
+async function switchSettingsTab(client, tabName) {
+  const normalized = String(tabName || "").trim().toLowerCase();
+  const wantedTexts = normalized === "configuration" || normalized === "config"
+    ? ["Конфигурация", "Configuration"]
+    : ["Подключение", "Connection"];
+  return client.evaluate(`(() => new Promise(async (resolve) => {
+    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+    const button = [...document.querySelectorAll('.settings-tabs .tab-btn')]
+      .find((el) => ${JSON.stringify(wantedTexts)}.includes((el.innerText || el.textContent || '').trim()));
+    if (!button) {
+      resolve({ ok: false, reason: 'settings tab not found', wanted: ${JSON.stringify(wantedTexts)} });
+      return;
+    }
+    button.click();
+    await sleep(250);
+    resolve({
+      ok: true,
+      route: location.hash,
+      activeTab: [...document.querySelectorAll('.settings-tabs .tab-btn')]
+        .find((el) => (el.className || '').toString().includes('_active'))
+        ?.innerText?.trim() || '',
+    });
+  }))()`, { awaitPromise: true });
+}
+
+async function readSettingsState(client) {
+  return client.evaluate(`(() => {
+    const activeTab = [...document.querySelectorAll('.settings-tabs .tab-btn')]
+      .find((el) => (el.className || '').toString().includes('_active'))
+      ?.innerText?.trim() || '';
+    const tabLabels = [...document.querySelectorAll('.settings-tabs .tab-btn')]
+      .map((el) => (el.innerText || el.textContent || '').trim())
+      .filter(Boolean);
+    const bodyText = document.body.innerText || '';
+    const locale = window.localStorage.getItem('locale') || '';
+    const serviceRows = [...document.querySelectorAll('.discovery-table tbody tr')].map((row, i) => ({
+      i,
+      text: (row.innerText || row.textContent || '').trim(),
+      ariaSelected: row.getAttribute('aria-selected') || '',
+    }));
+    const configText = document.querySelector('.configuration')?.innerText || '';
+    const connectionText = document.querySelector('.connection')?.innerText || '';
+    const selectText = [...document.querySelectorAll('.configuration [role="combobox"], .configuration .p-select-label, .configuration .p-dropdown-label')]
+      .map((el) => (el.innerText || el.textContent || '').trim())
+      .find(Boolean) || '';
+    return {
+      route: location.hash,
+      activeTab,
+      tabLabels,
+      locale,
+      selectText,
+      configText,
+      connectionText,
+      serviceRows,
+      searchingVisible: bodyText.includes('Поиск') || Boolean(document.querySelector('.progress-card')),
+    };
+  })()`);
+}
+
+async function discoverServices(client) {
+  await openSettings(client);
+  await switchSettingsTab(client, "connection");
+  return client.evaluate(`(() => new Promise(async (resolve) => {
+    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+    const button = document.querySelector('.connection .row .btn');
+    if (!button) {
+      resolve({ ok: false, reason: 'discover services button not found' });
+      return;
+    }
+    button.click();
+    await sleep(1800);
+    const rows = [...document.querySelectorAll('.discovery-table tbody tr')].map((row, i) => ({
+      i,
+      text: (row.innerText || row.textContent || '').trim(),
+    }));
+    const emptyText = document.querySelector('.discovery-table .p-datatable-emptymessage')?.innerText?.trim() || '';
+    const errorText = [...document.querySelectorAll('.error-inline, .p-message')]
+      .map((el) => (el.innerText || el.textContent || '').trim())
+      .find(Boolean) || '';
+    resolve({
+      ok: true,
+      route: location.hash,
+      rowCount: rows.length,
+      rows,
+      emptyText,
+      errorText,
+    });
+  }))()`, { awaitPromise: true });
+}
+
+async function setLocale(client, localeValue) {
+  const wanted = String(localeValue || "").trim().toLowerCase();
+  if (!["ru", "en"].includes(wanted)) {
+    throw new Error("set-locale requires ru or en");
+  }
+  await openSettings(client);
+  await switchSettingsTab(client, "configuration");
+  return client.evaluate(`(() => new Promise(async (resolve) => {
+    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+    const fireClick = (el) => {
+      for (const type of ['pointerdown', 'mousedown', 'mouseup', 'click']) {
+        el.dispatchEvent(new MouseEvent(type, { bubbles: true, cancelable: true, view: window }));
+      }
+    };
+    const getSelectedLabel = () =>
+      [...document.querySelectorAll('.configuration .p-select-label[role="combobox"], .configuration .p-select-label')]
+        .map((el) => (el.innerText || el.textContent || '').trim())
+        .find(Boolean) || '';
+    const targetTexts = ${wanted === "ru"
+      ? JSON.stringify(["Русский", "Russian"])
+      : JSON.stringify(["Английский", "English"])};
+    const expectedValue = ${jsString(wanted)};
+    const trigger = document.querySelector('.configuration .p-select-label[role="combobox"], .configuration [role="combobox"], .configuration .p-select, .configuration .p-dropdown');
+    if (!trigger) {
+      resolve({ ok: false, reason: 'locale selector not found' });
+      return;
+    }
+    const beforeLabel = getSelectedLabel();
+    fireClick(trigger);
+    await sleep(250);
+    const options = [...document.querySelectorAll('[role="option"], .p-select-option, .p-dropdown-item')];
+    const option = options
+      .find((el) => targetTexts.includes((el.innerText || el.textContent || '').trim()));
+    if (!option) {
+      resolve({
+        ok: false,
+        reason: 'locale option not found',
+        wanted: targetTexts,
+        options: options.map((el) => (el.innerText || el.textContent || '').trim()).filter(Boolean),
+      });
+      return;
+    }
+    fireClick(option);
+    await sleep(400);
+
+    let afterLabel = getSelectedLabel();
+    let localeAfter = window.localStorage.getItem('locale') || '';
+
+    if (afterLabel === beforeLabel || localeAfter !== expectedValue) {
+      fireClick(trigger);
+      await sleep(200);
+      trigger.dispatchEvent(new KeyboardEvent('keydown', { key: wanted === 'ru' ? 'Home' : 'ArrowDown', bubbles: true }));
+      await sleep(120);
+      trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      await sleep(450);
+      afterLabel = getSelectedLabel();
+      localeAfter = window.localStorage.getItem('locale') || '';
+    }
+
+    resolve({
+      ok: afterLabel !== beforeLabel || localeAfter === expectedValue,
+      route: location.hash,
+      locale: localeAfter,
+      activeTab: [...document.querySelectorAll('.settings-tabs .tab-btn')]
+        .find((el) => (el.className || '').toString().includes('_active'))
+        ?.innerText?.trim() || '',
+      tabLabels: [...document.querySelectorAll('.settings-tabs .tab-btn')]
+        .map((el) => (el.innerText || el.textContent || '').trim())
+        .filter(Boolean),
+      beforeLabel,
+      afterLabel,
+      bodySample: (document.querySelector('.configuration')?.innerText || '').trim(),
+    });
+  }))()`, { awaitPromise: true });
+}
+
+async function inspectSettingsVue(client) {
+  return client.evaluate(`(() => {
+    const candidates = [
+      ...document.querySelectorAll('.configuration *'),
+      ...document.querySelectorAll('.connection *'),
+      ...document.querySelectorAll('.p-dialog *')
+    ].slice(0, 220);
+    const hits = [];
+    for (const node of candidates) {
+      const comp = node.__vueParentComponent || null;
+      if (!comp) continue;
+      hits.push({
+        tag: node.tagName || '',
+        cls: (node.className || '').toString(),
+        text: (node.innerText || node.textContent || '').trim().replace(/\\s+/g, ' ').slice(0, 120),
+        typeName: comp.type ? (comp.type.name || comp.type.__name || '') : '',
+        setupKeys: comp.setupState ? Object.keys(comp.setupState).slice(0, 60) : [],
+        propsKeys: comp.props ? Object.keys(comp.props).slice(0, 40) : []
+      });
+      if (hits.length >= 20) break;
+    }
+    return { route: location.hash, hits };
+  })()`);
+}
+
+async function inspectSettingsDom(client) {
+  return client.evaluate(`(() => {
+    const root = document.querySelector('.configuration, .connection, .p-dialog') || document.body;
+    const nodes = [...root.querySelectorAll('*')].slice(0, 160).map((el, index) => ({
+      index,
+      tag: el.tagName || '',
+      cls: (el.className || '').toString(),
+      role: el.getAttribute('role') || '',
+      ariaLabel: el.getAttribute('aria-label') || '',
+      ariaExpanded: el.getAttribute('aria-expanded') || '',
+      id: el.id || '',
+      text: (el.innerText || el.textContent || '').trim().replace(/\\s+/g, ' ').slice(0, 120)
+    }));
+    return {
+      route: location.hash,
+      activeTab: [...document.querySelectorAll('.settings-tabs .tab-btn')]
+        .find((el) => (el.className || '').toString().includes('_active'))
+        ?.innerText?.trim() || '',
+      nodes
     };
   })()`);
 }
@@ -1287,7 +1511,7 @@ async function run() {
   const [, , command, ...args] = process.argv;
   if (!command) {
     console.error(
-      "Usage: sshcfg_cdp.js <list-elements|goto|snapshot|read-tables|read-selections|read-network-files-state|read-keys-state|read-vm-xmls-state|read-vm-images-state|open-console|read-console|open-settings|read-connection-form|set-host|click-connect|click-text|click-title|connect-minimal|select-app-row|select-prime-row|select-network-file|prepare-network-file-rename|select-first-key|delete-selected-key|select-xml-file|select-image-file|list-safe-actions|run-safe-action|assert-command|inventory-safe-routes> [args]",
+      "Usage: sshcfg_cdp.js <list-elements|goto|snapshot|read-tables|read-selections|read-network-files-state|read-keys-state|read-vm-xmls-state|read-vm-images-state|open-console|read-console|open-settings|switch-settings-tab|read-settings-state|inspect-settings-vue|read-connection-form|read-status|discover-services|set-locale|set-host|click-connect|click-text|click-title|connect-minimal|disconnect|select-app-row|select-prime-row|select-network-file|prepare-network-file-rename|select-first-key|delete-selected-key|select-xml-file|select-image-file|list-safe-actions|run-safe-action|assert-command|inventory-safe-routes> [args]",
     );
     process.exit(2);
   }
@@ -1299,8 +1523,18 @@ async function run() {
     if (command === "open-console") return openConsole(client);
     if (command === "read-console") return readConsole(client);
     if (command === "open-settings") return openSettings(client);
+    if (command === "switch-settings-tab") {
+      const tabName = args[0];
+      if (!tabName) throw new Error("switch-settings-tab requires connection|configuration");
+      return switchSettingsTab(client, tabName);
+    }
+    if (command === "read-settings-state") return readSettingsState(client);
+    if (command === "inspect-settings-vue") return inspectSettingsVue(client);
+    if (command === "inspect-settings-dom") return inspectSettingsDom(client);
     if (command === "read-connection-form") return readConnectionForm(client);
     if (command === "read-status") return readStatus(client);
+    if (command === "discover-services") return discoverServices(client);
+    if (command === "set-locale") return setLocale(client, args[0]);
     if (command === "read-selections") return readSelections(client);
     if (command === "read-network-files-state") return readNetworkFilesState(client);
     if (command === "read-keys-state") return readKeysState(client);

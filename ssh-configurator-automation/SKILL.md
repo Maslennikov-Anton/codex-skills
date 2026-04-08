@@ -66,8 +66,13 @@ description: Автоматизировать и тестировать лока
 
 ```bash
 /home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js open-settings
+/home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js switch-settings-tab configuration
+/home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js read-settings-state
+/home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js inspect-settings-dom
 /home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js read-connection-form
 /home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js read-status
+/home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js discover-services
+/home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js set-locale en
 ```
 
 Установить SSH host:
@@ -194,8 +199,13 @@ description: Автоматизировать и тестировать лока
 - `open-console`
 - `read-console`
 - `open-settings`
+- `switch-settings-tab <connection|configuration>`
+- `read-settings-state`
+- `inspect-settings-dom`
 - `read-connection-form`
 - `read-status`
+- `discover-services`
+- `set-locale <ru|en>`
 - `read-selections`
 - `read-network-files-state`
 - `read-keys-state`
