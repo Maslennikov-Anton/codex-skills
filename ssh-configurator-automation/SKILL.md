@@ -124,6 +124,9 @@ description: Автоматизировать и тестировать лока
   - `coverage`
   - `fixtures`
   - `notes`
+- журнал расхождений между manual ТК и текущим продуктом вести отдельно в:
+  - `/home/ant/codex-work/configurator/notes/testcase-obsolescence-log.md`
+- если кейс не совпадает с текущим UI/поведением, фиксировать это сначала в obsolescence log, а уже потом отражать в coverage/status registry
 - текущий базовый backend-образ для тестов: `/home/ant/libvirtimages/vcont_plc.qcow2`
 - текущий рабочий libvirt-домен для этого backend-контура: `plc1`
 - текущий рабочий overlay для тестового цикла: `/home/ant/libvirtimages/vcont_plc.plc1.overlay.qcow2`
