@@ -18,6 +18,7 @@ DEFAULT_SOURCE_REPORT = Path(
 
 KNOWN_HELPERS = {
     1700: "node /home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js connect-minimal",
+    1701: "node /home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js disconnect",
     1691: "node /home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js assert-command diagnostics.check-systemd-journald",
     1688: "node /home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js select-first-key",
     1686: "node /home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js assert-command keys.list-user-keys",

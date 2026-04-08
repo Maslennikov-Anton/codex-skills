@@ -1009,6 +1009,25 @@ async function readConnectionForm(client) {
   })()`);
 }
 
+async function readStatus(client) {
+  return client.evaluate(`(() => {
+    const bodyText = document.body.innerText || '';
+    const connectButton = [...document.querySelectorAll('button')]
+      .find((el) => ['Подключиться', 'Отключиться'].includes((el.innerText || el.textContent || '').trim()));
+    return {
+      route: location.hash,
+      statusText: bodyText.includes('Статус: подключен') ? 'connected' : (
+        bodyText.includes('Статус: отключен') ? 'disconnected' : 'unknown'
+      ),
+      connectButtonText: connectButton ? (connectButton.innerText || connectButton.textContent || '').trim() : '',
+      hostTypeText: (() => {
+        const match = bodyText.match(/Тип сервера:\\s*([^\\n]+)/);
+        return match ? match[1].trim() : '';
+      })(),
+    };
+  })()`);
+}
+
 async function connectMinimal(client) {
   const formState = await readConnectionForm(client);
   if (!formState.host) {
@@ -1099,6 +1118,50 @@ async function ensureConnectedAndClean(client) {
   const connectResult = await connectMinimal(client);
   const closeSettingsResult = await closeSettings(client);
   return { connectResult, closeSettingsResult };
+}
+
+async function disconnectCurrent(client) {
+  const formState = await readConnectionForm(client);
+  if (!formState.host) {
+    await openSettings(client);
+  }
+
+  return client.evaluate(`(() => new Promise(async (resolve) => {
+    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+    const disconnectButton = [...document.querySelectorAll('button')]
+      .find((el) => (el.innerText || el.textContent || '').trim() === 'Отключиться');
+    const connectButton = [...document.querySelectorAll('button')]
+      .find((el) => (el.innerText || el.textContent || '').trim() === 'Подключиться');
+
+    if (connectButton && !disconnectButton) {
+      resolve({
+        ok: true,
+        route: location.hash,
+        statusText: document.body.innerText.includes('Статус: отключен') ? 'disconnected' : 'unknown',
+        skippedClick: true
+      });
+      return;
+    }
+
+    if (!disconnectButton) {
+      resolve({ ok: false, reason: 'disconnect button not found', route: location.hash });
+      return;
+    }
+
+    disconnectButton.click();
+    await sleep(1000);
+
+    resolve({
+      ok: true,
+      route: location.hash,
+      statusText: document.body.innerText.includes('Статус: отключен') ? 'disconnected' : (
+        document.body.innerText.includes('Статус: подключен') ? 'connected' : 'unknown'
+      ),
+      buttonText: ([...document.querySelectorAll('button')]
+        .find((el) => ['Подключиться', 'Отключиться'].includes((el.innerText || el.textContent || '').trim()))
+        ?.innerText || '').trim()
+    });
+  }))()`, { awaitPromise: true });
 }
 
 function getSafeActionCatalog() {
@@ -1237,6 +1300,7 @@ async function run() {
     if (command === "read-console") return readConsole(client);
     if (command === "open-settings") return openSettings(client);
     if (command === "read-connection-form") return readConnectionForm(client);
+    if (command === "read-status") return readStatus(client);
     if (command === "read-selections") return readSelections(client);
     if (command === "read-network-files-state") return readNetworkFilesState(client);
     if (command === "read-keys-state") return readKeysState(client);
@@ -1273,6 +1337,10 @@ async function run() {
 
     if (command === "connect-minimal") {
       return connectMinimal(client);
+    }
+
+    if (command === "disconnect") {
+      return disconnectCurrent(client);
     }
 
     if (command === "select-app-row") {

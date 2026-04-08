@@ -67,6 +67,7 @@ description: Автоматизировать и тестировать лока
 ```bash
 /home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js open-settings
 /home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js read-connection-form
+/home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js read-status
 ```
 
 Установить SSH host:
@@ -86,6 +87,7 @@ description: Автоматизировать и тестировать лока
 
 ```bash
 /home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js connect-minimal
+/home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js disconnect
 ```
 
 ## Рабочий процесс
@@ -193,6 +195,7 @@ description: Автоматизировать и тестировать лока
 - `read-console`
 - `open-settings`
 - `read-connection-form`
+- `read-status`
 - `read-selections`
 - `read-network-files-state`
 - `read-keys-state`
@@ -203,6 +206,7 @@ description: Автоматизировать и тестировать лока
 - `click-title <button title>`
 - `click-connect`
 - `connect-minimal`
+- `disconnect`
 - `select-app-row <rowText> [tableIndex]`
 - `select-prime-row <rowText> [tableIndex]`
 - `select-network-file <fileName>`
