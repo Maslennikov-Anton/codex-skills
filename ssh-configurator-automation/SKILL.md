@@ -75,6 +75,8 @@ description: Автоматизировать и тестировать лока
 /home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js set-locale en
 /home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js rename-network-file 9995-manual.network 9995-manual-renamed.network
 /home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js delete-network-file 9995-manual-renamed.network
+/home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js add-user-key "ssh-ed25519 ... codex_temp_key"
+/home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js refresh-known-hosts 192.168.122.10
 ```
 
 Актуальное наблюдение по текущей сборке:
@@ -231,8 +233,13 @@ description: Автоматизировать и тестировать лока
 - `prepare-network-file-rename <fileName> <newName>`
 - `rename-network-file <fileName> <newName>`
 - `delete-network-file <fileName>`
+- `read-keys-form-state`
 - `select-first-key`
 - `delete-selected-key`
+- `add-user-key <publicKey>`
+- `refresh-known-hosts <ipAddress>`
+- `read-prompt-state`
+- `reconnect-after-known-hosts-refresh`
 - `select-xml-file <fileName>`
 - `select-image-file <fileName>`
 - `list-safe-actions`
@@ -251,6 +258,8 @@ description: Автоматизировать и тестировать лока
 - умеет повторно воспроизводить минимальный рабочий сценарий подключения
 - умеет извлекать строки HTML/PrimeVue-таблиц после `list/show` действий
 - для части mutating screen-ов умеет подтверждать результат по post-action state таблицы, даже если консольное evidence на этом экране не ловится стабильно
+- для `Keys` умеет подтверждать `add_user_key` через последующий `list_user_keys`
+- для `refresh_known_hosts` умеет подтверждать командный эффект, но ожидаемый fingerprint prompt на reconnect в текущем приложении не воспроизводится автоматически
 - умеет открывать встроенную консоль приложения и читать последние log entries
 - умеет выполнять проверенные `safe-read` сценарии по именованным action key
 - умеет проверять, какая именно backend-команда реально попала в console log после действия

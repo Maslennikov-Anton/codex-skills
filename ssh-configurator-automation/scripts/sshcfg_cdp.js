@@ -412,6 +412,134 @@ async function readKeysState(client) {
   })()`);
 }
 
+async function readKeysFormState(client) {
+  return client.evaluate(`(() => {
+    const textInputs = [...document.querySelectorAll('article.page-content input[type="text"]')];
+    const ipInput = textInputs[0] || null;
+    const newKeyInput = textInputs[1] || null;
+    const buttons = [...document.querySelectorAll('article.page-content button')].map((el, i) => ({
+      i,
+      text: (el.innerText || el.textContent || '').trim(),
+      disabled: Boolean(el.disabled),
+      cls: (el.className || '').toString(),
+    }));
+    return {
+      route: location.hash,
+      ipAddress: ipInput ? String(ipInput.value || '') : null,
+      newUserKey: newKeyInput ? String(newKeyInput.value || '') : null,
+      buttons,
+    };
+  })()`);
+}
+
+async function setKeysInputValues(client, { ipAddress = null, newUserKey = null } = {}) {
+  return client.evaluate(`(() => {
+    const values = ${JSON.stringify({ ipAddress, newUserKey })};
+    const textInputs = [...document.querySelectorAll('article.page-content input[type="text"]')];
+    const ipInput = textInputs[0] || null;
+    const newKeyInput = textInputs[1] || null;
+    const setInput = (el, value) => {
+      const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+      el.focus();
+      setter.call(el, value);
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+      el.dispatchEvent(new Event('change', { bubbles: true }));
+    };
+    if (values.ipAddress !== null && ipInput) {
+      setInput(ipInput, String(values.ipAddress));
+    }
+    if (values.newUserKey !== null && newKeyInput) {
+      setInput(newKeyInput, String(values.newUserKey));
+    }
+    return {
+      ok: true,
+      ipAddress: ipInput ? String(ipInput.value || '') : null,
+      newUserKey: newKeyInput ? String(newKeyInput.value || '') : null,
+    };
+  })()`);
+}
+
+async function addUserKey(client, publicKey) {
+  const { connectResult, closeSettingsResult } = await ensureConnectedAndClean(client);
+  const routeState = await gotoRoute(client, "/keys");
+  const setResult = await setKeysInputValues(client, { newUserKey: publicKey });
+  await openConsole(client);
+  const beforeConsole = await readConsole(client);
+  const triggerResult = await clickText(client, "Добавить");
+  await sleep(client, 1200);
+  const afterConsole = await readConsole(client);
+  const listResult = await runSafeAction(client, "keys.list-user-keys");
+  const matchedAdd = [...afterConsole.items.slice(beforeConsole.count)].reverse()
+    .find((item) => item.command === "add_user_key") || null;
+  const listed = JSON.stringify(listResult.matchedItem?.response || []).includes(publicKey.trim().split(/\s+/).slice(-1)[0]);
+  const state = await readKeysFormState(client);
+  return {
+    ok: Boolean(triggerResult?.ok) && listed,
+    route: routeState.route,
+    connectResult,
+    closeSettingsResult,
+    setResult,
+    triggerResult,
+    matchedCommand: matchedAdd ? matchedAdd.command : null,
+    matchedItem: matchedAdd,
+    listResult,
+    state,
+  };
+}
+
+async function readPromptState(client) {
+  return client.evaluate(`(() => {
+    const dialog = document.querySelector('.prompt-log')?.closest('.p-dialog') || null;
+    return {
+      route: location.hash,
+      isOpen: Boolean(dialog),
+      title: dialog ? ((dialog.querySelector('.p-dialog-title, .p-dialog-header')?.innerText || '').trim()) : '',
+      log: dialog ? String(dialog.querySelector('.prompt-log')?.value || '') : '',
+      inputType: dialog ? String(dialog.querySelector('.prompt-input')?.getAttribute('type') || '') : '',
+      sendDisabled: dialog ? Boolean(dialog.querySelector('.prompt-send')?.disabled) : null,
+    };
+  })()`);
+}
+
+async function reconnectAfterKnownHostsRefresh(client) {
+  const disconnectResult = await disconnectCurrent(client);
+  const connectResult = await connectMinimal(client);
+  const promptState = await readPromptState(client);
+  const status = await readStatus(client);
+  return {
+    ok: Boolean(promptState.isOpen),
+    disconnectResult,
+    connectResult,
+    promptState,
+    status,
+  };
+}
+
+async function refreshKnownHosts(client, ipAddress) {
+  const { connectResult, closeSettingsResult } = await ensureConnectedAndClean(client);
+  const routeState = await gotoRoute(client, "/keys");
+  const setResult = await setKeysInputValues(client, { ipAddress });
+  await openConsole(client);
+  const beforeConsole = await readConsole(client);
+  const triggerResult = await clickText(client, "Удалить ключи в known_hosts");
+  await sleep(client, 1200);
+  const afterConsole = await readConsole(client);
+  const matched = [...afterConsole.items.slice(beforeConsole.count)].reverse()
+    .find((item) => item.command === `refresh_known_hosts ${ipAddress}` || item.command === "refresh_known_hosts") || null;
+  const state = await readKeysFormState(client);
+  return {
+    ok: Boolean(triggerResult?.ok) && Boolean(matched),
+    route: routeState.route,
+    connectResult,
+    closeSettingsResult,
+    setResult,
+    triggerResult,
+    matchedCommand: matched ? matched.command : null,
+    matchedItem: matched,
+    state,
+  };
+}
+
 async function selectAppTableRow(client, rowText, tableIndex = 0) {
   return client.evaluate(`(() => {
     const fireClick = (el) => {
@@ -1572,7 +1700,7 @@ async function run() {
   const [, , command, ...args] = process.argv;
   if (!command) {
     console.error(
-      "Usage: sshcfg_cdp.js <list-elements|goto|snapshot|read-tables|read-selections|read-network-files-state|read-keys-state|read-vm-xmls-state|read-vm-images-state|open-console|read-console|open-settings|switch-settings-tab|read-settings-state|inspect-settings-vue|inspect-settings-dom|read-connection-form|read-status|discover-services|set-locale|set-host|click-connect|click-text|click-title|connect-minimal|disconnect|select-app-row|select-prime-row|select-network-file|prepare-network-file-rename|rename-network-file|delete-network-file|select-first-key|delete-selected-key|select-xml-file|select-image-file|list-safe-actions|run-safe-action|assert-command|inventory-safe-routes> [args]",
+      "Usage: sshcfg_cdp.js <list-elements|goto|snapshot|read-tables|read-selections|read-network-files-state|read-keys-state|read-keys-form-state|read-prompt-state|read-vm-xmls-state|read-vm-images-state|open-console|read-console|open-settings|switch-settings-tab|read-settings-state|inspect-settings-vue|inspect-settings-dom|read-connection-form|read-status|discover-services|set-locale|set-host|click-connect|click-text|click-title|connect-minimal|disconnect|select-app-row|select-prime-row|select-network-file|prepare-network-file-rename|rename-network-file|delete-network-file|select-first-key|delete-selected-key|add-user-key|refresh-known-hosts|reconnect-after-known-hosts-refresh|select-xml-file|select-image-file|list-safe-actions|run-safe-action|assert-command|inventory-safe-routes> [args]",
     );
     process.exit(2);
   }
@@ -1599,6 +1727,8 @@ async function run() {
     if (command === "read-selections") return readSelections(client);
     if (command === "read-network-files-state") return readNetworkFilesState(client);
     if (command === "read-keys-state") return readKeysState(client);
+    if (command === "read-keys-form-state") return readKeysFormState(client);
+    if (command === "read-prompt-state") return readPromptState(client);
     if (command === "read-vm-xmls-state") return readVmFileListState(client, "xml");
     if (command === "read-vm-images-state") return readVmFileListState(client, "images");
 
@@ -1684,6 +1814,22 @@ async function run() {
 
     if (command === "delete-selected-key") {
       return deleteSelectedKey(client);
+    }
+
+    if (command === "add-user-key") {
+      const publicKey = args.join(" ").trim();
+      if (!publicKey) throw new Error("add-user-key requires public key");
+      return addUserKey(client, publicKey);
+    }
+
+    if (command === "refresh-known-hosts") {
+      const ipAddress = args[0];
+      if (!ipAddress) throw new Error("refresh-known-hosts requires ip address");
+      return refreshKnownHosts(client, ipAddress);
+    }
+
+    if (command === "reconnect-after-known-hosts-refresh") {
+      return reconnectAfterKnownHostsRefresh(client);
     }
 
     if (command === "select-xml-file") {
