@@ -77,6 +77,7 @@ description: Автоматизировать и тестировать лока
 /home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js delete-network-file 9995-manual-renamed.network
 /home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js add-user-key "ssh-ed25519 ... codex_temp_key"
 /home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js refresh-known-hosts 192.168.122.10
+/home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js generate-key
 ```
 
 Актуальное наблюдение по текущей сборке:
@@ -234,10 +235,12 @@ description: Автоматизировать и тестировать лока
 - `rename-network-file <fileName> <newName>`
 - `delete-network-file <fileName>`
 - `read-keys-form-state`
+- `submit-prompt <value>`
 - `select-first-key`
 - `delete-selected-key`
 - `add-user-key <publicKey>`
 - `refresh-known-hosts <ipAddress>`
+- `generate-key`
 - `read-prompt-state`
 - `reconnect-after-known-hosts-refresh`
 - `select-xml-file <fileName>`
@@ -260,6 +263,8 @@ description: Автоматизировать и тестировать лока
 - для части mutating screen-ов умеет подтверждать результат по post-action state таблицы, даже если консольное evidence на этом экране не ловится стабильно
 - для `Keys` умеет подтверждать `add_user_key` через последующий `list_user_keys`
 - для `refresh_known_hosts` умеет подтверждать командный эффект, но ожидаемый fingerprint prompt на reconnect в текущем приложении не воспроизводится автоматически
+- для `generate_key` умеет проходить интерактивные prompt-ы через `TheDialogPrompt`
+- подтверждено, что `generate_key` исполняется внутри удалённой SSH shell-сессии и не меняет локальный `/home/ant/.ssh`
 - умеет открывать встроенную консоль приложения и читать последние log entries
 - умеет выполнять проверенные `safe-read` сценарии по именованным action key
 - умеет проверять, какая именно backend-команда реально попала в console log после действия

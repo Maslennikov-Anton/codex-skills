@@ -24,6 +24,7 @@ KNOWN_HELPERS = {
     1663: "node /home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js rename-network-file 9995-manual.network 9995-manual-renamed.network",
     1662: "node /home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js delete-network-file 9995-manual-renamed.network",
     1687: "node /home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js add-user-key \"ssh-ed25519 ... codex_temp_key\"",
+    1685: "node /home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js generate-key",
     1684: "node /home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js refresh-known-hosts 192.168.122.10",
     1691: "node /home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js assert-command diagnostics.check-systemd-journald",
     1688: "node /home/ant/codex-skills/ssh-configurator-automation/scripts/sshcfg_cdp.js select-first-key",
