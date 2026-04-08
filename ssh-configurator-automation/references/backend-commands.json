@@ -1,0 +1,1171 @@
+{
+  "_comments": [
+    "Если в аргументе присутствует пробел, то необходимо этот аргумент поместить в кавычки.",
+    "У каждого аргумента в спецификации есть порядковый номер, который указан в описании имени аргумента.",
+    "Обязательные аргументы не имеют дефолтного значения.",
+    "У необязательных аргументов всегда есть дефолтное значение (например, log_lines=${2:-50} в команде check_status).",
+    "При неуказывании аргумента в команде, будет использовано дефолтное значение для аргумента либо, если такового нет - будет брошена ошибка.",
+    "У отдельных команд переменное количество аргументов. Такие аргументы будут последними в команде, в их имени в спецификации будет указана \"*\".",
+    "",
+    "Типы аргументов:",
+    "Standard",
+    "Number",
+    "FileName",
+    "UserName",
+    "DirPath",
+    "IpAddress",
+    "UnicastIpAddress",
+    "InterfaceName",
+    "IpWithSubnet",
+    "BondName",
+    "BondMode",
+    "SshPublicKey",
+    "RawString",
+    "XmlFileName",
+    "DateTime",
+    "VmName",
+    "ServiceName",
+    "HostName",
+    "PciAddress",
+    "TimeZone",
+    "San",
+    "Json"
+  ],
+  "commands": [
+    {
+      "command": "set_ip_static",
+      "description": "Задает сетевые параметры интерфейса <interface> <ip_address> <gateway> <dns>",
+      "allowed_server_types": ["Virt-Server", "Runtime-VM", "Runtime-Server"],
+      "arguments": [
+        {
+          "name": "interface=$1",
+          "description": "Имя конфигурируемого сетевого интерфейса (например, eth0)",
+          "type": "InterfaceName"
+        },
+        {
+          "name": "ip_address=$2",
+          "description": "IPv4 адрес с маской подсети в формате CIDR (например, 192.168.1.10/24)",
+          "type": "IpWithSubnet"
+        },
+        {
+          "name": "gateway=${3:-0.0.0.0}",
+          "description": "Адрес шлюза по умолчанию",
+          "type": "IpAddress"
+        },
+        {
+          "name": "dns=${4:-0.0.0.0}",
+          "description": "Адрес DNS сервера",
+          "type": "IpAddress"
+        }
+      ],
+      "examples": [
+        {
+          "type": "happy_path",
+          "command": "set_ip_static eth0 192.168.122.10/24 192.168.122.1 8.8.8.8",
+          "description": "Успешная установка статического адреса с шлюзом и DNS"
+        },
+        {
+          "type": "unhappy_path",
+          "command": "set_ip_static eth0 192.168.122.10",
+          "description": "Ошибка: IP адрес указан без маски подсети"
+        }
+      ]
+    },
+    {
+      "command": "help",
+      "description": "Выводит справочную информацию о доступных командах и их кратком описании",
+      "arguments": []
+    },
+    {
+      "command": "describe",
+      "description": "Выводит подробную справку по использованию конкретной команды (аргументы, типы данных, дефолтные значения)",
+      "arguments": [
+        {
+          "name": "command=$1",
+          "description": "Имя команды, для которой требуется описание"
+        }
+      ]
+    },
+    {
+      "command": "configure_dhcp",
+      "description": "Настраивает сетевой интерфейс на автоматическое получение IP-адреса по протоколу DHCP",
+      "arguments": [
+        {
+          "name": "interface=$1",
+          "description": "Имя сетевого интерфейса",
+          "type": "InterfaceName"
+        }
+      ],
+      "examples": [
+        {
+          "type": "happy_path",
+          "command": "configure_dhcp eth0",
+          "description": "Перевод интерфейса eth0 в режим DHCP"
+        },
+        {
+          "type": "unhappy_path",
+          "command": "configure_dhcp",
+          "description": "Ошибка: не указано имя интерфейса"
+        }
+      ]
+    },
+    {
+      "command": "configure_bridge",
+      "allowed_server_types": ["Virt-Server"],
+      "description": "Создает и настраивает сетевой мост (Bridge), объединяя указанные физические интерфейсы",
+      "arguments": [
+        {
+          "name": "bridge_name=$1",
+          "description": "Имя создаваемого интерфейса-моста (например, br0)",
+          "type": "InterfaceName"
+        },
+        {
+          "name": "bridge_port=$2",
+          "description": "Список физических интерфейсов для включения в мост. Должен быть заключен в кавычки и разделен пробелами (например, 'eth1 eth2')",
+          "type": "RawString"
+        },
+        {
+          "name": "ip_address=$3",
+          "description": "IP адрес моста с маской сети (CIDR)",
+          "type": "IpWithSubnet"
+        },
+        {
+          "name": "gateway=${4:-0.0.0.0}",
+          "description": "Адрес шлюза",
+          "type": "IpAddress"
+        },
+        {
+          "name": "dns=${5:-0.0.0.0}",
+          "description": "Адрес DNS сервера",
+          "type": "IpAddress"
+        }
+      ],
+      "examples": [
+        {
+          "type": "happy_path",
+          "command": "configure_bridge br0 \"eth1 eth2\" 192.168.1.50/24 192.168.1.1 8.8.8.8",
+          "description": "Создание моста br0 из интерфейсов eth1 и eth2 со статическим IP"
+        },
+        {
+          "type": "unhappy_path",
+          "command": "configure_bridge br0 eth1 192.168.1.50/24",
+          "description": "Ошибка: список интерфейсов не взят в кавычки, '192.168.1.50/24' воспринимается как второй интерфейс, а не IP"
+        }
+      ]
+    },
+    {
+      "command": "configure_bond",
+      "description": "Настраивает агрегацию каналов (Bonding) для указанных интерфейсов",
+      "arguments": [
+        {
+          "name": "bond_name=$1",
+          "description": "Имя создаваемого bond-интерфейса (например, bond0)",
+          "type": "BondName"
+        },
+        {
+          "name": "bond_slaves=$2",
+          "description": "Список физических интерфейсов для агрегации. Должен быть заключен в кавычки и разделен пробелами (например, 'eth1 eth2')",
+          "type": "RawString"
+        },
+        {
+          "name": "ip_address=$3",
+          "description": "IP адрес bond-интерфейса с маской сети (CIDR)",
+          "type": "IpWithSubnet"
+        },
+        {
+          "name": "mode=${4:-balance-rr}",
+          "description": "Режим работы bonding (например, balance-rr, active-backup, balance-xor, broadcast, 802.3ad, balance-tlb, balance-alb)",
+          "type": "BondMode"
+        },
+        {
+          "name": "gateway=${5:-0.0.0.0}",
+          "description": "Адрес шлюза",
+          "type": "IpAddress"
+        },
+        {
+          "name": "dns=${6:-0.0.0.0}",
+          "description": "Адрес DNS сервера",
+          "type": "IpAddress"
+        }
+      ],
+      "examples": [
+        {
+          "type": "happy_path",
+          "command": "configure_bond bond0 \"eth1 eth2\" 10.10.10.5/24 802.3ad 10.10.10.1",
+          "description": "Настройка LACP (802.3ad) на bond0"
+        },
+        {
+          "type": "unhappy_path",
+          "command": "configure_bond bond0 \"eth1 eth2\" 10.10.10.5 invalid-mode",
+          "description": "Ошибка: IP адрес указан без маски (или указан невалидный режим bond)"
+        }
+      ]
+    },
+    {
+      "command": "apply_network_settings",
+      "description": "Применяет накопленные изменения сетевых настроек (перезапускает сетевую службу systemd-networkd). Может привести к временной потере связи",
+      "arguments": [],
+      "examples": [
+        {
+          "type": "happy_path",
+          "command": "apply_network_settings",
+          "description": "Применение настроек"
+        },
+        {
+          "type": "unhappy_path",
+          "command": "apply_network_settings some_arg",
+          "description": "Ошибка: команда не принимает аргументов"
+        }
+      ]
+    },
+    {
+      "command": "reset_network_settings",
+      "description": "Сбрасывает всю сетевую конфигурацию к заводским настройкам (все физические интерфейсы переводятся в режим DHCP, виртуальные удаляются)",
+      "arguments": [],
+      "examples": [
+        {
+          "type": "happy_path",
+          "command": "reset_network_settings",
+          "description": "Полный сброс сети"
+        }
+      ]
+    },
+    {
+      "command": "get_interface_details",
+      "description": "Получение данных по интерфейсам удаленной машины: имя, статус, IP/CIDR. Включая служебные интерфейсы",
+      "arguments": [],
+      "examples": [
+        {
+          "type": "happy_path",
+          "command": "get_interface_details",
+          "description": "Запрос информации об интерфейсах"
+        }
+      ]
+    },
+    {
+      "command": "delete_interface",
+      "description": "Удаляет конфигурационные файлы указанного интерфейса. Если интерфейс виртуальный (bond/bridge/vlan), он будет удален из системы после применения настроек",
+      "arguments": [
+        {
+          "name": "interface_name=$1",
+          "description": "Имя удаляемого интерфейса",
+          "type": "InterfaceName"
+        }
+      ],
+      "examples": [
+        {
+          "type": "happy_path",
+          "command": "delete_interface bond0",
+          "description": "Удаление конфигурации интерфейса bond0"
+        },
+        {
+          "type": "unhappy_path",
+          "command": "delete_interface",
+          "description": "Ошибка: не указано имя интерфейса"
+        }
+      ]
+    },
+    {
+      "command": "reboot_host",
+      "description": "Выполняет перезагрузку хоста (systemctl reboot)",
+      "arguments": [],
+      "examples": [
+        {
+          "type": "happy_path",
+          "command": "reboot_host",
+          "description": "Инициация перезагрузки системы"
+        }
+      ]
+    },
+    {
+      "command": "stop",
+      "description": "Валидно завершает работу конфигуратора, алиас для exit",
+      "arguments": []
+    },
+    {
+      "command": "exit",
+      "description": "Валидно завершает работу конфигуратора",
+      "arguments": []
+    },
+    {
+      "command": "shutdown_host",
+      "description": "Выполняет полное выключение питания хоста (systemctl poweroff)",
+      "arguments": [],
+      "examples": [
+        {
+          "type": "happy_path",
+          "command": "shutdown_host",
+          "description": "Инициация выключения системы"
+        }
+      ]
+    },
+    {
+      "command": "set_date_time",
+      "description": "Устанавливает системное время. Перед установкой отключает NTP-синхронизацию (timedatectl set-ntp false) — иначе NTP переопределит вручную заданное время",
+      "arguments": [
+        {
+          "name": "date_time=$1",
+          "description": "Дата и время в формате '\"YYYY-MM-DD HH:MM:SS\"'. Обязательно в кавычках",
+          "type": "DateTime"
+        }
+      ],
+      "examples": [
+        {
+          "type": "happy_path",
+          "command": "set_date_time \"2023-10-25 14:30:00\"",
+          "description": "Установка конкретной даты и времени"
+        },
+        {
+          "type": "unhappy_path",
+          "command": "set_date_time 2023-10-25",
+          "description": "Ошибка: отсутствуют кавычки или не указано время"
+        }
+      ]
+    },
+    {
+      "command": "date_time",
+      "description": "Выдает текущее системное время",
+      "arguments": [],
+      "examples": [
+        {
+          "type": "happy_path",
+          "command": "date_time",
+          "description": "Вывод текущего времени"
+        }
+      ]
+    },
+    {
+      "command": "set_timezone",
+      "description": "Устанавливает системный часовой пояс",
+      "arguments": [
+        {
+          "name": "timezone=$1",
+          "description": "Идентификатор часового пояса (например, 'Europe/Moscow')",
+          "type": "TimeZone"
+        }
+      ],
+      "examples": [
+        {
+          "type": "happy_path",
+          "command": "set_timezone Europe/Moscow",
+          "description": "Смена часового пояса на Московское время"
+        },
+        {
+          "type": "unhappy_path",
+          "command": "set_timezone Unknown/City",
+          "description": "Ошибка: указан несуществующий часовой пояс"
+        }
+      ]
+    },
+    {
+      "command": "timezone",
+      "description": "Возвращает текущую временную зону",
+      "arguments": [],
+      "examples": [
+        {
+          "type": "happy_path",
+          "command": "timezone",
+          "description": "Вывод текущей зоны"
+        }
+      ]
+    },
+    {
+      "command": "write_vfio_modules",
+      "allowed_server_types": ["Virt-Server"],
+      "description": "Служебная функция для записи параметров VFIO в /etc/modules (необходима для проброса PCI устройств)",
+      "arguments": [],
+      "examples": [
+        {
+          "type": "happy_path",
+          "command": "write_vfio_modules",
+          "description": "Обновление конфигурации модулей ядра"
+        }
+      ]
+    },
+    {
+      "command": "create_service",
+      "allowed_server_types": ["Runtime-VM", "Runtime-Server"],
+      "description": "Создать и запустить службу для хоста",
+      "arguments": [
+        {
+          "name": "service_name=$1",
+          "description": "Имя сервиса, доступного для запуска на машине",
+          "type": "ServiceName"
+        }
+      ]
+    },
+    {
+      "command": "configure_hugepages",
+      "description": "Выполняет настройку hugepages для работы ВМ и контейнеров",
+      "allowed_server_types": ["Virt-Server"],
+      "arguments": [
+        {
+          "name": "system_reserv=${1:-1}",
+          "description": "Оставляет указанное кол-во памяти в ГБ под систему. Остальное выделяется для ВМ и контейнеров",
+          "type": "Number"
+        }
+      ]
+    },
+    {
+      "command": "list_interfaces",
+      "description": "Выводит список интерфейсов, которые доступны на хостовой машине. Без учета служебных интерфейсов",
+      "arguments": []
+    },
+    {
+      "command": "update_grub_host_cmdline",
+      "description": "Обновляет параметры командной строки ядра в загрузчике GRUB для хостовой ОС (isolcpus, nohz_full и др.). Задаёт диапазон изолируемых ядер процессора",
+      "allowed_server_types": ["Virt-Server"],
+      "arguments": [
+        {
+          "name": "first_cpu=$1",
+          "description": "Номер первого ядра из диапазона изолируемых ядер",
+          "type": "Number"
+        },
+        {
+          "name": "last_cpu=$2",
+          "description": "Номер последнего ядра из диапазона изолируемых ядер",
+          "type": "Number"
+        }
+      ]
+    },
+    {
+      "command": "update_grub_rt_host_cmdline",
+      "description": "Обновляет параметры командной строки ядра в загрузчике GRUB для RT-хоста (isolcpus, nohz_full и др.). Задаёт диапазон изолируемых ядер процессора",
+      "allowed_server_types": ["Runtime-VM", "Runtime-Server"],
+      "arguments": [
+        {
+          "name": "first_cpu=$1",
+          "description": "Номер первого ядра из диапазона изолируемых ядер",
+          "type": "Number"
+        },
+        {
+          "name": "last_cpu=$2",
+          "description": "Номер последнего ядра из диапазона изолируемых ядер",
+          "type": "Number"
+        }
+      ]
+    },
+    {
+      "command": "delete_file",
+      "description": "Удаляет файл по имени из стандартных каталогов: /var/lib/libvirt/images, /var/lib/libvirt/xml_store, /etc/systemd/network",
+      "arguments": [
+        {
+          "name": "file_name=$1",
+          "description": "Имя файла для удаления",
+          "type": "FileName"
+        }
+      ]
+    },
+    {
+      "command": "update_grub_custom_cmdline",
+      "description": "Добавляет произвольные параметры в строку загрузки ядра GRUB. ВНИМАНИЕ: неправильное использование может привести к неработоспособности системы",
+      "arguments": [
+        {
+          "name": "grub_cmdline=$*",
+          "description": "Произвольные параметры командной строки ядра (все аргументы объединяются в одну строку)",
+          "type": "RawString"
+        }
+      ]
+    },
+    {
+      "command": "group_files_by_type_and_vm",
+      "allowed_server_types": ["Virt-Server"],
+      "description": "Выводит список файлов сгруппированных по типу и ВМ",
+      "arguments": []
+    },
+    {
+      "command": "change_ntp_server",
+      "description": "Заменяет NTP-сервер в /etc/systemd/timesyncd.conf и перезапускает systemd-timesyncd. Работает только если systemd-timesyncd активен",
+      "arguments": [
+        {
+          "name": "new_ntp_server=$1",
+          "description": "IP-адрес нового NTP-сервера",
+          "type": "UnicastIpAddress"
+        }
+      ]
+    },
+    {
+      "command": "rename_file",
+      "description": "Переименовывает файл в одном из стандартных каталогов: /var/lib/libvirt/images, /var/lib/libvirt/xml_store, /etc/systemd/network. Права доступа исходного файла сохраняются",
+      "arguments": [
+        {
+          "name": "old_name=$1",
+          "description": "Текущее имя файла (без пути)",
+          "type": "FileName"
+        },
+        {
+          "name": "new_name=$2",
+          "description": "Новое имя файла (без пути)",
+          "type": "FileName"
+        }
+      ]
+    },
+    {
+      "command": "list_files_by_directory",
+      "description": "Выводит список файлов в одном из стандартных каталогов",
+      "arguments": [
+        {
+          "name": "key=$1",
+          "description": "Ключ для выбора каталога. Допустимые значения: xml (/var/lib/libvirt/xml_store), images (/var/lib/libvirt/images), network (/etc/systemd/network)",
+          "type": "Standard"
+        }
+      ]
+    },
+    {
+      "command": "change_and_apply_hostname",
+      "description": "Устанавливает новое имя хоста: записывает в /etc/hostname (статическое), применяет немедленно через ядро (transient) и уведомляет системные службы через D-Bus (systemd-resolved, avahi-daemon)",
+      "arguments": [
+        {
+          "name": "new_hostname=$1",
+          "description": "Новое имя хоста для mDNS сервиса",
+          "type": "HostName"
+        }
+      ]
+    },
+    {
+      "command": "get_cpu_qty",
+      "description": "Выводит количество ядер на хосте",
+      "arguments": []
+    },
+    {
+      "command": "check_status",
+      "description": "Выводит статус systemd-сервиса (systemctl is-active) и последние N строк его журнала (journalctl)",
+      "arguments": [
+        {
+          "name": "service_name=$1",
+          "description": "Имя systemd-сервиса",
+          "type": "ServiceName"
+        },
+        {
+          "name": "log_lines=${2:-50}",
+          "description": "Количество строк журнала для вывода (допустимо 1–1000, по умолчанию 50)",
+          "type": "Number"
+        }
+      ]
+    },
+    {
+      "command": "check_host_type",
+      "description": "Определяет и выводит тип хоста на основе наличия KVM, типа ядра (RT/Generic) и наличия виртуализации. Возможные значения: Virt-Server, Runtime-VM, Runtime-Server",
+      "arguments": []
+    },
+    {
+      "command": "update_firmware",
+      "allowed_server_types": ["Runtime-VM", "Runtime-Server"],
+      "description": "Обновление среды исполнения VCont",
+      "arguments": [
+        {
+          "name": "target_dir=$1",
+          "description": "Путь к папке с обновленным firmware на удаленном хосте",
+          "type": "DirPath"
+        },
+        {
+          "name": "target_user=$2",
+          "description": "Пользователь под которым выполняется подключение к удаленному хосту",
+          "type": "UserName"
+        },
+        {
+          "name": "target_ip=$3",
+          "description": "IP адрес удаленного хоста",
+          "type": "IpAddress"
+        }
+      ]
+    },
+    {
+      "command": "make_runtime_backup",
+      "description": "Создать резервную копию текущей среды исполнения, включая программу",
+      "allowed_server_types": ["Runtime-VM", "Runtime-Server"],
+      "arguments": [
+        {
+          "name": "backup_user=$1",
+          "description": "Пользователь под которым выполняется подключение к удаленному хосту",
+          "type": "UserName"
+        },
+        {
+          "name": "backup_ip=$2",
+          "description": "IP адрес удаленного хоста",
+          "type": "IpAddress"
+        },
+        {
+          "name": "backup_dir=$3",
+          "description": "Директория для хранения резервной копии среды исполнения на удаленном хосте",
+          "type": "DirPath"
+        }
+      ]
+    },
+    {
+      "command": "restore_runtime_backup",
+      "allowed_server_types": ["Runtime-VM", "Runtime-Server"],
+      "description": "Восстанавливает среду исполнения VCont из резервной копии: загружает vcont*.tar.gz и файл подписи (.sig) с удалённого хоста, проверяет подпись и распаковывает в /usr/local/sbin/vcont. В директории должен быть ровно один архив и одна подпись",
+      "arguments": [
+        {
+          "name": "target_dir=$1",
+          "description": "Путь к папке с архивом резервной копии (vcont*.tar.gz) и файлом подписи (.sig) на удалённом хосте",
+          "type": "DirPath"
+        },
+        {
+          "name": "target_user=$2",
+          "description": "Пользователь под которым выполняется подключение к удаленному хосту",
+          "type": "UserName"
+        },
+        {
+          "name": "target_ip=$3",
+          "description": "IP адрес удаленного хоста",
+          "type": "IpAddress"
+        }
+      ]
+    },
+    {
+      "command": "make_vm_backup",
+      "allowed_server_types": ["Virt-Server"],
+      "description": "Создание резервной копии ВМ со всеми snapshots и XML схемами",
+      "arguments": [
+        {
+          "name": "vm_name=$1",
+          "description": "Имя виртуальной машины, чью резервную копию необходимо снять",
+          "type": "VmName"
+        },
+        {
+          "name": "backup_dir=$2",
+          "description": "Директория для хранения резервной копии ВМ на удаленном хосте",
+          "type": "DirPath"
+        },
+        {
+          "name": "user=$3",
+          "description": "Пользователь под которым выполняется подключение к удаленному хосту",
+          "type": "UserName"
+        },
+        {
+          "name": "backup_ip=$4",
+          "description": "IP адрес удаленного хоста",
+          "type": "IpAddress"
+        }
+      ]
+    },
+    {
+      "command": "restore_vm_backup",
+      "allowed_server_types": ["Virt-Server"],
+      "description": "Восстановление резервной копии ВМ со всеми snapshots и XML схемами",
+      "arguments": [
+        {
+          "name": "vm_name=$1",
+          "description": "Имя виртуальной машины, которую необходимо восстановить из резервной копии",
+          "type": "VmName"
+        },
+        {
+          "name": "backup_dir=$2",
+          "description": "Директория в которой хранится резервная копия ВМ на удаленном хосте",
+          "type": "DirPath"
+        },
+        {
+          "name": "backup_user=$3",
+          "description": "Пользователь под которым выполняется подключение к удаленному хосту",
+          "type": "UserName"
+        },
+        {
+          "name": "backup_ip=$4",
+          "description": "IP адрес удаленного хоста",
+          "type": "IpAddress"
+        }
+      ]
+    },
+    {
+      "command": "resume_vm",
+      "allowed_server_types": ["Virt-Server"],
+      "description": "Возобновляет выполнение приостановленной ВМ (virsh resume)",
+      "arguments": [
+        {
+          "name": "vm_name=$1",
+          "description": "Имя виртуальной машины",
+          "type": "VmName"
+        }
+      ]
+    },
+    {
+      "command": "pause_vm",
+      "allowed_server_types": ["Virt-Server"],
+      "description": "Приостанавливает выполнение ВМ (virsh suspend)",
+      "arguments": [
+        {
+          "name": "vm_name=$1",
+          "description": "Имя виртуальной машины",
+          "type": "VmName"
+        }
+      ]
+    },
+    {
+      "command": "merge_all_snapshots",
+      "allowed_server_types": ["Virt-Server"],
+      "description": "Объединяет все снапшоты ВМ с базовым образом диска (virsh blockcommit --active --pivot). ВМ должна быть запущена. Деструктивная операция: снапшоты удаляются после слияния",
+      "arguments": [
+        {
+          "name": "vm_name=$1",
+          "description": "Имя виртуальной машины",
+          "type": "VmName"
+        }
+      ]
+    },
+    {
+      "command": "make_vm_snapshot",
+      "allowed_server_types": ["Virt-Server"],
+      "description": "Создаёт снапшот диска ВМ (virsh snapshot-create-as --disk-only --atomic)",
+      "arguments": [
+        {
+          "name": "vm_name=$1",
+          "description": "Имя ВМ для которой необходимо сделать snapshot",
+          "type": "VmName"
+        }
+      ]
+    },
+    {
+      "command": "restore_snapshot",
+      "allowed_server_types": ["Virt-Server"],
+      "description": "Откатывает ВМ к указанному снапшоту. Деструктивная операция: все снапшоты, созданные после целевого, будут удалены. ВМ останавливается и перезапускается",
+      "arguments": [
+        {
+          "name": "vm_name=$1",
+          "description": "Имя виртуальной машины",
+          "type": "VmName"
+        },
+        {
+          "name": "snapshot_name=$2",
+          "description": "Имя снапшота, до которого нужно откатиться",
+          "type": "FileName"
+        }
+      ]
+    },
+    {
+      "command": "delete_snapshot",
+      "allowed_server_types": ["Virt-Server"],
+      "description": "Удаляет снапшот ВМ. Если снапшот находится в активной цепочке дисков, его данные предварительно переносятся в родительский образ (virsh blockcommit)",
+      "arguments": [
+        {
+          "name": "vm_name=$1",
+          "description": "Имя виртуальной машины",
+          "type": "VmName"
+        },
+        {
+          "name": "snap_del_name=$2",
+          "description": "Имя снапшота для удаления",
+          "type": "FileName"
+        }
+      ]
+    },
+    {
+      "command": "update_snap_list",
+      "allowed_server_types": ["Virt-Server"],
+      "description": "Выводит список снапшотов ВМ с датой создания и статусом (virsh snapshot-list)",
+      "arguments": [
+        {
+          "name": "vm_name=$1",
+          "description": "Имя виртуальной машины",
+          "type": "VmName"
+        }
+      ]
+    },
+    {
+      "command": "delete_all_snapshots",
+      "allowed_server_types": ["Virt-Server"],
+      "description": "Удаляет все снапшоты ВМ и объединяет их с базовым образом диска",
+      "arguments": [
+        {
+          "name": "vm_name=$1",
+          "description": "Имя виртуальной машины",
+          "type": "VmName"
+        }
+      ]
+    },
+    {
+      "command": "console",
+      "allowed_server_types": ["Virt-Server"],
+      "description": "Вход в гостевые ВМ через консоль",
+      "arguments": [
+        {
+          "name": "vm_name=$1",
+          "description": "Имя виртуальной машины для доступа через консоль",
+          "type": "VmName"
+        }
+      ]
+    },
+    {
+      "command": "list_vms",
+      "allowed_server_types": ["Virt-Server"],
+      "description": "Выдает полный список ВМ на хостовой машине",
+      "arguments": []
+    },
+    {
+      "command": "list_vms_images",
+      "allowed_server_types": ["Virt-Server"],
+      "description": "Выдает полный список ВМ на хостовой машине в форматах img и qcow2",
+      "arguments": []
+    },
+    {
+      "command": "list_vms_schemas",
+      "allowed_server_types": ["Virt-Server"],
+      "description": "Выводит список XML схем, которые доступны на хостовой машине",
+      "arguments": []
+    },
+    {
+      "command": "start_vm",
+      "allowed_server_types": ["Virt-Server"],
+      "description": "Запускает ВМ (virsh start) и включает автозапуск при загрузке хоста (virsh autostart). Требует установленного KVM",
+      "arguments": [
+        {
+          "name": "vm_name=$1",
+          "description": "Имя виртуальной машины",
+          "type": "VmName"
+        }
+      ]
+    },
+    {
+      "command": "reboot_vm_virsh",
+      "allowed_server_types": ["Virt-Server"],
+      "description": "Перезагружает ВМ: штатное завершение (virsh shutdown, таймаут 60 с), при таймауте — принудительное (virsh destroy), затем запуск (virsh start). Требует установленного KVM",
+      "arguments": [
+        {
+          "name": "vm_name=$1",
+          "description": "Имя виртуальной машины",
+          "type": "VmName"
+        }
+      ]
+    },
+    {
+      "command": "shutdown_vm_virsh",
+      "allowed_server_types": ["Virt-Server"],
+      "description": "Останавливает ВМ: штатное завершение (virsh shutdown, таймаут 60 с), при таймауте — принудительное (virsh destroy). Требует установленного KVM",
+      "arguments": [
+        {
+          "name": "vm_name=$1",
+          "description": "Имя виртуальной машины",
+          "type": "VmName"
+        }
+      ]
+    },
+    {
+      "command": "define_vm",
+      "allowed_server_types": ["Virt-Server"],
+      "description": "Регистрирует ВМ в libvirt из XML-описания (virsh define). Файл должен находиться в /var/lib/libvirt/xml_store",
+      "arguments": [
+        {
+          "name": "xml_file=$1",
+          "description": "Название XML файла в котором описана конфигурация ВМ",
+          "type": "XmlFileName"
+        }
+      ]
+    },
+    {
+      "command": "undefine_vm",
+      "allowed_server_types": ["Virt-Server"],
+      "description": "Удаляет ВМ из реестра libvirt (virsh undefine). Файлы образов и снапшоты не удаляются",
+      "arguments": [
+        {
+          "name": "vm_name=$1",
+          "description": "Имя ВМ",
+          "type": "VmName"
+        }
+      ]
+    },
+    {
+      "command": "delete_vm_full",
+      "allowed_server_types": ["Virt-Server"],
+      "description": "Полное удаление ВМ со всеми образами, snapshots, xml описанием",
+      "arguments": [
+        {
+          "name": "vm_name=$1",
+          "description": "Имя ВМ для полного удаления с устройства (образ, snapshots, xml описания)",
+          "type": "VmName"
+        }
+      ]
+    },
+    {
+      "command": "edit_xml_online",
+      "allowed_server_types": ["Virt-Server"],
+      "description": "Онлайн редактирование схемы XML для конкретной ВМ с сохранением ее после редактирования в новый файл $vm_name_$timestamp.xml",
+      "arguments": [
+        {
+          "name": "vm_name=$1",
+          "description": "Имя ВМ для редактирования XML",
+          "type": "VmName"
+        }
+      ]
+    },
+    {
+      "command": "restart_service",
+      "allowed_server_types": ["Runtime-VM", "Runtime-Server"],
+      "description": "Перезапуск службы",
+      "arguments": [
+        {
+          "name": "service_name=$1",
+          "description": "Имя сервиса",
+          "type": "ServiceName"
+        }
+      ]
+    },
+    {
+      "command": "stop_service",
+      "allowed_server_types": ["Runtime-VM", "Runtime-Server"],
+      "description": "Останов службы",
+      "arguments": [
+        {
+          "name": "service_name=$1",
+          "description": "Имя сервиса",
+          "type": "ServiceName"
+        }
+      ]
+    },
+    {
+      "command": "start_service",
+      "allowed_server_types": ["Runtime-VM", "Runtime-Server"],
+      "description": "Запуск службы",
+      "arguments": [
+        {
+          "name": "service_name=$1",
+          "description": "Имя сервиса",
+          "type": "ServiceName"
+        }
+      ]
+    },
+    {
+      "command": "kill_service",
+      "allowed_server_types": ["Runtime-VM", "Runtime-Server"],
+      "description": "Принудительно завершает временный сервис vcontd-once (SIGTERM через systemctl kill). Допустимо только для сервиса vcontd",
+      "arguments": [
+        {
+          "name": "service_name=$1",
+          "description": "Имя сервиса (допустимо только vcontd)",
+          "type": "ServiceName"
+        }
+      ]
+    },
+    {
+      "command": "start_once",
+      "allowed_server_types": ["Runtime-VM", "Runtime-Server"],
+      "description": "Единичный запуск временной службы, используется преимущественно для отладки",
+      "arguments": [
+        {
+          "name": "service_name=$1",
+          "description": "Имя сервиса, который уже был установлен на машине",
+          "type": "ServiceName"
+        }
+      ]
+    },
+    {
+      "command": "upload_license",
+      "description": "Загрузка лицензионного файла VCont (license.bin)",
+      "arguments": [
+        {
+          "name": "target_dir=$1",
+          "description": "Путь к папке с лицензией license.bin на удаленном хосте",
+          "type": "DirPath"
+        },
+        {
+          "name": "target_user=$2",
+          "description": "Пользователь под которым выполняется подключение к удаленному хосту",
+          "type": "UserName"
+        },
+        {
+          "name": "target_ip=$3",
+          "description": "IP адрес удаленного хоста",
+          "type": "IpAddress"
+        }
+      ]
+    },
+    {
+      "command": "run_vm_config",
+      "allowed_server_types": ["Virt-Server"],
+      "description": "Редактирует XML-конфигурацию ВМ в /var/lib/libvirt/xml_store. Операция задаёт изменяемую секцию XML",
+      "arguments": [
+        {
+          "name": "operation=$1",
+          "description": "Изменяемая секция XML. Допустимые значения: ram, cpu, network, pci, source, driver, rename",
+          "type": "Standard"
+        },
+        {
+          "name": "xml_file=$2",
+          "description": "Имя XML-файла в /var/lib/libvirt/xml_store",
+          "type": "XmlFileName"
+        },
+        {
+          "name": "additional_args=$*",
+          "description": "Параметры операции (зависят от выбранной операции)",
+          "type": "RawString"
+        }
+      ]
+    },
+    {
+      "command": "list_ethernet_pci_to_interface_mapping",
+      "allowed_server_types": ["Virt-Server", "Runtime-Server"],
+      "description": "Список сопоставлений PCI сетевых интерфейсов",
+      "arguments": []
+    },
+    {
+      "command": "check_iommu_grouping",
+      "description": "Для каждого указанного PCI-устройства выводит состав его IOMMU-группы (все устройства группы с читаемыми именами через lspci)",
+      "arguments": [
+        {
+          "name": "pci_devices=$1",
+          "description": "Список PCI-адресов в формате XX:XX.X (например, '01:00.0 02:00.0'), заключённый в кавычки",
+          "type": "RawString"
+        }
+      ]
+    },
+    {
+      "command": "list_pci_devices_by_iommu_group",
+      "description": "Список PCI устройств по группам IOMMU",
+      "arguments": []
+    },
+    {
+      "command": "restore_vm_schema",
+      "allowed_server_types": ["Virt-Server"],
+      "description": "Восстанавливает типовое XML-описание RT-ВМ: удаляет все существующие XML-файлы, содержащие имя ВМ, и заменяет их дефолтным шаблоном",
+      "arguments": [
+        {
+          "name": "vm_name=$1",
+          "description": "Имя виртуальной машины",
+          "type": "VmName"
+        }
+      ]
+    },
+    {
+      "command": "generate_key",
+      "description": "Создать ключи для удаленного доступа и записать открытый ключ на удаленный хост",
+      "arguments": []
+    },
+    {
+      "command": "refresh_known_hosts",
+      "description": "Удаление старых отпечатков ключей в файле known_hosts",
+      "arguments": [
+        {
+          "name": "ip_address=$1",
+          "description": "IP адрес удаленного хоста",
+          "type": "IpAddress"
+        }
+      ]
+    },
+    {
+      "command": "add_user_key",
+      "description": "Добавление SSH ключа нового пользователя/хоста",
+      "arguments": [
+        {
+          "name": "ssh_key=$1",
+          "description": "Открытый SSH ключ пользователя/хоста",
+          "type": "SshPublicKey"
+        }
+      ]
+    },
+    {
+      "command": "list_user_keys",
+      "description": "Выводит список разрешенных ключей пользователей",
+      "arguments": []
+    },
+    {
+      "command": "delete_user_key",
+      "description": "Удаление выбранного SSH ключа пользователя/хоста",
+      "arguments": [
+        {
+          "name": "ssh_key=$1",
+          "description": "Открытый SSH ключ пользователя/хоста",
+          "type": "SshPublicKey"
+        }
+      ]
+    },
+    {
+      "command": "set_default_user_key",
+      "description": "Восстанавливает SSH ключ по умолчанию. Команда доступна только в emergency учетной записи при восстановлении доступа к системе",
+      "arguments": []
+    },
+    {
+      "command": "list_serial_ports",
+      "description": "Получение списка имен последовательных портов RS-485 / RS-232 включая модемы USB-RS485/RS232",
+      "arguments": []
+    },
+    {
+      "command": "setup_monitoring_agent",
+      "description": "Установка агента мониторинга (agent*.tar.gz)",
+      "arguments": [
+        {
+          "name": "remote_source_dir=$1",
+          "description": "Папка, в которой лежит архив, содержащий агента мониторинга и подпись",
+          "type": "DirPath"
+        },
+        {
+          "name": "remote_user=$2",
+          "description": "Имя удаленного пользователя",
+          "type": "UserName"
+        },
+        {
+          "name": "remote_ip=$3",
+          "description": "IP адрес удаленной машины",
+          "type": "IpAddress"
+        }
+      ]
+    },
+    {
+      "command": "show_ram",
+      "description": "Вывести информацию о потреблении RAM памяти и топ-5 потребителей, сколько они потребляют",
+      "arguments": []
+    },
+    {
+      "command": "show_disks",
+      "description": "Вывести информацию о количестве места на дисках, их точке монтирования",
+      "arguments": []
+    },
+    {
+      "command": "grant_vcont_access",
+      "description": "Возвращает 1-й фактор (токен) для получения пароля доступа к учетной записи vcont. После вызова функции доступ сразу открывается и истекает через 24 часа",
+      "arguments": []
+    },
+    {
+      "command": "update_configurator",
+      "description": "Загружает deb-пакет конфигуратора (configurator*.deb) с удалённого хоста, проверяет подпись и устанавливает через dpkg. После установки требуется перезапуск конфигуратора",
+      "arguments": [
+        {
+          "name": "target_dir=$1",
+          "description": "Путь к папке с новой версией конфигуратора на удаленном хосте",
+          "type": "DirPath"
+        },
+        {
+          "name": "target_user=$2",
+          "description": "Пользователь под которым выполняется подключение к удаленному хосту",
+          "type": "UserName"
+        },
+        {
+          "name": "target_ip=$3",
+          "description": "IP адрес удаленного хоста",
+          "type": "IpAddress"
+        }
+      ]
+    },
+    {
+      "command": "update_certs",
+      "description": "Обновить сертификаты для работы мониторинга с использованием SSL/TLS с удаленного сервера",
+      "arguments": [
+        {
+          "name": "target_dir=$1",
+          "description": "Путь к папке с сертификатами на удаленном хосте",
+          "type": "DirPath"
+        },
+        {
+          "name": "target_user=$2",
+          "description": "Пользователь под которым выполняется подключение к удаленному хосту",
+          "type": "UserName"
+        },
+        {
+          "name": "target_ip=$3",
+          "description": "IP адрес удаленного хоста",
+          "type": "IpAddress"
+        }
+      ]
+    },
+    {
+      "command": "configure_firewall",
+      "description": "Настройка правил межсетевого экрана (firewall) на хосте на основе переданной JSON-конфигурации",
+      "arguments": [
+        {
+          "name": "json=$1",
+          "description": "Конфигурация правил фильтрации в формате JSON. Содержит массив правил (адреса, порты, протоколы). Строка должна быть заключена в одинарные кавычки",
+          "type": "Json"
+        }
+      ]
+    }
+  ]
+}

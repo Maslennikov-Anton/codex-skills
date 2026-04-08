@@ -1,0 +1,9 @@
+{
+  "name": "ssh-configurator-automation",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Local helpers for automating ssh-configurator via Chromium DevTools Protocol.",
+  "dependencies": {
+    "ws": "^8.18.3"
+  }
+}
