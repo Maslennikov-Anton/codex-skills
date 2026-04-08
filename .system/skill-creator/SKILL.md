@@ -33,6 +33,16 @@ The context window is a public good. Skills share the context window with everyt
 
 Prefer concise examples over verbose explanations.
 
+### Match The User's Language
+
+By default, write local skills in the user's working language. If the repository and surrounding local skills are Russian, write `SKILL.md`, references, and instructional text in Russian unless the user explicitly asks for another language.
+
+Keep English only where it is structurally required or materially clearer:
+
+- CLI flags, shell commands, API fields, DOM selectors, identifiers, and code
+- user-facing metadata in `agents/openai.yaml` when the user explicitly wants English UI text
+- product, framework, or protocol names such as Electron, Vue, CDP, AT-SPI
+
 ### Set Appropriate Degrees of Freedom
 
 Match the level of specificity to the task's fragility and variability:

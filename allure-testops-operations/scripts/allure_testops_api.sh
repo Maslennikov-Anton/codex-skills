@@ -62,6 +62,21 @@ api_call() {
     -H "Authorization: Bearer ${access_token}"
 }
 
+json_from_file() {
+  if [[ $# -ne 1 ]]; then
+    echo "Usage: $0 json-from-file JSON_FILE" >&2
+    exit 2
+  fi
+
+  local json_file="$1"
+  if [[ ! -f "${json_file}" ]]; then
+    echo "JSON file not found: ${json_file}" >&2
+    exit 2
+  fi
+
+  cat "${json_file}"
+}
+
 testcase_get() {
   if [[ $# -ne 1 ]]; then
     echo "Usage: $0 testcase-get TESTCASE_ID" >&2
@@ -282,6 +297,226 @@ PY
   api_call GET "/api/testcase/${testcase_id}/overview"
 }
 
+defect_list() {
+  if [[ $# -lt 1 || $# -gt 3 ]]; then
+    echo "Usage: $0 defect-list PROJECT_ID [PAGE] [SIZE]" >&2
+    exit 2
+  fi
+
+  local project_id="$1"
+  local page="${2:-0}"
+  local size="${3:-20}"
+  api_call GET "/api/defect" "?projectId=${project_id}&page=${page}&size=${size}"
+}
+
+defect_get() {
+  if [[ $# -ne 1 ]]; then
+    echo "Usage: $0 defect-get DEFECT_ID" >&2
+    exit 2
+  fi
+
+  api_call GET "/api/defect/$1"
+}
+
+defect_create() {
+  if [[ $# -ne 1 ]]; then
+    echo "Usage: $0 defect-create DEFECT_JSON_FILE" >&2
+    exit 2
+  fi
+
+  local payload
+  payload="$(json_from_file "$1")"
+  api_call POST "/api/defect" "" "${payload}"
+}
+
+defect_patch() {
+  if [[ $# -ne 2 ]]; then
+    echo "Usage: $0 defect-patch DEFECT_ID DEFECT_PATCH_JSON_FILE" >&2
+    exit 2
+  fi
+
+  local defect_id="$1"
+  local payload
+  payload="$(json_from_file "$2")"
+  api_call PATCH "/api/defect/${defect_id}" "" "${payload}"
+}
+
+defect_close() {
+  if [[ $# -ne 1 ]]; then
+    echo "Usage: $0 defect-close DEFECT_ID" >&2
+    exit 2
+  fi
+
+  api_call PATCH "/api/defect/$1" "" '{"closed":true}'
+}
+
+defect_reopen() {
+  if [[ $# -ne 1 ]]; then
+    echo "Usage: $0 defect-reopen DEFECT_ID" >&2
+    exit 2
+  fi
+
+  api_call PATCH "/api/defect/$1" "" '{"closed":false}'
+}
+
+defect_matcher_list() {
+  if [[ $# -lt 1 || $# -gt 3 ]]; then
+    echo "Usage: $0 defect-matcher-list DEFECT_ID [PAGE] [SIZE]" >&2
+    exit 2
+  fi
+
+  local defect_id="$1"
+  local page="${2:-0}"
+  local size="${3:-20}"
+  api_call GET "/api/defect/${defect_id}/matcher" "?page=${page}&size=${size}"
+}
+
+issueschema_list() {
+  if [[ $# -lt 1 || $# -gt 3 ]]; then
+    echo "Usage: $0 issueschema-list PROJECT_ID [PAGE] [SIZE]" >&2
+    exit 2
+  fi
+
+  local project_id="$1"
+  local page="${2:-0}"
+  local size="${3:-20}"
+  api_call GET "/api/issueschema" "?projectId=${project_id}&page=${page}&size=${size}"
+}
+
+testcase_defect_list() {
+  if [[ $# -lt 1 || $# -gt 3 ]]; then
+    echo "Usage: $0 testcase-defect-list TESTCASE_ID [PAGE] [SIZE]" >&2
+    exit 2
+  fi
+
+  local testcase_id="$1"
+  local page="${2:-0}"
+  local size="${3:-20}"
+  api_call GET "/api/testcase/${testcase_id}/defect" "?page=${page}&size=${size}"
+}
+
+testcase_link_defect() {
+  if [[ $# -ne 2 ]]; then
+    echo "Usage: $0 testcase-link-defect TESTCASE_ID DEFECT_ID" >&2
+    exit 2
+  fi
+
+  local testcase_id="$1"
+  local defect_id="$2"
+
+  # This endpoint may return 200 with an empty body, so verify by reading linked defects.
+  api_call POST "/api/testcase/${testcase_id}/defect/${defect_id}" >/dev/null
+  api_call GET "/api/testcase/${testcase_id}/defect" "?page=0&size=100"
+}
+
+defect_create_template() {
+  if [[ $# -ne 1 ]]; then
+    echo "Usage: $0 defect-create-template OUTPUT_JSON_FILE" >&2
+    exit 2
+  fi
+
+  local output_file="$1"
+  cat > "${output_file}" <<'EOF'
+{
+  "projectId": 3,
+  "name": "Тестовый дефект: краткий заголовок",
+  "description": "Краткое описание:\nОпиши проблему.\n\nПредусловия:\n1. Пользователь авторизован.\n2. Открыт нужный экран.\n\nШаги воспроизведения:\n1. Выполнить первое действие.\n2. Выполнить второе действие.\n\nОжидаемый результат:\nСистема ведет себя корректно.\n\nФактический результат:\nНаблюдается ошибка.\n\nСерьезность: Major\nПриоритет: Medium\nОкружение: test / web UI / Chrome / Linux",
+  "matcher": {
+    "name": "Тестовый matcher",
+    "messageRegex": ".*(error text|navigation failed).*",
+    "traceRegex": ".*(ExceptionType|ComponentName).*"
+  }
+}
+EOF
+}
+
+defect_verify() {
+  if [[ $# -ne 1 ]]; then
+    echo "Usage: $0 defect-verify DEFECT_ID" >&2
+    exit 2
+  fi
+
+  local defect_id="$1"
+  local defect_json
+  local matcher_json
+
+  defect_json="$(api_call GET "/api/defect/${defect_id}")"
+  matcher_json="$(api_call GET "/api/defect/${defect_id}/matcher" "?page=0&size=100")"
+
+  python3 - <<'PY' "${defect_json}" "${matcher_json}"
+import json
+import sys
+
+defect = json.loads(sys.argv[1])
+matchers = json.loads(sys.argv[2])
+
+summary = {
+    "id": defect.get("id"),
+    "projectId": defect.get("projectId"),
+    "name": defect.get("name"),
+    "closed": defect.get("closed"),
+    "hasDescription": bool(defect.get("description")),
+    "matcherCount": matchers.get("totalElements", len(matchers.get("content", []))),
+}
+
+print(json.dumps(summary, ensure_ascii=False))
+PY
+}
+
+testcase_unlink_defect() {
+  if [[ $# -ne 2 ]]; then
+    echo "Usage: $0 testcase-unlink-defect TESTCASE_ID DEFECT_ID" >&2
+    exit 2
+  fi
+
+  local testcase_id="$1"
+  local defect_id="$2"
+
+  api_call DELETE "/api/testcase/${testcase_id}/defect/${defect_id}" >/dev/null
+  api_call GET "/api/testcase/${testcase_id}/defect" "?page=0&size=100"
+}
+
+defect_clone() {
+  if [[ $# -ne 2 ]]; then
+    echo "Usage: $0 defect-clone DEFECT_ID OUTPUT_JSON_FILE" >&2
+    exit 2
+  fi
+
+  local defect_id="$1"
+  local output_file="$2"
+  local defect_json
+  local matcher_json
+
+  defect_json="$(api_call GET "/api/defect/${defect_id}")"
+  matcher_json="$(api_call GET "/api/defect/${defect_id}/matcher" "?page=0&size=100")"
+
+  python3 - <<'PY' "${defect_json}" "${matcher_json}" "${output_file}"
+import json
+import sys
+from pathlib import Path
+
+defect = json.loads(sys.argv[1])
+matchers = json.loads(sys.argv[2]).get("content", [])
+output_path = Path(sys.argv[3])
+
+payload = {
+    "projectId": defect.get("projectId"),
+    "name": f'{defect.get("name", "").strip()} (copy)',
+    "description": defect.get("description", ""),
+}
+
+if matchers:
+    matcher = matchers[0]
+    payload["matcher"] = {
+        "name": matcher.get("name", ""),
+        "messageRegex": matcher.get("messageRegex", ""),
+        "traceRegex": matcher.get("traceRegex", ""),
+    }
+
+output_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n")
+PY
+}
+
 case "${1:-}" in
   auth)
     auth
@@ -321,6 +556,62 @@ case "${1:-}" in
     shift
     testcase_set_step_expected_result "$@"
     ;;
+  defect-list)
+    shift
+    defect_list "$@"
+    ;;
+  defect-get)
+    shift
+    defect_get "$@"
+    ;;
+  defect-create)
+    shift
+    defect_create "$@"
+    ;;
+  defect-patch)
+    shift
+    defect_patch "$@"
+    ;;
+  defect-close)
+    shift
+    defect_close "$@"
+    ;;
+  defect-reopen)
+    shift
+    defect_reopen "$@"
+    ;;
+  defect-matcher-list)
+    shift
+    defect_matcher_list "$@"
+    ;;
+  issueschema-list)
+    shift
+    issueschema_list "$@"
+    ;;
+  testcase-defect-list)
+    shift
+    testcase_defect_list "$@"
+    ;;
+  testcase-link-defect)
+    shift
+    testcase_link_defect "$@"
+    ;;
+  defect-create-template)
+    shift
+    defect_create_template "$@"
+    ;;
+  defect-verify)
+    shift
+    defect_verify "$@"
+    ;;
+  testcase-unlink-defect)
+    shift
+    testcase_unlink_defect "$@"
+    ;;
+  defect-clone)
+    shift
+    defect_clone "$@"
+    ;;
   GET|POST|PUT|PATCH|DELETE)
     api_call "$@"
     ;;
@@ -336,6 +627,20 @@ case "${1:-}" in
     echo "  $0 testcase-step-tree TESTCASE_ID" >&2
     echo "  $0 testcase-sync-scenario TESTCASE_ID SCENARIO_JSON_FILE" >&2
     echo "  $0 testcase-set-step-expected-result TESTCASE_ID STEP_INDEX EXPECTED_RESULT_TEXT" >&2
+    echo "  $0 defect-list PROJECT_ID [PAGE] [SIZE]" >&2
+    echo "  $0 defect-get DEFECT_ID" >&2
+    echo "  $0 defect-create DEFECT_JSON_FILE" >&2
+    echo "  $0 defect-patch DEFECT_ID DEFECT_PATCH_JSON_FILE" >&2
+    echo "  $0 defect-close DEFECT_ID" >&2
+    echo "  $0 defect-reopen DEFECT_ID" >&2
+    echo "  $0 defect-matcher-list DEFECT_ID [PAGE] [SIZE]" >&2
+    echo "  $0 issueschema-list PROJECT_ID [PAGE] [SIZE]" >&2
+    echo "  $0 testcase-defect-list TESTCASE_ID [PAGE] [SIZE]" >&2
+    echo "  $0 testcase-link-defect TESTCASE_ID DEFECT_ID" >&2
+    echo "  $0 defect-create-template OUTPUT_JSON_FILE" >&2
+    echo "  $0 defect-verify DEFECT_ID" >&2
+    echo "  $0 testcase-unlink-defect TESTCASE_ID DEFECT_ID" >&2
+    echo "  $0 defect-clone DEFECT_ID OUTPUT_JSON_FILE" >&2
     echo "  $0 METHOD PATH [QUERY] [JSON_BODY]" >&2
     exit 2
     ;;
