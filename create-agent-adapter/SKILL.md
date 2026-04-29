@@ -1,12 +1,8 @@
 ---
 name: create-agent-adapter
 description: >
-  Техническое руководство по созданию нового Paperclip agent adapter. Использовать,
-  когда нужно собрать новый пакет адаптера, добавить поддержку нового AI coding tool
-  например CLI-агента, API-based agent или custom process, либо изменить саму
-  adapter system. Покрывает обязательные интерфейсы, структуру модулей,
-  точки регистрации и соглашения, выведенные из существующих адаптеров
-  claude-local и codex-local.
+  Создавать или менять Paperclip agent adapter: пакет адаптера, интерфейсы,
+  модули, регистрацию и поддержку CLI/API/custom AI coding tools.
 ---
 
 # Создание Agent Adapter для Paperclip

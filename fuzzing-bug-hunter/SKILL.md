@@ -1,6 +1,6 @@
 ---
 name: fuzzing-bug-hunter
-description: Искать новые баги и скрытые ограничения через matrix fuzzing, grammar fuzzing и targeted bug hunting. Использовать, когда Codex должен системно исследовать failure surface, строить матрицы `construct x context x operand-shape`, отделять реальные дефекты от harness noise, минимизировать воспроизведение и переводить находки в bug artifact, inventory и regression cases. Не использовать для обычного написания детерминированных автотестов без исследовательского слоя, для доказательства root cause уже найденного дефекта или для обычного code review — для этого есть `autotest-engineer`, `systematic-debugging` и `code-review-professional`.
+description: Искать скрытые баги через matrix/grammar fuzzing и targeted bug hunting: failure surface, минимальные repro, bug artifacts и regression cases.
 ---
 
 # Fuzzing Bug Hunter

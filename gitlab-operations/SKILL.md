@@ -1,12 +1,8 @@
 ---
 name: gitlab-operations
 description: >
-  Работать с GitLab end to end: аутентификация, репозитории, issues, merge
-  requests, pipelines, releases, variables и API-вызовы. Использовать, когда
-  пользователю нужна операционная или инженерная работа с GitLab через CLI,
-  API, shell scripts или автоматизацию. По умолчанию предпочитать официальный
-  `glab` CLI, затем `glab api`, и только потом прямые HTTP-запросы или другие
-  tool-specific пути.
+  Работать с GitLab: auth, repositories, issues, merge requests, pipelines,
+  releases, variables и API через glab CLI, glab api, scripts или HTTP.
 ---
 
 # GitLab Operations

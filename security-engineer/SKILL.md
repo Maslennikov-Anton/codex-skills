@@ -1,6 +1,6 @@
 ---
 name: security-engineer
-description: Проектировать и проверять безопасность приложений, интеграций и инфраструктуры. Использовать, когда Codex должен оценить auth/authz, хранение секретов, уязвимости зависимостей, attack surface, secure defaults, threat model, security controls и безопасные практики разработки и релиза. Не использовать для обычного инфраструктурного сопровождения без security-фокуса — для этого есть `devops-engineer`, и не использовать как замену общей архитектурной проработке без выраженного security-аспекта — для этого есть `solution-architect`.
+description: Проектировать и проверять security: auth/authz, secrets, dependency risks, attack surface, secure defaults, threat model и controls.
 ---
 
 # Инженер по безопасности

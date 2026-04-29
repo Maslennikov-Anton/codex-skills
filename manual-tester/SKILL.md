@@ -1,6 +1,6 @@
 ---
 name: manual-tester
-description: Планировать и выполнять ручное тестирование веб-, API- и мобильных продуктов. Использовать, когда Codex должен подготовить checklist или test cases, провести smoke/regression/exploratory/UAT тестирование, воспроизвести и локализовать дефекты, оформить bug report и оценить release-риски. Не использовать для написания автотестов и CI-интеграции — для этого есть `autotest-engineer`.
+description: Планировать и выполнять ручное тестирование: checklists, test cases, smoke/regression/exploratory/UAT, bug reports и release risks.
 ---
 
 # Ручной тестировщик

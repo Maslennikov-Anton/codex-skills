@@ -1,6 +1,6 @@
 ---
 name: skill-creator
-description: Guide for creating effective skills. This skill should be used when users want to create a new skill (or update an existing skill) that extends Codex's capabilities with specialized knowledge, workflows, or tool integrations.
+description: Create or update Codex skills with concise metadata, workflows, references, scripts, assets, and validation.
 metadata:
   short-description: Create or update a skill
 ---
@@ -32,16 +32,6 @@ The context window is a public good. Skills share the context window with everyt
 **Default assumption: Codex is already very smart.** Only add context Codex doesn't already have. Challenge each piece of information: "Does Codex really need this explanation?" and "Does this paragraph justify its token cost?"
 
 Prefer concise examples over verbose explanations.
-
-### Match The User's Language
-
-By default, write local skills in the user's working language. If the repository and surrounding local skills are Russian, write `SKILL.md`, references, and instructional text in Russian unless the user explicitly asks for another language.
-
-Keep English only where it is structurally required or materially clearer:
-
-- CLI flags, shell commands, API fields, DOM selectors, identifiers, and code
-- user-facing metadata in `agents/openai.yaml` when the user explicitly wants English UI text
-- product, framework, or protocol names such as Electron, Vue, CDP, AT-SPI
 
 ### Set Appropriate Degrees of Freedom
 

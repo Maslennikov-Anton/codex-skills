@@ -1,6 +1,6 @@
 ---
 name: devops-engineer
-description: Строить и сопровождать deployment pipelines, инфраструктуру и практики надежности для программных систем. Использовать, когда Codex должен настраивать CI/CD, управлять Infrastructure as Code, готовить release automation, улучшать observability, выстраивать incident workflows и снижать операционные риски.
+description: Строить CI/CD, deployment pipelines, IaC, release automation, observability, incident workflows и операционную надежность.
 ---
 
 # DevOps-инженер

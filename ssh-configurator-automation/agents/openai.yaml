@@ -1,4 +1,0 @@
-interface:
-  display_name: "Автоматизация SSH Configurator"
-  short_description: "Автоматизировать UI Vue3+Electron приложения"
-  default_prompt: "Используй $ssh-configurator-automation для автоматизации ssh-configurator через Electron DevTools Protocol."

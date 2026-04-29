@@ -1,14 +1,8 @@
 ---
 name: para-memory-files
 description: >
-  Файловая система памяти по методу PARA Тьяго Форте. Использовать этот skill
-  всегда, когда нужно сохранять, извлекать, обновлять или организовывать знания
-  между сессиями. Покрывает три слоя памяти: (1) knowledge graph в PARA-папках
-  с атомарными YAML-фактами, (2) daily notes как сырая временная шкала,
-  (3) tacit knowledge о пользовательских паттернах. Также покрывает planning
-  files, memory decay, weekly synthesis и recall через qmd. Триггерится на любой
-  memory operation: сохранение фактов, ведение daily notes, создание entities,
-  weekly synthesis, recall прошлого контекста и управление планами.
+  Работать с файловой PARA-памятью: сохранять, искать и обновлять знания,
+  daily notes, entities, tacit knowledge, planning files и recall через qmd.
 ---
 
 # Файловая PARA-память

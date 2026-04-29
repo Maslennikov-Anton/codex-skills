@@ -1,12 +1,8 @@
 ---
 name: allure-testops-operations
 description: >
-  Работать с Allure TestOps end to end: аутентификация, проекты, test case-ы,
-  defects, launches, jobs, upload результатов и операционная диагностика.
-  Использовать, когда пользователю нужна автоматизация, исследование, отладка
-  или операционная работа с Allure TestOps через `allurectl`, HTTP API, shell
-  scripts или CI-интеграции. По умолчанию предпочитать `allurectl` для upload
-  flow и lifecycle launch, а HTTP API — для discovery и объектных операций.
+  Работать с Allure TestOps: auth, проекты, test cases, defects, launches,
+  jobs, upload результатов и диагностика через allurectl, HTTP API, shell или CI.
 ---
 
 # Allure TestOps Operations

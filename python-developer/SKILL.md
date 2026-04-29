@@ -1,6 +1,6 @@
 ---
 name: python-developer
-description: Проектировать, реализовывать и сопровождать Python-приложения и сервисы. Использовать, когда Codex должен создавать новые Python-функции, рефакторить модули, делать API или CLI, писать тесты, оптимизировать производительность и разбирать production- или integration-проблемы в Python-коде. Не использовать для чисто аналитических задач без изменения кода — для этого есть `analyst`.
+description: Разрабатывать Python-код: приложения, сервисы, API, CLI, refactor, tests, performance и production/integration debugging.
 ---
 
 # Python-разработчик

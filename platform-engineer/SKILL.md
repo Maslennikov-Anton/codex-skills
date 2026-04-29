@@ -1,6 +1,6 @@
 ---
 name: platform-engineer
-description: Проектировать и развивать внутреннюю инженерную платформу, developer experience и reusable platform capabilities. Использовать, когда Codex должен улучшать внутренние платформенные сервисы, self-service инструменты, шаблоны проектов, стандарты окружений, build/release foundations и удобство работы инженерных команд. Не использовать для обычной настройки CI/CD в конкретном проекте без platform-фокуса — для этого есть `devops-engineer`, и не использовать для общих локальных правил команды без платформенной составляющей — для этого есть `team-engineering-style`.
+description: Развивать engineering platform: internal services, self-service tools, templates, environment standards, build/release foundations и DX.
 ---
 
 # Платформенный инженер
