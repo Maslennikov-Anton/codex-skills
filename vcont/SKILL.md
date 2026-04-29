@@ -11,10 +11,11 @@ description: "Работать с VCont runtime: vcontcfg.json, vcont.fboot, XML
 
 1. Определи область задачи:
    - Конфигурация runtime, значения по умолчанию `vcontcfg.json`, HSB-параметры и общие runtime-настройки: читай `references/config.md`.
-   - `vcont.fboot`, `AUTH`, роли сессии, XML-команды IDE, создание ФБ, связей, тасков и назначение лупов: читай `references/protocol.md`.
+   - Протокол VCStudio/VCont, `vcont.fboot`, подписанный `fboot`, `LOADFILE`/`EXECBOOT`, `AUTH`, роли сессии, XML-команды IDE, создание ФБ, связей, тасков и назначение лупов: читай `references/protocol.md`.
    - Встроенный Modbus TCP server, alias-регистры, `MBREAD`/`MBWRITE`, `modbusbatch` и `modbus_async`: читай `references/modbus.md`.
    - Hot Standby: автомат HSB-состояний, failover, heartbeat, поведение MAIN/RESERVE/STANDALONE: читай `references/hot-standby.md`.
    - Peer-to-peer TCP-канал между контроллерами, модель синхронизации данных и Docker/eCAL: читай `references/synchronization.md`.
+   - Диагностика по `vcont.log`, признаки загрузки bootfile, HSB-ролей, heartbeat, sync и ограничения логов как oracle для тестов: читай `references/logs.md`.
    - Автотесты с разными программами VCont: храни варианты `vcont.fboot` в тестовых ресурсах и копируй нужный bootfile в runtime-директории через fixture перед стартом контейнеров.
    - Не опирайся на наличие внешних документов: работай по `references/` как по сохраненной базе знаний.
 2. При редактировании или тестировании локальных артефактов проекта сначала изучи текущий репозиторий. Сейчас в проекте нет очевидного дерева исходников приложения; обычно доступны артефакты поставки VCont, конфиги, bootfile, логи и тесты.
@@ -30,7 +31,7 @@ description: "Работать с VCont runtime: vcontcfg.json, vcont.fboot, XML
 
 - VCont runtime запускается из поставочного бинарника и конфигурации `vcontcfg.json`; если конфиг не задан явно, runtime ищет `vcontcfg.json` рядом с бинарником.
 - Пользовательская программа VCont может загружаться через файл `vcont.fboot`: он должен называться именно так и лежать рядом с бинарником VCont до запуска, иначе runtime может стартовать без bootfile и писать в лог `No bootfile specified...`.
-- `vcont.fboot` задаёт пользовательскую программу через XML-команды IDE: создание ФБ, запись литералов в пины, создание `Connection`/`Alias`, создание и старт ресурсов/тасков.
+- `vcont.fboot` задаёт пользовательскую программу через XML-команды IDE: создание ФБ, запись литералов в пины, создание `Connection`/`Alias`, создание и старт ресурсов/тасков. При загрузке полного проекта из VCStudio для ресурсов формируются `fboot`-файлы; в протокольной модели они подписываются на стороне VCStudio и валидируются на стороне VCont.
 - Modbus в VCont включает встроенный `MBSERVER` и клиентские ФБ `MBREAD`/`MBWRITE`; для асинхронного клиента используется режим `modbus_async`, для синхронного - `modbusbatch`.
 - Hot Standby использует два или три инстанса VCont. В каждый момент времени только один активный контроллер должен управлять процессом; остальные находятся в резерве.
 - Контроллеры в HSB обмениваются heartbeat-данными: диагностикой, текущим HSB-режимом, номером итерации рабочего цикла и `PlcId`.
@@ -41,8 +42,9 @@ description: "Работать с VCont runtime: vcontcfg.json, vcont.fboot, XML
 
 Подробности разнесены по reference-файлам. Не требуй внешние документы при будущих задачах:
 
-- `references/protocol.md`: `AUTH`, `UseAuth`, роли сессии, XML-команды IDE.
+- `references/protocol.md`: протокол VCStudio/VCont, подписанный `fboot`, `LOADFILE`/`EXECBOOT`, `AUTH`, `UseAuth`, роли сессии, XML-команды IDE.
 - `references/hot-standby.md`: режимы Hot Standby, heartbeat, failover, схема 1+1 и 1+2.
 - `references/synchronization.md`: peer-to-peer канал, Master/Slave-модель, синхронизация ФБ, Docker/eCAL.
+- `references/logs.md`: практическая диагностика `vcont.log`, полезные паттерны, HSB/bootfile assertions и ограничения логов.
 - `references/config.md`: значения по умолчанию и смысл параметров `vcontcfg.json`.
 - `references/modbus.md`: встроенный `MBSERVER`, alias-регистры, async `MBREAD`/`MBWRITE`, `modbusbatch`, `modbus_async`, ограничения и ошибки.
