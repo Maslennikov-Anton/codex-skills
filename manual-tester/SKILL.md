@@ -1,6 +1,6 @@
 ---
 name: manual-tester
-description: Планировать и выполнять ручное тестирование: checklists, test cases, smoke/regression/exploratory/UAT, bug reports и release risks.
+description: "Планировать и выполнять ручное тестирование: checklists, test cases, smoke/regression/exploratory/UAT, bug reports и release risks."
 ---
 
 # Ручной тестировщик

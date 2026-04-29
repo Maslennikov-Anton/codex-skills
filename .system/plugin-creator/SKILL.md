@@ -1,6 +1,6 @@
 ---
 name: plugin-creator
-description: Create or update Codex plugins: scaffold plugin.json, optional folders/files, placeholders, and marketplace metadata.
+description: "Create or update Codex plugins: scaffold plugin.json, optional folders/files, placeholders, and marketplace metadata."
 ---
 
 # Plugin Creator

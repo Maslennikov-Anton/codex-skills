@@ -1,6 +1,6 @@
 ---
 name: vcont-hsb
-description: Работать с vcont-hsb: VCont Hot Standby, HSB-настройки vcontcfg.json, синхронизация контроллеров, AUTH и XML-команды IDE.
+description: "Работать с vcont-hsb: VCont Hot Standby, HSB-настройки vcontcfg.json, синхронизация контроллеров, AUTH и XML-команды IDE."
 ---
 
 # VCont HSB

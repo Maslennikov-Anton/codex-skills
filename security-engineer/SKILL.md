@@ -1,6 +1,6 @@
 ---
 name: security-engineer
-description: Проектировать и проверять security: auth/authz, secrets, dependency risks, attack surface, secure defaults, threat model и controls.
+description: "Проектировать и проверять security: auth/authz, secrets, dependency risks, attack surface, secure defaults, threat model и controls."
 ---
 
 # Инженер по безопасности

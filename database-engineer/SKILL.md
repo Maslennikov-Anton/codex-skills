@@ -1,6 +1,6 @@
 ---
 name: database-engineer
-description: Проектировать data layer: схемы БД, миграции, integrity constraints, транзакции, индексы, SQL-производительность и эволюцию данных.
+description: "Проектировать data layer: схемы БД, миграции, integrity constraints, транзакции, индексы, SQL-производительность и эволюцию данных."
 ---
 
 # Инженер по базам данных

@@ -1,6 +1,6 @@
 ---
 name: product-designer
-description: Проектировать UX и интерфейсы: user flows, IA, wireframes, usability, структуру экранов и визуальное направление до реализации.
+description: "Проектировать UX и интерфейсы: user flows, IA, wireframes, usability, структуру экранов и визуальное направление до реализации."
 ---
 
 # Продуктовый дизайнер

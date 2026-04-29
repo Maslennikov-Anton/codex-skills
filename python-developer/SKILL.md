@@ -1,6 +1,6 @@
 ---
 name: python-developer
-description: Разрабатывать Python-код: приложения, сервисы, API, CLI, refactor, tests, performance и production/integration debugging.
+description: "Разрабатывать Python-код: приложения, сервисы, API, CLI, refactor, tests, performance и production/integration debugging."
 ---
 
 # Python-разработчик
