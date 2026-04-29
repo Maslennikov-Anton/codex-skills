@@ -1,0 +1,7 @@
+interface:
+  display_name: "VCont"
+  short_description: "Runtime, Modbus, HSB и bootfile VCont"
+  default_prompt: "Используй $vcont, чтобы разобрать конфиг, bootfile, Modbus, HSB или поведение runtime VCont."
+
+policy:
+  allow_implicit_invocation: true

@@ -1,7 +1,0 @@
-interface:
-  display_name: "VCont HSB"
-  short_description: "Заметки по VCont Hot Standby"
-  default_prompt: "Используй $vcont-hsb, чтобы разобрать или изменить поведение VCont Hot Standby."
-
-policy:
-  allow_implicit_invocation: true
