@@ -17,6 +17,7 @@
   "MaxBackupFiles": 4,
   "PathFileLog": "./vcont.log",
   "LevelLog": "info",
+  "DataToLog": "",
   "RealtimeMode": "auto",
   "EventQueueSize": 256,
   "EventQueueEnqueuePolicy": "DropDuplicatesAndFlush",
@@ -56,6 +57,7 @@
 
 - `IpPort`: адрес сетевого интерфейса и порт, на котором VCont принимает команды от VCStudio.
 - `SizeFileLog`, `MaxBackupFiles`, `PathFileLog`, `LevelLog`: настройки логирования на базе quill.
+- `DataToLog`: экспериментальная локальная настройка, подтвержденная только для текущего проекта/поставки `vcont-hsb`. Для диагностики HSB-синхронизации в этом проекте используй `"serialize,deserialize"`, чтобы в `vcont.log` появились строки `SERIALIZE:...` и `DESERIALIZE:...` со снимками DI/DO блоков. В других проектах или поставках VCont эта настройка может игнорироваться, и строки данных в логах могут не появиться.
 - `RealtimeMode`: поведение realtime-режима.
   - `reatlime`: включает realtime-механизмы, включая привязку к CPU и realtime-приоритет для тасков, где привязка к CPU задана явно. Значение зафиксировано именно как `reatlime`.
   - `emulator`: отключает realtime-механизмы даже для тасков с явной привязкой к CPU.
