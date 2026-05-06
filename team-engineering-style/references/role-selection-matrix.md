@@ -17,6 +17,7 @@
 | Нужно спроектировать архитектуру, интеграции и технические компромиссы | `solution-architect` | `security-engineer` для security-sensitive решений; `database-engineer` для выраженного DB-фокуса |
 | Нужно написать или изменить Python-код | `python-developer` | `database-engineer` для data-layer; `code-review-professional` для сильного review |
 | Нужно разработать frontend | `frontend-engineer` | `product-designer` для сильного UX-фокуса; `autotest-engineer` для UI automation |
+| Нужно проверить web-сценарий в браузере, собрать screenshot, DOM или network evidence | `browser-automation` | `frontend-engineer`, если нужно сразу исправлять UI; `autotest-engineer`, если проверку нужно превратить в долгоживущий тест |
 | Нужно спроектировать UX, user flow или визуальную концепцию | `product-designer` | `frontend-engineer`, если сразу нужна реализация |
 | Нужно сделать мобильный экран, поток или архитектуру клиента | `mobile-engineer` | `product-designer` для UX; `autotest-engineer` для mobile test strategy |
 | Нужно проработать схему БД, миграцию, индексы или SQL-производительность | `database-engineer` | `python-developer`, если дальше нужно реализовать data-access слой |
@@ -28,9 +29,21 @@
 | Нужно провести профессиональное ревью изменений | `code-review-professional` | `security-engineer`, если ревью security-sensitive; `database-engineer`, если изменение тяжелое по DB |
 | Нужно спланировать поставку, зависимости и readiness релиза | `delivery-manager` | `product-manager` для приоритетов; `devops-engineer` для release/infra readiness |
 | Нужно локализовать инцидент, воспроизвести проблему или подготовить эскалацию | `support-engineer` | `manual-tester` для формального bug report; `devops-engineer` для operational incidents |
+| Нужно продолжить длинную задачу, подготовить handoff или сжать историю после compaction | `context-hygiene` | `para-memory-files`, если знание нужно сохранить между сессиями; профильный skill текущей задачи |
 | Нужно проанализировать метрики, воронку или влияние фичи | `data-analyst` | `product-manager`, если по результатам нужно принять продуктовое решение |
 | Нужно написать README, runbook, guide или release notes | `technical-writer` | профильный skill по содержанию документа |
 | Нужно обновить локальные стандарты, skills или ввести новый стек | `team-engineering-style` | профильный skill той области, которую меняем |
+
+## Инструментальные и доменные skills
+
+| Ситуация | Основной skill | Когда добавить второй skill |
+| --- | --- | --- |
+| Нужно создать или изменить Paperclip agent adapter | `create-agent-adapter` | `security-engineer` для secrets/sandboxing; `frontend-engineer`, если меняется UI config |
+| Нужно работать с файловой PARA-памятью, daily notes или recall | `para-memory-files` | `context-hygiene`, если сначала нужно сжать длинную сессию |
+| Нужно работать с Allure TestOps | `allure-testops-operations` | `autotest-engineer`, если задача связана с test results и reporting strategy |
+| Нужно работать с GitLab issues, MRs, pipelines или releases | `gitlab-operations` | `devops-engineer` для CI/CD incidents; `code-review-professional` для MR review |
+| Нужно работать с Yandex Tracker | `yandex-tracker-operations` | `analyst` для требований; `delivery-manager` для release coordination |
+| Нужно работать с VCont runtime, bootfile, Modbus или HSB | `vcont` | `autotest-engineer`, если нужна автоматизация проверки; `systematic-debugging` для расследования сбоя |
 
 ## Как отличать похожие роли
 
@@ -53,6 +66,7 @@
 
 - `manual-tester` нужен для ручной проверки, exploratory, smoke, UAT и bug reports.
 - `autotest-engineer` нужен для автоматизации, CI и тестовой архитектуры.
+- `browser-automation` нужен для фактического браузерного evidence прямо сейчас; если сценарий должен жить в test suite, добавляй `autotest-engineer`.
 
 ### `support-engineer` vs `manual-tester`
 
@@ -71,6 +85,7 @@
 - Подготовка релиза: `delivery-manager` + `devops-engineer` + `manual-tester` + `code-review-professional`
 - Инцидент в эксплуатации: `support-engineer` + `devops-engineer` + профильный инженерный skill
 - Изменение стандартов команды: `team-engineering-style` + профильный skill по области изменения
+- Длинная агентская задача: `context-hygiene` + профильный skill + при необходимости `para-memory-files`
 
 ## Антипаттерны выбора
 

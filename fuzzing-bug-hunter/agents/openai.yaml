@@ -1,4 +1,4 @@
 interface:
   display_name: "Fuzzing Bug Hunter"
-  short_description: "Find bugs via matrix fuzzing"
-  default_prompt: "Use $fuzzing-bug-hunter to run matrix fuzzing, isolate new defect families, and turn findings into reproducible regression cases."
+  short_description: "Matrix fuzzing и воспроизводимые regressions."
+  default_prompt: "Используй $fuzzing-bug-hunter, чтобы провести matrix fuzzing, изолировать defect families и оформить воспроизводимые regression cases."

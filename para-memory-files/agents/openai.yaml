@@ -1,0 +1,4 @@
+interface:
+  display_name: "PARA Memory Files"
+  short_description: "Файловая память, daily notes и recall."
+  default_prompt: "Используй $para-memory-files, чтобы сохранить, найти или обновить знания в файловой PARA-памяти."

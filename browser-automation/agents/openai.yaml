@@ -1,4 +1,4 @@
 interface:
   display_name: "Browser Automation"
   short_description: "Automate and verify browser workflows with Playwright."
-  default_prompt: "Use $browser-automation to inspect or verify a web workflow."
+  default_prompt: "Используй $browser-automation, чтобы проверить web-сценарий в браузере, собрать скриншоты и DOM/network evidence."

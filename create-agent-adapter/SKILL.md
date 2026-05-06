@@ -51,21 +51,21 @@ Adapter обязательно регистрируется в трех registry
 
 1. Определи тип runtime: local CLI, remote API, custom process, hybrid.
 2. Выбери имя адаптера:
-- adapter type -> `snake_case`
-- package -> `@paperclipai/adapter-<kebab-name>`
-- directory -> `packages/adapters/<kebab-name>/`
+   - adapter type -> `snake_case`
+   - package -> `@paperclipai/adapter-<kebab-name>`
+   - directory -> `packages/adapters/<kebab-name>/`
 3. Создай пакет с четырьмя export entrypoints: `.`, `./server`, `./ui`, `./cli`.
 4. Опиши metadata в root `index.ts`: `type`, `label`, `models`, `agentConfigurationDoc`.
 5. Реализуй server core:
-- config parsing через `@paperclipai/adapter-utils/server-utils`;
-- process/API execution;
-- parse output;
-- session persistence и retry на stale session;
-- `testEnvironment`.
+   - config parsing через `@paperclipai/adapter-utils/server-utils`;
+   - process/API execution;
+   - parse output;
+   - session persistence и retry на stale session;
+   - `testEnvironment`.
 6. Реализуй UI-часть:
-- transcript parser;
-- config builder;
-- adapter-specific config fields.
+   - transcript parser;
+   - config builder;
+   - adapter-specific config fields.
 7. Реализуй CLI formatter для `paperclipai run --watch`.
 8. Зарегистрируй adapter во всех registry.
 9. Добавь тесты минимум на parsing, session codec и config building.

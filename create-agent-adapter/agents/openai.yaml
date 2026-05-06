@@ -1,0 +1,4 @@
+interface:
+  display_name: "Paperclip Agent Adapter"
+  short_description: "Adapter packages, contracts and registration."
+  default_prompt: "Используй $create-agent-adapter, чтобы создать или изменить Paperclip agent adapter с корректными server/UI/CLI контрактами."
