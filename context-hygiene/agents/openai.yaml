@@ -1,0 +1,4 @@
+interface:
+  display_name: "Context Hygiene"
+  short_description: "Keep long agent sessions compact and recoverable."
+  default_prompt: "Use $context-hygiene to summarize progress, preserve decisions, and continue a long task."
