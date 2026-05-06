@@ -16,6 +16,7 @@
 | Нужно решить, что делать в продукте, что брать в MVP и как приоритизировать backlog | `product-manager` | `data-analyst`, если решение должно опираться на метрики; `analyst`, если нужно глубже формализовать требования |
 | Нужно спроектировать архитектуру, интеграции и технические компромиссы | `solution-architect` | `security-engineer` для security-sensitive решений; `database-engineer` для выраженного DB-фокуса |
 | Нужно написать или изменить Python-код | `python-developer` | `database-engineer` для data-layer; `code-review-professional` для сильного review |
+| Нужно выполнить сложную реализацию через независимые subtasks или agent workflow | `subagent-driven-development` | профильные engineering skills по областям задач; `code-review-professional` для финального review |
 | Нужно разработать frontend | `frontend-engineer` | `product-designer` для сильного UX-фокуса; `autotest-engineer` для UI automation |
 | Нужно проверить web-сценарий в браузере, собрать screenshot, DOM или network evidence | `browser-automation` | `frontend-engineer`, если нужно сразу исправлять UI; `autotest-engineer`, если проверку нужно превратить в долгоживущий тест |
 | Нужно спроектировать UX, user flow или визуальную концепцию | `product-designer` | `frontend-engineer`, если сразу нужна реализация |
@@ -39,6 +40,7 @@
 | Ситуация | Основной skill | Когда добавить второй skill |
 | --- | --- | --- |
 | Нужно создать или изменить Paperclip agent adapter | `create-agent-adapter` | `security-engineer` для secrets/sandboxing; `frontend-engineer`, если меняется UI config |
+| Нужно делегировать работу нескольким subagents | `subagent-driven-development` | `context-hygiene`, если задача длинная; `team-engineering-style`, если меняется сам workflow |
 | Нужно работать с файловой PARA-памятью, daily notes или recall | `para-memory-files` | `context-hygiene`, если сначала нужно сжать длинную сессию |
 | Нужно работать с Allure TestOps | `allure-testops-operations` | `autotest-engineer`, если задача связана с test results и reporting strategy |
 | Нужно работать с GitLab issues, MRs, pipelines или releases | `gitlab-operations` | `devops-engineer` для CI/CD incidents; `code-review-professional` для MR review |
@@ -56,6 +58,7 @@
 
 - `solution-architect` отвечает за высокоуровневую схему и границы решения.
 - `python-developer` отвечает за реализацию конкретного кода и модулей.
+- `subagent-driven-development` не заменяет инженерный skill: он организует делегирование, ownership, review gates и интеграцию, а профильный skill определяет качество работы в своей области.
 
 ### `devops-engineer` vs `platform-engineer`
 
@@ -86,6 +89,7 @@
 - Инцидент в эксплуатации: `support-engineer` + `devops-engineer` + профильный инженерный skill
 - Изменение стандартов команды: `team-engineering-style` + профильный skill по области изменения
 - Длинная агентская задача: `context-hygiene` + профильный skill + при необходимости `para-memory-files`
+- Большая реализация с независимыми частями: `subagent-driven-development` + профильные engineering skills + `code-review-professional`
 
 ## Антипаттерны выбора
 

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Subagent-Driven Development"
+  short_description: "Параллельная разработка через subagents."
+  default_prompt: "Используй $subagent-driven-development, чтобы выполнить план через subagents с ownership, review gates и интеграционной проверкой."
