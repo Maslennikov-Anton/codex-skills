@@ -1,6 +1,6 @@
 ---
 name: skill-creator
-description: Guide for creating effective skills. This skill should be used when users want to create a new skill (or update an existing skill) that extends Codex's capabilities with specialized knowledge, workflows, or tool integrations.
+description: Guide for creating, updating, evaluating, and optimizing skills. Use when users want to create or improve a skill, add tool/workflow knowledge, run skill eval prompts, compare baseline behavior, or tune skill description triggers.
 metadata:
   short-description: Create or update a skill
 ---
@@ -229,7 +229,9 @@ Skill creation involves these steps:
 3. Initialize the skill (run init_skill.py)
 4. Edit the skill (implement resources and write SKILL.md)
 5. Validate the skill (run quick_validate.py)
-6. Iterate based on real usage and forward-test complex skills.
+6. Evaluate nontrivial skills with realistic prompts and a baseline
+7. Iterate based on real usage, eval results, and forward-tests
+8. Optimize the description trigger when the skill should auto-invoke reliably.
 
 Follow these steps in order, skipping only if there is a clear reason why they are not applicable.
 
@@ -253,6 +255,7 @@ For example, when building an image-editor skill, relevant questions include:
 - "Can you give some examples of how this skill would be used?"
 - "I can imagine users asking for things like 'Remove the red-eye from this image' or 'Rotate this image'. Are there other ways you imagine this skill being used?"
 - "What would a user say that should trigger this skill?"
+- "Should we set up eval prompts to verify the skill works? This is useful for deterministic workflows, code generation, file transforms, and multi-step tool use."
 - "Where should I create this skill? If you do not have a preference, I will place it in `$CODEX_HOME/skills` (or `~/.codex/skills` when `CODEX_HOME` is unset) so Codex can discover it automatically."
 
 To avoid overwhelming users, avoid asking too many questions in a single message. Start with the most important questions and follow up as needed for better effectiveness.
@@ -369,7 +372,23 @@ scripts/quick_validate.py <path/to/skill-folder>
 
 The validation script checks YAML frontmatter format, required fields, and naming rules. If validation fails, fix the reported issues and run the command again.
 
-### Step 6: Iterate
+### Step 6: Evaluate the Skill
+
+For nontrivial skills, create 2-5 realistic eval prompts before declaring the skill done. This is especially valuable when outputs are objectively inspectable: code, files, data extraction, docs with required structure, fixed workflows, and tool integrations.
+
+Use `references/evaluation_workflow.md` for the lightweight eval process and `scripts/init_eval_workspace.py` to create the workspace skeleton.
+
+Keep evals small at first:
+
+- Include user-like prompts, not abstract descriptions.
+- Include `expected_output` in plain language.
+- Compare against a baseline when useful:
+  - new skill: run without the skill;
+  - existing skill: snapshot the old skill before editing and run against that snapshot.
+- Evaluate both result quality and whether the skill caused wasted work.
+- Do not overfit the skill to only pass the first eval set.
+
+### Step 7: Iterate
 
 After testing the skill, you may detect the skill is complex enough that it requires forward-testing; or users may request improvements.
 
@@ -382,6 +401,19 @@ User testing often this happens right after using the skill, with fresh context 
 3. Identify how SKILL.md or bundled resources should be updated
 4. Implement changes and test again
 5. Forward-test if it is reasonable and appropriate
+
+### Step 8: Optimize Description Triggering
+
+After creating or substantially updating a skill, check whether the `description` is likely to trigger at the right times.
+
+Use `references/evaluation_workflow.md` for trigger evals:
+
+- 5-10 should-trigger prompts with varied wording.
+- 5-10 should-not-trigger near misses that share keywords but need another skill or no skill.
+- Prefer realistic prompts with paths, tools, constraints, typos, or casual phrasing.
+- Revise the description when it is too vague, under-triggering, or over-triggering.
+
+Do not hide trigger rules in the body. The body is only loaded after the skill triggers.
 
 ## Forward-testing
 
