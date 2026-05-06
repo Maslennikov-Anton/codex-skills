@@ -230,7 +230,7 @@ Skill creation involves these steps:
 4. Edit the skill (implement resources and write SKILL.md)
 5. Validate the skill (run quick_validate.py)
 6. Evaluate nontrivial skills with realistic prompts and a baseline
-7. Iterate based on real usage, eval results, and forward-tests
+7. Iterate based on real usage, pressure scenarios, eval results, and forward-tests
 8. Optimize the description trigger when the skill should auto-invoke reliably.
 
 Follow these steps in order, skipping only if there is a clear reason why they are not applicable.
@@ -255,6 +255,7 @@ For example, when building an image-editor skill, relevant questions include:
 - "Can you give some examples of how this skill would be used?"
 - "I can imagine users asking for things like 'Remove the red-eye from this image' or 'Rotate this image'. Are there other ways you imagine this skill being used?"
 - "What would a user say that should trigger this skill?"
+- "What pressure scenario would make an agent fail without this skill?"
 - "Should we set up eval prompts to verify the skill works? This is useful for deterministic workflows, code generation, file transforms, and multi-step tool use."
 - "Where should I create this skill? If you do not have a preference, I will place it in `$CODEX_HOME/skills` (or `~/.codex/skills` when `CODEX_HOME` is unset) so Codex can discover it automatically."
 
@@ -352,9 +353,11 @@ Write the YAML frontmatter with `name` and `description`:
 
 - `name`: The skill name
 - `description`: This is the primary triggering mechanism for your skill, and helps Codex understand when to use the skill.
-  - Include both what the Skill does and specific triggers/contexts for when to use it.
+  - Describe when to use the skill, not the workflow summary.
+  - Include specific triggers, symptoms, file types, tools, or task contexts.
+  - Do not summarize step-by-step behavior in `description`; if the description contains the workflow, Codex may follow the shortcut and skip the body.
   - Include all "when to use" information here - Not in the body. The body is only loaded after triggering, so "When to Use This Skill" sections in the body are not helpful to Codex.
-  - Example description for a `docx` skill: "Comprehensive document creation, editing, and analysis with support for tracked changes, comments, formatting preservation, and text extraction. Use when Codex needs to work with professional documents (.docx files) for: (1) Creating new documents, (2) Modifying or editing content, (3) Working with tracked changes, (4) Adding comments, or any other document tasks"
+  - Example description for a `docx` skill: "Use when working with professional documents (.docx files): creating documents, editing content, preserving formatting, tracked changes, comments, or extracting text."
 
 Do not include any other fields in YAML frontmatter.
 
@@ -374,7 +377,7 @@ The validation script checks YAML frontmatter format, required fields, and namin
 
 ### Step 6: Evaluate the Skill
 
-For nontrivial skills, create 2-5 realistic eval prompts before declaring the skill done. This is especially valuable when outputs are objectively inspectable: code, files, data extraction, docs with required structure, fixed workflows, and tool integrations.
+For nontrivial skills, create 2-5 realistic eval prompts before declaring the skill done. For discipline-enforcing skills, include pressure scenarios: time pressure, tempting shortcuts, stale evidence, partial verification, or ambiguous user wording. This is especially valuable when outputs are objectively inspectable: code, files, data extraction, docs with required structure, fixed workflows, and tool integrations.
 
 Use `references/evaluation_workflow.md` for the lightweight eval process and `scripts/init_eval_workspace.py` to create the workspace skeleton.
 
@@ -382,6 +385,7 @@ Keep evals small at first:
 
 - Include user-like prompts, not abstract descriptions.
 - Include `expected_output` in plain language.
+- Include at least one pressure scenario for rules that agents are likely to rationalize around.
 - Compare against a baseline when useful:
   - new skill: run without the skill;
   - existing skill: snapshot the old skill before editing and run against that snapshot.
@@ -412,6 +416,7 @@ Use `references/evaluation_workflow.md` for trigger evals:
 - 5-10 should-not-trigger near misses that share keywords but need another skill or no skill.
 - Prefer realistic prompts with paths, tools, constraints, typos, or casual phrasing.
 - Revise the description when it is too vague, under-triggering, or over-triggering.
+- Remove workflow summaries from description; keep process details in the body.
 
 Do not hide trigger rules in the body. The body is only loaded after the skill triggers.
 

@@ -7,6 +7,7 @@ Use this reference when a skill needs more than structural validation. The goal 
 Run lightweight evals when:
 
 - the skill encodes a multi-step workflow;
+- the skill enforces discipline under pressure;
 - output quality can be judged against concrete expectations;
 - the skill includes scripts or references that should change behavior;
 - the skill competes with adjacent skills and needs clear trigger boundaries;
@@ -37,6 +38,21 @@ Create `evals/evals.json` inside the skill:
 ```
 
 Keep prompts realistic. Good prompts include paths, concrete constraints, user intent, and ambiguity that a real task would contain.
+
+## Pressure Scenarios
+
+Use pressure scenarios for skills that prevent shortcuts, rationalizations, or premature claims.
+
+Good pressure prompts combine:
+
+- time pressure or impatience;
+- a tempting partial check;
+- stale evidence from an earlier run;
+- a user asking for speed over rigor;
+- ambiguous success language such as "looks fixed" or "should pass";
+- delegated-agent reports that still need independent verification.
+
+Success means the agent follows the skill despite the pressure and states actual status from evidence.
 
 ## Baseline Comparison
 
@@ -141,6 +157,7 @@ Revise the description when:
 - positive prompts require the skill but the description does not mention the intent, file type, tool, or workflow;
 - negative prompts share keywords and would likely over-trigger;
 - the description only says what the skill is, but not when to use it.
+- the description summarizes process steps that belong in the skill body.
 
 ## Iteration Rule
 

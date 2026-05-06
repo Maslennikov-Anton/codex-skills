@@ -1,0 +1,4 @@
+interface:
+  display_name: "Implementation Planner"
+  short_description: "Планы реализации с файлами, шагами и проверками."
+  default_prompt: "Используй $implementation-planner, чтобы подготовить инженерный implementation plan с точными файлами, шагами и verification commands."
