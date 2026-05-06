@@ -1,0 +1,4 @@
+interface:
+  display_name: "Receiving Code Review"
+  short_description: "Обработка review feedback без слепого согласия."
+  default_prompt: "Используй $receiving-code-review, чтобы разобрать review feedback, проверить его по codebase и исправить или аргументированно возразить."

@@ -64,6 +64,13 @@ Expected scope:
 Diff or files:
 - ...
 
+Review contract:
+- What was implemented: ...
+- Plan or requirements: ...
+- Base SHA: ...
+- Head SHA: ...
+- Verification already run: ...
+
 Return findings first:
 - Severity.
 - File/line.
@@ -80,3 +87,28 @@ If no findings:
 - Один файл не должен быть write-owned двумя worker'ами одновременно.
 - Shared config, lockfiles, migrations и public contracts требуют отдельной coordination task.
 - Если worker обнаружил необходимость выйти за ownership, он должен остановиться и сообщить, а не расширять scope самостоятельно.
+
+## Code Reviewer Prompt
+
+```text
+Проведи профессиональное code review. Не меняй файлы.
+
+What was implemented:
+- ...
+
+Plan or requirements:
+- ...
+
+Review range:
+- Base SHA: ...
+- Head SHA: ...
+- Or changed files: ...
+
+Known verification:
+- ...
+
+Return:
+- Findings first, ordered by severity: Critical, Important, Minor.
+- Each finding: file/line, issue, why it matters, required fix.
+- If no findings: say so clearly and name residual risks.
+```

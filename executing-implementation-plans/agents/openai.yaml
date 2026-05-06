@@ -1,0 +1,4 @@
+interface:
+  display_name: "Executing Implementation Plans"
+  short_description: "Исполнение written plans с checkpoints."
+  default_prompt: "Используй $executing-implementation-plans, чтобы выполнить written implementation plan task-by-task с критическим review и verification checkpoints."

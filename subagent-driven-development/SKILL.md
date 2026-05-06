@@ -41,6 +41,7 @@ description: "Использовать, когда пользователь ра
    - прочитай результат;
    - проверь changed files или evidence;
    - интегрируй только то, что проходит review;
+   - для code-changing tasks запускай review gate перед переходом к следующей независимой task;
    - закрой thread, если он больше не нужен.
 6. Перед финальным ответом:
    - проверь общий diff;
@@ -63,6 +64,19 @@ description: "Использовать, когда пользователь ра
    - нет конфликтов с параллельными изменениями.
 
 Если review выявил проблему, не исправляй вслепую поверх результата. Сначала реши, лучше ли вернуть задачу тому же subagent, исправить локально или пересобрать ownership.
+
+## Requesting Review
+
+Для review subagent не передавай всю историю сессии. Дай сфокусированный review contract:
+
+- что реализовано;
+- план или требования;
+- base/head SHA, если есть commit boundary;
+- changed files, если commit boundary нет;
+- known verification и ее результат;
+- expected severity format: Critical, Important, Minor.
+
+Critical issues исправляй сразу. Important issues исправляй перед продолжением. Minor issues можно оставить как follow-up, если они не влияют на correctness.
 
 ## Что делегировать
 

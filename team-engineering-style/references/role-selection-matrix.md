@@ -16,6 +16,7 @@
 | Нужно решить, что делать в продукте, что брать в MVP и как приоритизировать backlog | `product-manager` | `data-analyst`, если решение должно опираться на метрики; `analyst`, если нужно глубже формализовать требования |
 | Нужно спроектировать архитектуру, интеграции и технические компромиссы | `solution-architect` | `security-engineer` для security-sensitive решений; `database-engineer` для выраженного DB-фокуса |
 | Нужно подготовить исполнимый план реализации перед кодом | `implementation-planner` | `solution-architect`, если нужно сначала выбрать архитектуру; `subagent-driven-development`, если план будут выполнять агенты |
+| Нужно выполнить уже написанный implementation plan | `executing-implementation-plans` | `subagent-driven-development`, если tasks независимы; `verification-before-completion` для финального claim |
 | Нужно написать или изменить Python-код | `python-developer` | `database-engineer` для data-layer; `code-review-professional` для сильного review |
 | Нужно выполнить сложную реализацию через независимые subtasks или agent workflow | `subagent-driven-development` | профильные engineering skills по областям задач; `code-review-professional` для финального review |
 | Нужно разработать frontend | `frontend-engineer` | `product-designer` для сильного UX-фокуса; `autotest-engineer` для UI automation |
@@ -43,6 +44,7 @@
 | Нужно создать или изменить Paperclip agent adapter | `create-agent-adapter` | `security-engineer` для secrets/sandboxing; `frontend-engineer`, если меняется UI config |
 | Нужно делегировать работу нескольким subagents | `subagent-driven-development` | `context-hygiene`, если задача длинная; `team-engineering-style`, если меняется сам workflow |
 | Нужно подтвердить "готово", "починено", "тесты проходят", build/lint success, commit, push или PR | `verification-before-completion` | профильный skill текущей задачи, чтобы выбрать правильную проверку |
+| Нужно обработать review feedback, requested changes или inline comments | `receiving-code-review` | `code-review-professional`, если нужно независимо оценить спорный feedback; GitHub/GitLab skill для thread-level replies |
 | Нужно работать с файловой PARA-памятью, daily notes или recall | `para-memory-files` | `context-hygiene`, если сначала нужно сжать длинную сессию |
 | Нужно работать с Allure TestOps | `allure-testops-operations` | `autotest-engineer`, если задача связана с test results и reporting strategy |
 | Нужно работать с GitLab issues, MRs, pipelines или releases | `gitlab-operations` | `devops-engineer` для CI/CD incidents; `code-review-professional` для MR review |
@@ -56,6 +58,7 @@
 - `analyst` нужен, когда требуется понять, описать и структурировать требования.
 - `product-manager` нужен, когда требуется выбрать, что делать в первую очередь и какую ценность это даст.
 - `implementation-planner` нужен после требований/дизайна, когда надо разложить реализацию на exact files, steps и verification commands.
+- `executing-implementation-plans` нужен после появления written plan, когда надо строго выполнить steps и checkpoints.
 
 ### `solution-architect` vs `python-developer`
 
@@ -94,6 +97,7 @@
 - Длинная агентская задача: `context-hygiene` + профильный skill + при необходимости `para-memory-files`
 - Большая реализация с независимыми частями: `subagent-driven-development` + профильные engineering skills + `code-review-professional`
 - Завершение реализации: профильный engineering skill + `verification-before-completion`
+- Работа с review comments: `receiving-code-review` + профильный engineering skill + `verification-before-completion`
 
 ## Антипаттерны выбора
 
