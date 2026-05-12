@@ -30,7 +30,7 @@ description: "Поддерживать локальные инженерные �
 
 ## Текущие локальные правила по умолчанию
 
-- Репозиторий `addyosmani/agent-skills` принят как внешний baseline для agentic engineering lifecycle: refine/spec/plan/build/test/debug/review/ship. Не копируй его wholesale; выравнивай локальные skills через mapping, сохраняй наши русскоязычные форматы, VCont/HSB-специфику и правила текущей среды.
+- Локальная lifecycle-модель для agentic engineering: refine/spec -> plan -> small implementation slices -> test/debug -> review -> verify -> ship. Правила фиксируются только в наших skills.
 - Для новых или спорных библиотек, framework API и интеграционных паттернов используй `source-driven-development`: решение должно опираться на версию проекта и официальную документацию, а не на память модели.
 - Для high-risk решений, security-sensitive изменений, irreversible операций и уверенных, но дорогих для исправления выводов используй `doubt-driven-development`: сначала сформулируй claim и smallest reviewable artifact, затем проверь его fresh pass или независимым reviewer'ом, если это разрешено текущими инструкциями.
 - После изменения или добавления локального skill изменения нужно закоммитить и запушить в репозиторий `codex-skills` в рамках той же задачи, если пользователь явно не попросил этого не делать.
@@ -80,7 +80,6 @@ description: "Поддерживать локальные инженерные �
 - `references/implementation-done-definition.md` -> критерии завершения реализации и стандарт post-implementation проверки.
 - `references/role-selection-matrix.md` -> быстрый выбор роли или связки ролей под конкретный тип задачи.
 - `references/skill-quality.md` -> чеклист качества локальных skills: автотриггер, progressive disclosure, границы и validation.
-- `references/agent-skills-alignment.md` -> mapping локальных skills к baseline `addyosmani/agent-skills` и правила заимствования практик.
 
 ## Формат ответа
 
