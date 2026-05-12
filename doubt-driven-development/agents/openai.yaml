@@ -1,0 +1,4 @@
+interface:
+  display_name: "Doubt-Driven Development"
+  short_description: "Скептическая проверка рискованных решений."
+  default_prompt: "Используй $doubt-driven-development, чтобы проверить high-risk решение свежим скептическим pass."

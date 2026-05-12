@@ -1,0 +1,4 @@
+interface:
+  display_name: "Source-Driven Development"
+  short_description: "Проверка решений по официальным источникам."
+  default_prompt: "Используй $source-driven-development, чтобы сверить реализацию с официальной документацией и текущими версиями."

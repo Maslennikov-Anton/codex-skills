@@ -21,6 +21,7 @@ description: "Использовать, когда есть written implementati
    - отметь task in progress;
    - следуй steps в плане;
    - не расширяй scope;
+   - держи изменение маленьким завершенным slice;
    - запускай verification, указанную в task;
    - фиксируй result;
    - переходи дальше только после pass или явного решения по blocker.
@@ -40,6 +41,7 @@ description: "Использовать, когда есть written implementati
 - task unclear;
 - план содержит TODO/TBD/placeholders;
 - verification command отсутствует для risky task;
+- risky step не имеет source/doubt gate, хотя зависит от внешнего API, миграции, security или irreversible action;
 - dependency не установлена или недоступна;
 - test/build fails не из-за ожидаемого red step;
 - выполнение требует изменения scope;
@@ -50,6 +52,7 @@ description: "Использовать, когда есть written implementati
 - Не исполняй план на blind trust, если он противоречит codebase.
 - Не переписывай план молча, если меняется architecture или scope.
 - Не пропускай verification steps.
+- Не превращай большой план в один большой diff без промежуточных проверок.
 - Не объявляй task complete по факту изменения файлов без проверки.
 - Не продолжай после repeated failure без root cause или уточнения.
 

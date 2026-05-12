@@ -17,6 +17,8 @@
 | Нужно спроектировать архитектуру, интеграции и технические компромиссы | `solution-architect` | `security-engineer` для security-sensitive решений; `database-engineer` для выраженного DB-фокуса |
 | Нужно подготовить исполнимый план реализации перед кодом | `implementation-planner` | `solution-architect`, если нужно сначала выбрать архитектуру; `subagent-driven-development`, если план будут выполнять агенты |
 | Нужно выполнить уже написанный implementation plan | `executing-implementation-plans` | `subagent-driven-development`, если tasks независимы; `verification-before-completion` для финального claim |
+| Нужно принять решение по внешнему API, framework/library behavior или версии инструмента | `source-driven-development` | профильный engineering skill для реализации; `security-engineer`, если источник влияет на security default |
+| Нужно проверить рискованный claim, irreversible change, migration или спорное решение | `doubt-driven-development` | `code-review-professional` для diff review; `source-driven-development`, если риск связан с внешним API |
 | Нужно написать или изменить Python-код | `python-developer` | `database-engineer` для data-layer; `code-review-professional` для сильного review |
 | Нужно выполнить сложную реализацию через независимые subtasks или agent workflow | `subagent-driven-development` | профильные engineering skills по областям задач; `code-review-professional` для финального review |
 | Нужно разработать frontend | `frontend-engineer` | `product-designer` для сильного UX-фокуса; `autotest-engineer` для UI automation |
@@ -98,6 +100,7 @@
 - Большая реализация с независимыми частями: `subagent-driven-development` + профильные engineering skills + `code-review-professional`
 - Завершение реализации: профильный engineering skill + `verification-before-completion`
 - Работа с review comments: `receiving-code-review` + профильный engineering skill + `verification-before-completion`
+- Рискованное изменение внешней интеграции: `source-driven-development` + `doubt-driven-development` + профильный engineering skill
 
 ## Антипаттерны выбора
 
@@ -106,3 +109,5 @@
 - Не заменяй `manual-tester` автотестами там, где сначала нужно проверить саму идею сценария.
 - Не заменяй `support-engineer` обычной разработкой, если сначала непонятно, где именно проблема и как она проявляется у пользователя.
 - Не тащи слишком много ролей в одну задачу: если достаточно двух skills, третий уже должен быть явно обоснован.
+- Не заменяй `source-driven-development` поиском по памяти модели, если задача зависит от актуальной версии внешнего API.
+- Не заменяй `doubt-driven-development` обычным финальным review, если сначала нужно проверить сам claim или план до изменения кода.

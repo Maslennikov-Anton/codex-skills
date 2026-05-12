@@ -26,8 +26,10 @@ description: "Использовать перед multi-step реализаци�
    - test-first шаг, если применимо;
    - command для проверки;
    - expected output или критерий pass/fail.
-6. Проверь план на placeholders и несогласованность names/types.
-7. Укажи подход выполнения: inline, batch checkpoints или `subagent-driven-development`.
+6. Для внешних API/framework decisions добавь source gate: где взять версию и official docs, либо явно пометь unknown.
+7. Для high-risk или irreversible шага добавь doubt gate: какой claim нужно проверить до изменения.
+8. Проверь план на placeholders и несогласованность names/types.
+9. Укажи подход выполнения: inline, batch checkpoints или `subagent-driven-development`.
 
 ## Правила качества плана
 
@@ -39,6 +41,9 @@ description: "Использовать перед multi-step реализаци�
 - Expected output должен быть проверяемым.
 - Не добавляй архитектурный redesign, если задача требует локального изменения.
 - Не планируй TODO/placeholders.
+- План должен идти маленькими slices: после каждого рискованного slice есть локальная проверка.
+- Не принимай внешние API и framework behavior на память: добавляй `source-driven-development`.
+- Если шаг содержит миграцию, удаление данных, security-sensitive изменение или дорогой rollback, добавляй `doubt-driven-development`.
 
 ## Запрещенные placeholders
 
@@ -67,6 +72,8 @@ description: "Использовать перед multi-step реализаци�
 - Для delivery/release coordination используй `delivery-manager`.
 - Для архитектурного решения с trade-offs используй `solution-architect`.
 - Для выполнения плана через агентов используй `subagent-driven-development`.
+- Для решений по внешним API/framework/library используй `source-driven-development`.
+- Для рискованных claims и irreversible изменений используй `doubt-driven-development`.
 - Перед claim о завершении используй `verification-before-completion`.
 
 ## Формат ответа

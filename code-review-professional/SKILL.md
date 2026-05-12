@@ -18,6 +18,10 @@ description: Ревьюить изменения в коде с фокусом �
 3. Оцени риск: низкий, средний или высокий.
 4. Проверь:
    - корректность логики;
+   - читаемость и простоту решения;
+   - архитектурные границы и совместимость контрактов;
+   - security implications;
+   - performance implications;
    - граничные случаи и обработку ошибок;
    - регрессии и обратную совместимость;
    - достаточность тестов и проверок.
@@ -31,6 +35,16 @@ description: Ревьюить изменения в коде с фокусом �
 - недостаточное тестовое покрытие;
 - скрытая избыточная сложность;
 - нарушение локальных стандартов.
+
+## Five-axis review
+
+Проверяй каждое значимое изменение по пяти осям:
+
+1. Correctness: поведение, edge cases, error paths, regression risk.
+2. Simplicity/readability: лишняя сложность, naming, локальные conventions.
+3. Architecture: границы модулей, contracts, coupling, migration path.
+4. Security: auth/authz, secrets, injection, unsafe defaults, data exposure.
+5. Performance: unnecessary work, queries, memory, latency, scalability cliffs.
 
 ## Какие references открывать
 
@@ -46,6 +60,7 @@ description: Ревьюить изменения в коде с фокусом �
 - Привязывай замечания к файлам и строкам, если это возможно.
 - Разделяй факты, выводы и предположения.
 - Если проблем не найдено или ревью ограничено окружением, явно это отмечай.
+- Не принимай “small diff” как low risk без проверки behavior surface.
 - Не доверяй session history вместо review contract: review должен опираться на diff, файлы, требования и проверки.
 - Для Critical findings блокируй продолжение до исправления или явного решения пользователя.
 - Important findings исправляй до merge/финального claim либо явно фиксируй как accepted risk.
@@ -65,3 +80,5 @@ description: Ревьюить изменения в коде с фокусом �
 Если ревью-комментарии уже получены и их нужно обработать, используй `receiving-code-review`.
 
 Если review выполняет subagent, prompt должен содержать review contract: implementation summary, plan/requirements, base/head SHA или changed files, expected output и severity format.
+
+Если review упирается в спорный high-risk claim, используй `doubt-driven-development`.
