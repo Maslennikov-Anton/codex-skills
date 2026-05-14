@@ -55,8 +55,10 @@ This file is a compact map of Ant's local repositories and recurring commands. K
 - Verification commands:
   - Full tests: `pytest`.
   - Allure results: `pytest --alluredir=allure-results`.
+  - HSB heartbeat timing full run with terminal progress: `pytest -s tests/pytest_test/test_hsb_heartbeat_timing.py`.
+  - HSB heartbeat timing debug run: `HSB_HEARTBEAT_TIMING_ITERATIONS=10 pytest -s tests/pytest_test/test_hsb_heartbeat_timing.py`.
   - Local report: `allure serve allure-results`.
-- Notes: `pytest.ini` uses `tests/pytest_test`; markers include `docker` and `slow`. Use the `vcont` skill for HSB behavior, logs, eCAL, and XML command context.
+- Notes: `pytest.ini` uses `tests/pytest_test`; markers include `docker` and `slow`. Heartbeat timing writes a single Markdown report to `reports/hsb-heartbeat-timing/report.md`; clean timing runs should have `data_quality.duplicate_measurement_count == 0`. The report should include full iteration table plus column legend, summary stats, direction split, and extremes. GitLab `hsb-e2e` stores this report as an artifact together with `allure-results/`. Use the `vcont` skill for HSB behavior, logs, eCAL, and XML command context.
 
 ### `/home/ant/IdeaProjects/vcont-runtime-runner`
 
