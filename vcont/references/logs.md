@@ -4,7 +4,7 @@
 
 ## Где искать
 
-- Основной файл обычно лежит рядом с бинарником: `vcont*/.../vcont-lin.x86_64-arch/vcont.log`.
+- Основной файл обычно лежит рядом с бинарником. В актуальной локальной HSB-инфре путь выглядит как `.work/vcont-runtime/vcontN/vcont-lin.x86_64-arch/vcont.log`.
 - При ротации рядом могут быть `vcont.1.log`, `vcont.2.log` и т.д.
 - Для тестов лучше читать только свежий диапазон после старта теста: запомнить byte-offset файла до `docker compose up`, затем читать `tail -c +<offset+1> vcont.log`.
 - `docker compose logs` почти бесполезен для диагностики VCont: stdout может содержать только короткие служебные строки вроде `Registration thread is started`; значимые данные идут в файловый `vcont.log`.
