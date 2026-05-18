@@ -11,6 +11,7 @@ description: "Опирайтесь на официальные источник�
 
 1. Определи stack и версии:
    - lockfile, package metadata, pyproject, build files, Docker image, CLI version;
+   - для Python/JS/Playwright/GitHub/OpenAI/Allure сначала проверь локально установленную версию, lockfile или официальный CLI output;
    - если версия не видна локально, явно зафиксируй unknown и не делай version-specific claim.
 2. Найди authoritative source:
    - official docs, release notes, migration guide, API reference, standards document;
@@ -31,6 +32,7 @@ description: "Опирайтесь на официальные источник�
 - Решение берется из старого blog post вместо официального migration guide.
 - Breaking change предполагается на память.
 - Security/config default выбран без документации.
+- Python/JS/Playwright/GitHub/OpenAI/Allure API используется без проверки текущей версии или official docs.
 
 ## Формат ответа
 

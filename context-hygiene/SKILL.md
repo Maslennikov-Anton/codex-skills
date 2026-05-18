@@ -43,6 +43,7 @@ description: "Управлять длинным контекстом agent-се�
 - Не сохраняй секреты, tokens, cookies, приватные ключи и персональные данные.
 - Не превращай summary в полную историю чата.
 - Не сохраняй гипотезу как факт: помечай статус `confirmed`, `suspected`, `rejected`.
+- Handoff для кода должен содержать exact next command, changed files, commands already run, failing evidence и ближайший blocker.
 - Для знаний, которые должны стать частью файловой PARA-памяти, дополнительно используй `para-memory-files`.
 - Для правил команды и эволюции skills дополнительно используй `team-engineering-style`.
 

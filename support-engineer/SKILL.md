@@ -31,6 +31,18 @@ description: "Разбирать поддержку и инциденты: си�
 - Любая эскалация должна содержать шаги воспроизведения, влияние и уже собранные артефакты.
 - Если проблема выглядит как баг, не маскируй ее изменением теста или описания поведения.
 
+## Triage Template
+
+Для обращения или инцидента собери:
+
+- Impact: кто затронут, сколько пользователей/запусков, какой бизнес-поток.
+- Severity: blocker/critical/major/minor с причиной.
+- Environment: версия, build, tenant/project, browser/device/OS, region.
+- Reproduction: точные шаги, частота, test data, timestamps.
+- Evidence: logs, screenshots, request/response, trace IDs, failing command.
+- Workaround: есть ли безопасный обход и его ограничения.
+- Escalation: owner/team, что уже проверено, что нужно решить дальше.
+
 ## Формат ответа
 
 Когда просят помощь с сопровождением, возвращай:

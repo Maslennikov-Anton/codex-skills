@@ -41,3 +41,13 @@ Description должен отвечать на два вопроса:
 - Внутри хранится одноразовое решение из одного проекта.
 - Для использования нужно прочитать много reference-файлов заранее.
 - После добавления он часто триггерится на нерелевантные задачи.
+
+## Audit Checklist
+
+- Размер: `SKILL.md` содержит только routing, workflow и hard guardrails.
+- Description: короткий, конкретный, с реальными trigger terms.
+- Progressive disclosure: подробные команды, payloads, схемы и edge cases вынесены в `references/` или `scripts/`.
+- Duplication: правило не повторяет system/developer instructions и не конфликтует с ними.
+- Scope: skill не смешивает профессию, локальную политику, проектный workaround и разовую заметку.
+- Links: все `references/*.md` существуют и названы из `SKILL.md`.
+- Validation: `quick_validate.py`, проверка ссылок и `git diff --check`.

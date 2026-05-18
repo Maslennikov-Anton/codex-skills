@@ -5,111 +5,56 @@ description: "Искать скрытые баги через matrix/grammar fuz
 
 # Fuzzing Bug Hunter
 
-Используй этот skill, когда задача не в том, чтобы просто покрыть известный сценарий тестом, а в том, чтобы расширить карту отказов системы и найти новые defect families.
+Используй этот skill, когда цель - расширить карту отказов системы и найти новые defect families, а не просто покрыть известный сценарий тестом.
 
-## Когда использовать
+## Gate
 
-- Нужно найти новые defect families, а не только зафиксировать уже известный сценарий.
-- Нужно системно продавить поверхность через матрицу `construct x context x operand-shape`.
-- Нужно понять, какие границы реально supported, а какие только кажутся supported.
-- Нужно перевести исследовательские находки в воспроизводимые declarative cases и при необходимости во временную аналитическую сводку для разработчика.
+Подходит, если нужно:
 
-## Когда не использовать
+- исследовать матрицу `construct x context x operand-shape`;
+- понять supported/unsupported границы;
+- отделить новые defect families от вариаций уже известного бага;
+- превратить находки в минимальные repro и declarative cases.
 
-- Если сценарий уже известен и нужен просто стабильный regression test, используй `autotest-engineer`.
-- Если дефект уже найден и задача сместилась к доказательству root cause, используй `systematic-debugging`.
-- Если нужно оценить качество уже написанных тестов, generators или repro artifacts, используй `code-review-professional`.
-- Если речь идет только о ручной exploratory-проверке без автоматизированного генератора, используй `manual-tester`.
+Не подходит для обычного regression test (`autotest-engineer`), root cause уже найденной поверхности (`systematic-debugging`), review fuzz artifacts (`code-review-professional`) или ручной exploratory-проверки (`manual-tester`).
 
 ## Workflow
 
-1. Определи поверхность поиска:
-   - grammar;
-   - parser;
-   - codegen;
-   - runtime;
-   - input hygiene;
-   - diagnostics quality.
-2. Проверь, что уже известно:
-   - декларативный inventory в `tests/cases`;
-   - существующие matrix-артефакты и generators;
-   - какие случаи уже реально красные на текущем прогоне.
-3. Сформулируй матрицу:
-   - `construct x context x operand-shape`;
-   - минимально достаточный, но комбинаторно полезный набор значений;
-   - явная гипотеза, какую границу система может ломать.
-4. Запусти исследование так, чтобы signal был правдивым:
-   - сначала отдели harness noise от реального дефекта;
-   - не считай новый surface найденным, пока не снят representative raw diagnostic;
-   - различай parser/codegen/runtime/environment failures.
-5. После подтверждения нового сигнала:
-   - минимизируй воспроизведение;
-   - оформи отдельный declarative case, который сам проходит при своем oracle;
-   - если нужна коммуникация с разработчиком, обнови временную аналитическую сводку по текущим failing cases;
-   - прогони релевантный baseline suite.
-6. Если новых defects нет, зафиксируй это как результат:
-   - какая поверхность проверена;
-   - какие границы confirmed supported;
-   - почему следующий фронт поиска надо смещать.
+1. Определи поверхность: grammar, parser, codegen, runtime, input hygiene или diagnostics.
+2. Проверь существующий inventory: `tests/cases`, generators, matrix artifacts, текущие красные случаи.
+3. Сформулируй минимальную, но полезную матрицу и гипотезу о границе.
+4. Запусти исследование с правдивым signal:
+   - отдели harness/setup noise от дефекта;
+   - сними representative raw diagnostic;
+   - классифицируй parser/codegen/runtime/environment/diagnostics failure.
+5. После нового сигнала минимизируй repro, оформи case с собственным oracle, при необходимости обнови временную сводку failing cases и прогони baseline.
+6. Если новых defects нет, зафиксируй проверенную поверхность, confirmed supported границы и следующий рациональный фронт.
 
-## Что покрывает этот skill
+## Rules
 
-- Matrix fuzzing и targeted bug hunting.
-- Поиск новых defect families, а не только новых примеров старого бага.
-- Triage false positives и harness noise.
-- Минимизация и формализация repro.
-- Синхронизацию `finding -> case -> current failing signal`.
+- Цель fuzzing-а - знание о failure surface, а не покрытие ради покрытия.
+- Не превращай matrix в случайные комбинации без гипотезы.
+- Один новый defect family ценнее многих дубликатов без новой границы.
+- Не озеленяй результаты удалением плохих входов или ослаблением oracle; `xfail` не используем.
+- Если reproducer начал проходить, актуализируй кейс/гипотезу: переведи в supported regression или удали устаревший artifact.
+- Проверенная поверхность без новых багов - полезный результат, фиксируй его явно.
 
-## Границы ответственности
+## Typical Axes
 
-- Этот skill отвечает за расширение знания о failure surface системы.
-- Этот skill не отвечает за обычную реализацию продуктового fix.
-- Этот skill не заменяет deterministic test engineering после того, как новая граница уже найдена.
-- Этот skill не должен подменять root-cause investigation, если поверхность уже найдена и вопрос теперь в механике дефекта.
-- Если генератор не открывает новый класс проблемы, результатом должна быть фиксация проверенной поверхности, а не искусственное наращивание кейсов.
-
-## Базовые правила
-
-- Главная цель fuzzing-а здесь не покрытие ради покрытия, а рост правдивого знания о границах системы.
-- Не превращай exploratory matrix в набор случайных комбинаций без гипотезы.
-- Один новый defect family ценнее десятка почти одинаковых кейсов без новой границы.
-- Если новый сигнал оказался noise из harness или setup, сначала почини harness, потом продолжай исследование.
-- Не озеленяй результаты за счёт удаления плохих входов или ослабления oracle.
-- `xfail` не используем.
-- Если находка оформлена как тест, он должен проходить при своем oracle.
-- Если reproducer начал проходить, это означает, что кейс или гипотеза устарели. Их нужно немедленно актуализировать, а не хранить как исторический шум.
-- После подтверждения фикса или невоспроизводимости defect family нужно либо перевести кейс в supported regression, либо удалить устаревший reproducer.
-- Всегда разделяй:
-  - parser failure;
-  - codegen failure;
-  - runtime failure;
-  - environment dependency;
-  - diagnostics defect.
-- Если поверхность проверена и новых багов нет, это тоже полезный результат и его нужно фиксировать явно.
-
-## Типовые исследовательские оси
-
-- selector/context matrix для control flow
-- built-in argument matrix
-- placement/context matrix для standard blocks
-- input hygiene matrix
-- diagnostics normalization matrix
-- sequence-level combinations нескольких unsupported forms
+- selector/context matrix для control flow.
+- built-in argument matrix.
+- placement/context matrix для standard blocks.
+- input hygiene matrix.
+- diagnostics normalization matrix.
+- sequence-level combinations unsupported forms.
 
 ## Формат результата
 
-Когда просят заняться fuzzing/bug hunting, возвращай:
+Верни: исследованную поверхность, матрицу/гипотезу, найденные defect families, confirmed supported зоны, обновленные artifacts и следующий фронт исследования.
 
-1. Какую поверхность исследовал.
-2. Какая матрица или гипотеза использовалась.
-3. Какие новые defect families найдены, если найдены.
-4. Какие зоны confirmed supported.
-5. Какие кейсы/артефакты/документы обновлены.
-6. Какой следующий фронт исследования рационален.
+## Related Skills
 
-## Связь с другими skills
-
-- Используй вместе с `autotest-engineer`, если нужно превратить находки в стабильные regression tests.
-- Используй вместе с `systematic-debugging`, если задача уже сместилась от поиска поверхности к доказательству root cause.
-- Используй вместе с `code-review-professional`, если нужно оценить качество уже созданных fuzz/repro artifacts.
-- Используй вместе с `team-engineering-style`, если нужно закрепить новый устойчивый процесс fuzzing или развести зоны ответственности между skills.
+- `autotest-engineer` -> stable regression tests по найденным дефектам.
+- `systematic-debugging` -> доказательство root cause.
+- `code-review-professional` -> review fuzz/repro artifacts.
+- `team-engineering-style` -> закрепление устойчивого процесса fuzzing.

@@ -36,6 +36,8 @@ description: "Автоматизировать браузерные сценар
 
 - Практики Playwright-сценариев, селекторов и диагностики:
   [references/playwright-patterns.md](references/playwright-patterns.md)
+- Verification checklist для browser evidence:
+  [references/playwright-verification.md](references/playwright-verification.md)
 
 ## Базовые правила
 

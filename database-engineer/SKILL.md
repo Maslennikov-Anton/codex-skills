@@ -31,6 +31,14 @@ description: "Проектировать data layer: схемы БД, мигра
 - Каждая миграция должна иметь понятный operational plan: порядок, совместимость, откат.
 - Если бизнес-сущность часто собирается из множества запросов, оцени, не стоит ли изменить модель данных или стратегию загрузки.
 
+## Migration Safety
+
+- Перед изменением схемы зафиксируй affected tables/data, backward compatibility, rollout order и rollback или forward-only strategy.
+- Для индексов и constraints оцени lock risk, table size, concurrent writes и downtime budget.
+- Для data migrations опиши idempotency, batching, retry behavior и verification query.
+- Не удаляй columns/tables/data в том же шаге, где код только начал переходить на новую модель, если нет явного cutover plan.
+- После миграции нужна проверка: schema state, row counts/invariants, critical query и application compatibility.
+
 ## Артефакты
 
 - Схема данных или ее изменения.

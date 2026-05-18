@@ -7,120 +7,54 @@ description: >
 
 # Файловая PARA-память
 
-Постоянная файловая память, организованная по методу PARA Тьяго Форте. Три слоя: knowledge graph, daily notes и tacit knowledge. Все пути заданы относительно `$AGENT_HOME`.
+Используй этот skill для durable memory в `$AGENT_HOME`: knowledge graph, daily notes, tacit knowledge и planning files. Не сохраняй одноразовые логи, секреты, tokens, cookies или данные, которые пользователь не просил запоминать.
 
-## Когда использовать
+## When
 
-Используй этот skill, если нужно:
+- Сохранить устойчивое знание о пользователе, проекте, компании или процессе.
+- Найти ранее сохраненный контекст через `qmd`.
+- Обновить entity, daily note, tacit knowledge или planning file.
+- Подготовить handoff между сессиями.
+- Решить, что хранить в памяти, а что оставить только в текущем контексте.
 
-- сохранить устойчивое знание о пользователе, проекте, компании или процессе;
-- найти ранее сохраненный контекст через `qmd`;
-- обновить entity, daily note, tacit knowledge или planning file;
-- подготовить durable handoff между сессиями;
-- решить, что хранить в PARA, а что оставить только в текущем контексте.
+## Layers
 
-Не используй этот skill для одноразовых промежуточных логов, секретов, tokens, cookies или данных, которые пользователь не просил сохранять.
+1. Knowledge graph: `$AGENT_HOME/life/`
+   - `projects/` -> активная работа с целью/deadline.
+   - `areas/` -> постоянные ответственности, люди, компании.
+   - `resources/` -> справочные темы.
+   - `archives/` -> неактивные items.
+   - Entity folder содержит `summary.md` и `items.yaml`.
+2. Daily notes: `$AGENT_HOME/memory/YYYY-MM-DD.md`
+   - сырая временная шкала, слой "когда".
+3. Tacit knowledge: `$AGENT_HOME/MEMORY.md`
+   - operating patterns и предпочтения пользователя, а не факты о мире.
 
-## Три слоя памяти
+## Rules
 
-### Слой 1: Knowledge Graph (`$AGENT_HOME/life/` -- PARA)
+- Устойчивые факты сохраняй в `items.yaml`; быстрый контекст держи в `summary.md`.
+- Entity создавай, если сущность упоминалась 3+ раза, напрямую связана с пользователем или является значимым проектом/компанией; иначе пиши в daily note.
+- Не удаляй факты: помечай `status: superseded` и добавляй `superseded_by`.
+- Завершенные projects и неактивные entities переноси в `$AGENT_HOME/life/archives/`.
+- Новые operating patterns пользователя обновляй в `$AGENT_HOME/MEMORY.md`.
+- Извлеченные инженерные уроки сохраняй в релевантный `AGENTS.md`, `TOOLS.md` или skill/reference, а не только в personal memory.
+- Схему `items.yaml`, статусы, access tracking и memory decay см. в `references/schemas.md`.
 
-Хранилище на основе сущностей. Для каждой entity создается папка с двумя уровнями:
+## Recall
 
-1. `summary.md` -- быстрый контекст, читать в первую очередь.
-2. `items.yaml` -- атомарные факты, читать по мере необходимости.
-
-```text
-$AGENT_HOME/life/
-  projects/          # Active work with clear goals/deadlines
-    <name>/
-      summary.md
-      items.yaml
-  areas/             # Ongoing responsibilities, no end date
-    people/<name>/
-    companies/<name>/
-  resources/         # Reference material, topics of interest
-    <topic>/
-  archives/          # Inactive items from the other three
-  index.md
-```
-
-**Правила PARA:**
-
-- **Projects** -- активная работа с целью или дедлайном. После завершения переносить в archives.
-- **Areas** -- постоянные области ответственности: люди, компании, обязанности. Без даты окончания.
-- **Resources** -- справочные материалы и интересующие темы.
-- **Archives** -- неактивные элементы из любой категории.
-
-**Правила фактов:**
-
-- Устойчивые факты сразу сохраняй в `items.yaml`.
-- Раз в неделю переписывай `summary.md` на основе активных фактов.
-- Никогда не удаляй факты. Вместо этого помечай их как superseded (`status: superseded`, добавляй `superseded_by`).
-- Когда entity перестает быть активной, переносить ее папку в `$AGENT_HOME/life/archives/`.
-
-**Когда создавать entity:**
-
-- Сущность упоминалась 3+ раза, ИЛИ
-- Она напрямую связана с пользователем: семья, коллега, партнер, клиент, ИЛИ
-- Это значимый проект или компания в жизни пользователя.
-- В остальных случаях просто зафиксируй это в daily notes.
-
-Схему атомарных YAML-фактов и правила memory decay смотри в [references/schemas.md](references/schemas.md).
-
-### Слой 2: Daily Notes (`$AGENT_HOME/memory/YYYY-MM-DD.md`)
-
-Сырая временная шкала событий -- слой "когда".
-
-- Пиши туда по ходу разговоров.
-- Во время heartbeats выноси устойчивые факты в Layer 1.
-
-### Слой 3: Tacit Knowledge (`$AGENT_HOME/MEMORY.md`)
-
-Как пользователь действует -- паттерны, предпочтения, извлеченные уроки.
-
-- Это не факты о мире, а факты о пользователе.
-- Обновляй слой всякий раз, когда узнаешь новые operating patterns.
-
-## Записывай, а не держи в голове
-
-Память не переживает перезапуск сессии. Файлы переживают.
-
-- Хочешь что-то запомнить -> ЗАПИШИ ЭТО В ФАЙЛ.
-- "Запомни это" -> обнови `$AGENT_HOME/memory/YYYY-MM-DD.md` или нужный entity-файл.
-- Извлек урок -> обнови `AGENTS.md`, `TOOLS.md` или релевантный skill-файл.
-- Ошибся -> задокументируй, чтобы future-you не повторил это.
-- Текстовые файлы на диске всегда лучше, чем временный контекст в голове.
-
-## Вспоминание памяти -- через qmd
-
-Используй `qmd`, а не обычный grep по файлам:
+Используй `qmd`, а не обычный grep:
 
 ```bash
-qmd query "what happened at Christmas"   # Semantic search with reranking
-qmd search "specific phrase"              # BM25 keyword search
-qmd vsearch "conceptual question"         # Pure vector similarity
+qmd query "what happened at Christmas"
+qmd search "specific phrase"
+qmd vsearch "conceptual question"
+qmd index $AGENT_HOME
 ```
 
-Индексируй свою папку памяти командой `qmd index $AGENT_HOME`
+## Planning Files
 
-Вектора + BM25 + reranking помогают находить вещи даже при другой формулировке.
-
-## Планирование
-
-Храни планы в timestamped-файлах в `plans/` в корне проекта, вне personal memory, чтобы к ним могли обращаться и другие агенты. Для поиска по планам используй `qmd`. Планы устаревают: если существует более новый план, не путай его со старой версией. Если заметил устаревание, обнови файл и укажи, чем он superseded.
-
-## Карта reference-файлов
-
-Читай только при работе с entity facts и decay rules:
-
-- `references/schemas.md` -> схема `items.yaml`, статусы фактов, access tracking и memory decay.
+Планы храни в timestamped-файлах `plans/` в корне проекта, вне personal memory. Если есть более новый план, не путай его со старым; при устаревании обнови файл и укажи superseded-by.
 
 ## Формат ответа
 
-Когда работаешь с памятью, возвращай:
-
-1. Что сохранено, найдено или обновлено.
-2. В какой слой памяти и файл внесено изменение.
-3. Какие факты считаются `active`, `superseded` или только дневниковой заметкой.
-4. Какой следующий recall или maintenance шаг нужен, если он есть.
+Верни: что сохранено/найдено/обновлено, слой и файл, статус фактов (`active`, `superseded`, daily-only) и следующий recall/maintenance шаг.

@@ -29,6 +29,9 @@ description: Строить CI/CD, deployment pipelines, IaC, release automation
 - Соблюдай review и workflow plan-before-apply.
 - Храни секреты в специализированных системах управления секретами.
 - Избегай ручного drift, сверяя фактическое и целевое состояние.
+- `terraform plan`, `validate`, `fmt -check`, `docker compose config` и dry-run проверки допустимы как verification.
+- `terraform apply`, `destroy`, state operations, IAM/secret changes, production deploy и irreversible CI/CD mutations выполняй только после явного подтверждения пользователя.
+- Перед high-impact IaC изменением фиксируй target workspace/project, expected diff, rollback path и affected resources.
 
 ## Стратегия деплоя
 

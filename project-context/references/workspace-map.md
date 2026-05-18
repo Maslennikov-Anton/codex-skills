@@ -216,6 +216,21 @@ This file is a compact map of Ant's local repositories and recurring commands. K
   - For Python changes, inspect `requirements.txt` and run the narrow target script/test manually.
 - Notes: Internal spelling is `fuzzing-hypotesys`/`fuzzing_hypothesys`; preserve existing names in paths and package references. README appears stale: root `Dockerfile` is Python fuzzing, not a systemd unit image. CI runs only on tags and publishes `${HARBOR_URL}/vcont-qa/fuzzing:${CI_COMMIT_TAG}` through Kaniko after fetching Harbor/Nexus secrets from Yandex Lockbox.
 
+### `/home/ant/codex-skills`
+
+- Purpose: Local Codex skills and references used across Ant's workspaces.
+- Stack: Markdown `SKILL.md`, YAML frontmatter, optional `references/`, `scripts/`, `assets/`, Python validation script from `.system/skill-creator`.
+- Known workflows:
+  - Inspect local changes: `git status --short`, `git diff --stat`, `git diff`.
+  - Validate one skill: `python3 .system/skill-creator/scripts/quick_validate.py <skill-dir>`.
+  - Validate all skills: loop over top-level dirs with `SKILL.md` and run `quick_validate.py`.
+  - Check markdown/reference link targets with `rg` and file existence.
+- Verification commands:
+  - `git diff --check`
+  - `python3 .system/skill-creator/scripts/quick_validate.py <skill-dir>`
+  - For all skills, run the all-skill validation loop instead of assuming one changed skill is representative.
+- Notes: Keep `SKILL.md` small and route detailed content to `references/`. Do not commit/push skill changes unless the user asks or publishing is explicitly in scope.
+
 ## Local Tooling Preferences
 
 - Search text with `rg`; if system `rg` is not installed, Codex may have a vendored `rg` in its own package path.

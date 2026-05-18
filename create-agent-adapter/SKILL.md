@@ -7,28 +7,20 @@ description: >
 
 # Создание Agent Adapter для Paperclip
 
-Используй этот skill, когда нужно добавить новый adapter package или изменить базовый контракт adapter system в Paperclip. Основная задача skill: быстро привести к правильной структуре пакета, обязательным интерфейсам и точкам регистрации, а подробные примеры и reference-материалы читать только по необходимости.
+Используй этот skill, когда нужно создать adapter package или изменить контракт adapter system в Paperclip. Задача skill - держать правильную структуру пакета, обязательные интерфейсы и registry points; подробности читать в `references/` по необходимости.
 
-## Когда использовать
+## When
 
-Используй skill, если нужно:
+- Новый adapter package для local CLI, API-based агента или custom process.
+- Поддержка нового agent runtime в server, UI и CLI слоях.
+- Изменение session handling, parse layer или environment test contract.
+- Новые поля config, transcript parsing или runtime behavior существующего adapter.
 
-- создать новый adapter package для локального CLI, API-based агента или custom process;
-- добавить поддержку нового agent runtime в server, UI и CLI слоях;
-- изменить session handling, parse layer или environment test contract адаптера;
-- доработать существующий adapter под новые поля config, transcript parsing или runtime-поведение.
+Не используй для обычной backend/UI разработки вне adapter system.
 
-Не используй skill, если задача сводится только к обычной backend/UI разработке вне adapter system.
+## Contract
 
-## Что обязательно должно получиться
-
-Каждый adapter должен быть самодостаточным пакетом с реализациями для трех consumers:
-
-- server: `execute`, `testEnvironment`, `sessionCodec`, parse helpers;
-- UI: `parseStdoutLine`, `ConfigFields`, `buildAdapterConfig`;
-- CLI: `formatStdoutEvent`.
-
-Минимальная структура:
+Adapter - самодостаточный пакет:
 
 ```text
 packages/adapters/<name>/
@@ -41,77 +33,47 @@ packages/adapters/<name>/
   tsconfig.json
 ```
 
-Adapter обязательно регистрируется в трех registry:
+Обязательные consumers:
+
+- server: `execute`, `testEnvironment`, `sessionCodec`, parse helpers.
+- UI: `parseStdoutLine`, `ConfigFields`, `buildAdapterConfig`.
+- CLI: `formatStdoutEvent`.
+
+Registry points:
 
 - `server/src/adapters/registry.ts`
 - `ui/src/adapters/registry.ts`
 - `cli/src/adapters/registry.ts`
 
-## Базовый workflow
+## Workflow
 
-1. Определи тип runtime: local CLI, remote API, custom process, hybrid.
-2. Выбери имя адаптера:
-   - adapter type -> `snake_case`
-   - package -> `@paperclipai/adapter-<kebab-name>`
-   - directory -> `packages/adapters/<kebab-name>/`
-3. Создай пакет с четырьмя export entrypoints: `.`, `./server`, `./ui`, `./cli`.
-4. Опиши metadata в root `index.ts`: `type`, `label`, `models`, `agentConfigurationDoc`.
-5. Реализуй server core:
-   - config parsing через `@paperclipai/adapter-utils/server-utils`;
-   - process/API execution;
-   - parse output;
-   - session persistence и retry на stale session;
-   - `testEnvironment`.
-6. Реализуй UI-часть:
-   - transcript parser;
-   - config builder;
-   - adapter-specific config fields.
-7. Реализуй CLI formatter для `paperclipai run --watch`.
+1. Определи runtime: local CLI, remote API, custom process или hybrid.
+2. Выбери names: type -> `snake_case`, package -> `@paperclipai/adapter-<kebab-name>`, dir -> `packages/adapters/<kebab-name>/`.
+3. Создай exports: `.`, `./server`, `./ui`, `./cli`.
+4. Root `index.ts`: `type`, `label`, `models`, `agentConfigurationDoc`.
+5. Server: config parsing через `@paperclipai/adapter-utils/server-utils`, execution, output parsing, session persistence/retry, `testEnvironment`.
+6. UI: transcript parser, config builder, adapter-specific fields.
+7. CLI: formatter для `paperclipai run --watch`.
 8. Зарегистрируй adapter во всех registry.
-9. Добавь тесты минимум на parsing, session codec и config building.
-10. Прогони проверки и убедись, что adapter не загрязняет cwd и безопасно обращается с секретами.
+9. Добавь тесты на parsing, session codec и config building.
+10. Проверь, что adapter не загрязняет cwd и безопасно обращается с секретами.
 
-## Ключевые правила
+## Rules
 
-- Root `index.ts` должен быть dependency-free: без Node APIs и без React.
-- `agentConfigurationDoc` пиши как routing logic: когда использовать adapter и когда не использовать.
-- `config` и stdout агента считай недоверенными данными: парси безопасно, ничего не исполняй динамически.
-- Сессионность проектируй сразу как норму, а не как позднюю оптимизацию.
-- Не копируй Paperclip skills в рабочую директорию пользователя; используй tmpdir, глобальный config dir или другой изолированный механизм.
-- Секреты передавай через environment, а не через prompt template.
-- Если runtime поддерживает sandboxing, approvals или network controls, документируй и ограничивай их явно.
+- Root `index.ts` dependency-free: без Node APIs и React.
+- `agentConfigurationDoc` описывает routing logic: когда использовать adapter и когда не использовать.
+- Config и stdout агента недоверенные: безопасный parsing, без dynamic execution.
+- Сессионность проектируй сразу; stale session retry должен быть явным.
+- Не копируй Paperclip skills в рабочую директорию пользователя; используй tmpdir/global config/изоляцию.
+- Секреты передавай через environment, не через prompt template.
+- Sandboxing, approvals и network controls документируй и ограничивай явно, если runtime их поддерживает.
 
-## Минимальный checklist
+## References
 
-- [ ] `package.json` с exports для `.`, `./server`, `./ui`, `./cli`
-- [ ] root `index.ts` с `type`, `label`, `models`, `agentConfigurationDoc`
-- [ ] `server/execute.ts`
-- [ ] `server/test.ts`
-- [ ] `server/parse.ts`
-- [ ] `server/index.ts`
-- [ ] `ui/parse-stdout.ts`
-- [ ] `ui/build-config.ts`
-- [ ] `ui/config-fields.tsx`
-- [ ] `ui/index.ts`
-- [ ] `cli/format-event.ts`
-- [ ] `cli/index.ts`
-- [ ] регистрация в server/UI/CLI registry
-- [ ] тесты на parse/session/config
-
-## Карта reference-файлов
-
-Читай только нужный раздел:
-
-- `references/architecture-and-contract.md` -> структура пакета, интерфейсы и registration contract
-- `references/session-runtime-patterns.md` -> session management, server-utils, skills injection, prompt/config patterns
-- `references/security-and-testing.md` -> security rules, transcript kinds, testing checklist
+- `references/architecture-and-contract.md` -> структура пакета, интерфейсы, registration contract.
+- `references/session-runtime-patterns.md` -> session management, server-utils, skills injection, prompt/config patterns.
+- `references/security-and-testing.md` -> security rules, transcript kinds, testing checklist.
 
 ## Формат ответа
 
-Когда просят создать или изменить adapter, возвращай:
-
-1. Какой тип adapter runtime выбран и почему.
-2. Какие файлы и модули нужно создать или изменить.
-3. Какие обязательные контракты server/UI/CLI будут реализованы.
-4. Какие риски есть в session handling, secrets, cwd isolation и parsing.
-5. Какой минимальный набор тестов и проверок нужен перед завершением.
+Верни: выбранный runtime, файлы/модули, server/UI/CLI contracts, риски session/secrets/cwd/parsing и минимальные тесты/проверки.

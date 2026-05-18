@@ -66,6 +66,14 @@ description: Ревьюить изменения в коде с фокусом �
 - Important findings исправляй до merge/финального claim либо явно фиксируй как accepted risk.
 - Minor findings можно отметить как follow-up, если они не меняют correctness.
 
+## Severity
+
+- Critical: correctness/security/data-loss/regression issue, который блокирует merge/release или может сломать production/пользовательский critical path.
+- Important: реальный баг, риск регрессии, несовместимость контракта, существенный test gap или operational risk, который нужно исправить до финального claim.
+- Minor: readability, maintainability, локальная cleanup-правка или low-risk edge case, который не меняет correctness и может быть follow-up.
+
+Не повышай severity из-за стиля, если нет behavioral или operational риска; не понижай severity из-за маленького diff.
+
 ## Формат ответа
 
 Когда просят сделать ревью, отвечай так:

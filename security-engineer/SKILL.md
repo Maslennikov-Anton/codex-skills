@@ -31,6 +31,14 @@ description: "Проектировать и проверять security: auth/au
 - Безопасность по умолчанию важнее удобства временных обходов.
 - Если риск сознательно принимается, это должно быть явно зафиксировано вместе с owner и сроком пересмотра.
 
+## Secrets Handling
+
+- Не печатай tokens, cookies, приватные ключи, `.env` values и service credentials.
+- Не коммить `.env`, generated credentials, local kubeconfig, Terraform state или plan-файлы с secrets.
+- В логах, reports и финальных ответах редактируй секреты как `<redacted>` и оставляй только имя переменной или путь.
+- External API tokens используй через env/helper scripts/secret managers, не через prompt templates или hardcoded config.
+- Если секрет мог попасть в git/log/artifact, считай это incident: зафиксируй scope, предложи rotation и cleanup.
+
 ## Артефакты
 
 - Threat model.

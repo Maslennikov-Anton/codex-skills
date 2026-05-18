@@ -1,6 +1,6 @@
 ---
 name: project-context
-description: Use when working in Ant's local repositories under /home/ant/IdeaProjects or when the user asks for local project commands, repo orientation, build/test/run workflows, release steps, or recurring workspace conventions. Read the workspace map before making assumptions about commands or ownership.
+description: "Use in Ant's local repos under /home/ant/IdeaProjects: repo orientation, workspace map, commands, build/test/run workflows, release steps, and conventions."
 metadata:
   short-description: Local project map and command conventions
 ---
