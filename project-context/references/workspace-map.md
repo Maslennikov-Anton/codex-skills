@@ -179,13 +179,14 @@ This file is a compact map of Ant's local repositories and recurring commands. K
 - Known workflows:
   - Full local checks: `bash scripts/run_local_checks.sh`.
   - The script creates `.venv`, installs `.[dev]`, runs `ruff check .`, and runs `pytest --alluredir allure-results`.
+  - Compose wrapper for the same local checks: `docker compose run --rm tests` or `docker compose up --build`.
   - Translator archive lives at `sources/st2lua-translator.tar.gz`; harness unpacks to `.work/translator-dist`.
 - Verification commands:
   - Full test suite: `./.venv/bin/python -m pytest -q`.
   - Declarative translation/runtime cases: `./.venv/bin/python -m pytest -q tests/test_translation_cases.py`.
   - Strict GitHub cases: `./.venv/bin/python -m pytest -q tests/test_github_projects.py`.
   - Allure report: `allure serve allure-results`.
-- Notes: No `docker-compose` or `pytest.ini`; pytest config is in `pyproject.toml`. Markers include `bug`, `github_projects`, `runtime`, `smoke`, `regression`. GitLab CI installs `lua5.4`, runs `ruff check .` and `python3 -m compileall src tests scripts`; CI test job runs `python3 -m pytest --alluredir allure-results || true`, so known translator regressions can be collected as artifacts without failing the job. Some known regression cases can intentionally make pytest fail; use Allure results and local bug limitation reports to understand current translator defects.
+- Notes: `compose.yaml` runs `bash scripts/run_local_checks.sh` in a `tests` service; no `pytest.ini`; pytest config is in `pyproject.toml`. Markers include `bug`, `github_projects`, `runtime`, `smoke`, `regression`. GitLab CI installs `lua5.4`, runs `ruff check .` and `python3 -m compileall src tests scripts`; CI test job runs `python3 -m pytest --alluredir allure-results || true`, so known translator regressions can be collected as artifacts without failing the job. Some known regression cases can intentionally make pytest fail; use Allure results and local bug limitation reports to understand current translator defects.
 
 ### `/home/ant/IdeaProjects/fuzzing`
 
@@ -229,7 +230,7 @@ This file is a compact map of Ant's local repositories and recurring commands. K
   - `git diff --check`
   - `python3 .system/skill-creator/scripts/quick_validate.py <skill-dir>`
   - For all skills, run the all-skill validation loop instead of assuming one changed skill is representative.
-- Notes: Keep `SKILL.md` small and route detailed content to `references/`. Do not commit/push skill changes unless the user asks or publishing is explicitly in scope.
+- Notes: Keep `SKILL.md` small and route detailed content to `references/`. Use `para-memory-files` for memory recall/update behavior; this repo documents local skills and validation. Skill sync/push is in scope only when the user asks; otherwise stop at local diff/validation recommendations. Validate changed skills with `quick_validate.py`; validate all top-level skills when trigger rules, shared conventions, or common validation behavior changes.
 
 ## Local Tooling Preferences
 
