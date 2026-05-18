@@ -18,6 +18,26 @@ MODBUS_1;<Request ID="4" Action="START"/>
 
 В сохраненных требованиях указано, что разделитель параметров - пробел. В реальных `.fboot` встречается и позиционная часть `Options="0.0.0.0 1502 Address=0.0.0.0 Port=1502 Mode=tcp SlaveId=1"`; при разборе конкретного bootfile ориентируйся на фактически поддерживаемый runtime.
 
+### MBSERVER в RTU-over-TCP режиме
+
+Для проверки RTU без serial-device можно поднимать встроенный VCont server как RTU-over-TCP endpoint:
+
+```xml
+;<Request ID="2" Action="CREATE"><FB Name="MBSRV1" Type="MBSERVER" Options="Address=0.0.0.0 Port=1502 Mode=rtu SlaveId=1"/></Request>
+MBSRV1;<Request ID="3" Action="START"/>
+```
+
+В этом режиме внешний клиент должен отправлять raw Modbus RTU ADU поверх TCP: `SlaveId + Function + Payload + CRC16`, без Modbus TCP MBAP-заголовка. Для чтения holding registers используется функция `3`, например чтение `MW2048..MW2050` как адрес `2048`, quantity `3`.
+
+Практическая HSB-схема для публикации счетчиков во встроенный `MBSERVER Mode=rtu`:
+
+```xml
+;<Request ID="15" Action="CREATE"><Connection Source="APP001.LOOP010.CTU_A.CV" Destination="APP001.LOOP010.CNT_A.IN" /></Request>
+;<Request ID="18" Action="CREATE"><Alias Source="APP001.LOOP010.CNT_A.OUT" Destination="MBSRV1.MW2048" /></Request>
+```
+
+Не рассчитывай на прямой alias с `CTU.CV` в `MBSERVER` как на универсальный рабочий паттерн. На локальном HSB-стенде счетчики `CTU_A/B/C` росли, но прямой alias `CTU_A.CV -> MBSRV1.MW2048` оставлял внешне читаемые регистры нулевыми. Рабочая схема: сначала перенести `CTU.CV` в промежуточный `INT.IN`, затем alias делать с `INT.OUT`.
+
 ## Alias-связи
 
 Alias похож на `Connection`, но связывает ножку функционального блока с регистром Modbus server. Alias однонаправленный.
@@ -189,3 +209,25 @@ modbus_async[127.0.0.1:1502:1:0:confirm]
 - если `confirm` указан, `MBWRITE` после отправки пачки запросов ждет ответы до timeout и выставляет качество по фактическим подтверждениям;
 - если `confirm` не указан, ожидание ответов не выполняется, а внутренний флаг подтверждения равен `false`;
 - чтобы включить `confirm`, его нужно указывать именно пятым параметром, то есть вместе с четвертым параметром `limit`.
+
+## RTU-over-TCP клиент VCont
+
+Для проверки VCont как Modbus RTU client используй `MBCLIENTRTUOVERTCP` и внешний RTU-over-TCP server. Это прямой аналог сценария с `MBCLIENTTCP`: пользовательская программа пишет значения во внешний Modbus server, а тестовый код читает внешний server как oracle.
+
+Минимальный клиент:
+
+```xml
+;<Request ID="2" Action="CREATE"><FB Name="MBCLIENT_RTUOVERTCP" Type="MBCLIENTRTUOVERTCP" Options="Address=11.0.0.102 Port=503 SlaveId=1 Window=1 Timeout=100 "/></Request>
+MBCLIENT_RTUOVERTCP;<Request ID="3" Action="START"/>
+```
+
+Пример записи счетчика в holding register внешнего RTU-over-TCP server:
+
+```xml
+;<Request ID="15" Action="WRITE"><Connection Source="&apos;MBCLIENT_RTUOVERTCP&apos;" Destination="APP001.LOOP010.MBWRITE_A.DEVICE" /></Request>
+;<Request ID="17" Action="WRITE"><Connection Source="&apos;2048:6&apos;" Destination="APP001.LOOP010.MBWRITE_A.ADDRESS" /></Request>
+;<Request ID="18" Action="WRITE"><Connection Source="&apos;S2&apos;" Destination="APP001.LOOP010.MBWRITE_A.FORMAT" /></Request>
+;<Request ID="28" Action="CREATE"><Connection Source="APP001.LOOP010.CTU_A.CV" Destination="APP001.LOOP010.MBWRITE_A.WD01" /></Request>
+```
+
+Для такого клиента внешний RTU-over-TCP server должен понимать raw RTU ADU с CRC16 поверх TCP. В тестах достаточно поддержать функции `3` для чтения oracle-регистров и `6`/`16` для записи из VCont.

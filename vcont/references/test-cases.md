@@ -183,3 +183,59 @@ missing active counter reads=0
 ```
 
 Вывод: для будущих прогонов сначала проверяй корректность IDE-клиента и выбора активного узла, затем оценивай именно непрерывность пользовательских счетчиков на failover. Если после failover значения расходятся похожим образом, это evidence рассинхронизации runtime-данных ФБ, а не проблема запуска контейнеров.
+
+## HSB failover с Modbus RTU-over-TCP
+
+RTU без serial-device можно проверять как RTU-over-TCP: TCP-соединение несет raw Modbus RTU ADU с CRC16, без MBAP. Для HSB нужны два разных сценария, потому что они покрывают разные роли VCont.
+
+### Вариант 1: VCont как RTU client
+
+Назначение: прямой аналог теста с `MBCLIENTTCP`.
+
+Схема:
+
+```text
+VCont active:
+  CTU_A/B/C.CV -> MBWRITE_PACK_1.WD01
+  MBWRITE_PACK_1 -> MBCLIENTRTUOVERTCP
+  MBCLIENTRTUOVERTCP -> external RTU-over-TCP server registers 2048..2050
+
+pytest:
+  external checker reads external RTU server registers 2048..2050
+```
+
+Failover oracle:
+
+1. дождаться, что внешний server получил ненулевые одинаковые значения;
+2. дождаться следующего шага счетчика до остановки MAIN;
+3. остановить MAIN;
+4. дождаться нового active;
+5. проверить, что значения во внешнем server продолжаются, а не сбрасываются: `after_stop > during_stop` по каждому регистру;
+6. для счетчиков с периодом 1000 мс можно дополнительно проверять ожидаемый шаг `+1`, если чтение сделано на контролируемой границе.
+
+### Вариант 2: VCont как RTU server
+
+Назначение: проверить встроенный `MBSERVER Mode=rtu`, который читает внешний RTU-клиент.
+
+Схема:
+
+```text
+VCont active:
+  CTU_A/B/C.CV -> CNT_A/B/C.IN
+  CNT_A/B/C.OUT -> Alias -> MBSRV1.MW2048..2050
+  MBSRV1 = MBSERVER Mode=rtu
+
+pytest:
+  external RTU client reads active VCont MBSERVER registers 2048..2050
+```
+
+Failover oracle:
+
+1. читать текущий `MAIN` как RTU server через host-порт его `1502`;
+2. дождаться `before_stop` - ненулевых одинаковых значений;
+3. остановить MAIN;
+4. дождаться, что бывший `RESERVE` стал active;
+5. переключить внешний RTU-клиент на порт нового active;
+6. проверить, что `after_stop > before_stop` по каждому регистру. Проверка только "не ноль" или "все регистры равны" недостаточна, потому что пропустит reset/откат.
+
+Практическая ловушка: для публикации счетчика во встроенный `MBSERVER` не делай alias напрямую с `CTU.CV`. На локальном стенде счетчики росли, но регистры оставались нулевыми. Рабочий паттерн: `CTU.CV -> INT.IN`, затем `INT.OUT -> MBSRV1.MW...`.
