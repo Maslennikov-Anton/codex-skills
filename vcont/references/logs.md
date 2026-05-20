@@ -1,6 +1,6 @@
 # VCont Logs
 
-Практические знания по `vcont.log` получены на Docker-стенде `vcont-hsb` с двумя инстансами VCont. Логи полезны как diagnostic oracle для старта, загрузки программы, HSB-ролей, heartbeat и sync. Экспериментально для текущего проекта/поставки `vcont-hsb`: если в `vcontcfg.json` включен `DataToLog: "serialize,deserialize"`, логи также показывают снимки DI/DO функциональных блоков при сериализации и десериализации HSB-данных. В других проектах или поставках VCont эта настройка может не поддерживаться.
+Практические знания по `vcont.log` получены на Docker-стенде `vcont-hsb` с двумя инстансами VCont. Логи полезны как diagnostic oracle для старта, загрузки программы, HSB-ролей, heartbeat и sync. Для текущей роли HSB предпочитай прямую IDE-команду `HSBSTATUS`; логи используй для истории переходов и объяснения причин. Экспериментально для текущего проекта/поставки `vcont-hsb`: если в `vcontcfg.json` включен `DataToLog: "serialize,deserialize"`, логи также показывают снимки DI/DO функциональных блоков при сериализации и десериализации HSB-данных. В других проектах или поставках VCont эта настройка может не поддерживаться.
 
 ## Где искать
 
@@ -43,6 +43,7 @@
 
 Полезные признаки:
 
+- `HSBSTATUS` через IDE TCP возвращает текущую локальную роль без парсинга логов: `MAIN`, `RESERVE`, `STANDALONE` или `NONE`.
 - `HSB processing is started. HSB priority: <N>. Period: <ms>` - HSB-обработка запущена, виден приоритет и период.
 - `The mode has been changed to: INITIALIZING` - узел вошел в начальную HSB-фазу.
 - `Waiting for node discovery before initial election. Deadline: <ms>` - узел ждет discovery перед выборами.

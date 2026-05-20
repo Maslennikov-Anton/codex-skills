@@ -16,7 +16,18 @@ MODBUS_1;<Request ID="4" Action="START"/>
 - `Mode`: `tcp` для клиентов `MBCLIENTTCP`, `rtu` для клиентов `MBCLIENTRTUOVERTCP`.
 - `SlaveId`: идентификатор slave-устройства.
 
-В сохраненных требованиях указано, что разделитель параметров - пробел. В реальных `.fboot` встречается и позиционная часть `Options="0.0.0.0 1502 Address=0.0.0.0 Port=1502 Mode=tcp SlaveId=1"`; при разборе конкретного bootfile ориентируйся на фактически поддерживаемый runtime.
+Параметры `Options` задаются строкой `name=value`, разделитель параметров - пробел. Если значение по умолчанию подходит, параметр можно не указывать. Полные таблицы параметров для `MBSERVER`, `MBCLIENTTCP`, `MBCLIENTRTU`, `MBCLIENTRTUOVERTCP` и `MBSERIALPORT` см. в `runtime-options.md`.
+
+В реальных `.fboot` встречается и позиционная часть `Options="0.0.0.0 1502 Address=0.0.0.0 Port=1502 Mode=tcp SlaveId=1"`; при разборе конкретного bootfile ориентируйся на фактически поддерживаемый runtime.
+
+## Modbus Client Options And HSB
+
+`MBCLIENTTCP` поддерживает параметр `HsbAlg`:
+
+- `HsbAlg=1` по умолчанию: к серверу при старте подключаются `MAIN`, `STANDALONE` и `RESERVE`.
+- `HsbAlg=2`: к серверу при старте подключаются только `MAIN` и `STANDALONE`; `RESERVE` не держит соединение до перехода в активную роль.
+
+Для HSB-тестов с внешним Modbus server явно фиксируй `HsbAlg`, если поведение соединений важно для oracle. Иначе можно получить разные симптомы на резервном узле: при `HsbAlg=1` reserve уже имеет клиентское соединение, при `HsbAlg=2` соединение должно появиться только после takeover.
 
 ### MBSERVER в RTU-over-TCP режиме
 
@@ -36,7 +47,7 @@ MBSRV1;<Request ID="3" Action="START"/>
 ;<Request ID="18" Action="CREATE"><Alias Source="APP001.LOOP010.CNT_A.OUT" Destination="MBSRV1.MW2048" /></Request>
 ```
 
-Не рассчитывай на прямой alias с `CTU.CV` в `MBSERVER` как на универсальный рабочий паттерн. На локальном HSB-стенде счетчики `CTU_A/B/C` росли, но прямой alias `CTU_A.CV -> MBSRV1.MW2048` оставлял внешне читаемые регистры нулевыми. Рабочая схема: сначала перенести `CTU.CV` в промежуточный `INT.IN`, затем alias делать с `INT.OUT`.
+Не рассчитывай на прямой alias с `CTU.CV` в `MBSERVER` как на универсальный рабочий паттерн. На локальном HSB-стенде счетчики `CTU_A/B/C` росли, но прямой alias `CTU_A.CV -> MBSRV1.MW2048` оставлял внешне читаемые регистры нулевыми. Рабочая схема: сначала перенести `CTU.CV` в промежуточный `INT.IN`, затем alias делать с `INT.OUT`. Это отдельный сценарий от external `MBWRITE` failover oracle: для внешней записи через `MBWRITE` прямое соединение `CTU.CV -> MBWRITE.WD01` может быть правильнее, потому что HSB/runtime surface другой.
 
 ## Alias-связи
 
@@ -82,6 +93,16 @@ TASK_1;<Request ID="6" Action="CREATE"><Alias Source="MODBUS_1.ML1" Destination=
 - `ML`: holding register, 64 бит, RW, alias `ML0-ML3750`, Modbus-адреса `50000-65000`.
 
 Адреса начинаются с нуля: `QX3` означает coil по адресу 3, четвертый по счету.
+
+## VC024SA Runtime-Facing Modbus/OPC UA Notes
+
+VCStudio GUI setup for Modbus Serial/TCP, UserLibrary port-count changes, and OPC UA block editing belongs to `vcstudio` skill. Keep this file focused on runtime behavior and generated artifacts.
+
+Runtime-facing facts from VC024SA.B that matter here:
+
+- VCont may receive Studio-generated programs using `MBSERVER`, aliases, `MBREAD_PACK`/`MBWRITE_PACK`, diagnostic blocks, and OPC UA `CLIENT`/`SUBSCRIBE`/`PUBLISH`.
+- The Modbus server memory map and `_PACK` status/format codes are summarized in `references/vc024sa-runtime-contract.md`.
+- For implementation/test work, verify actual block ports against the current typelibrary/runtime. VC024SA.B contains known typos such as `TIMOUT`, `MBDEVIERTU`, and reused write wording in `MBREAD_PACK`.
 
 ## Асинхронный Modbus-клиент
 
@@ -217,7 +238,7 @@ modbus_async[127.0.0.1:1502:1:0:confirm]
 Минимальный клиент:
 
 ```xml
-;<Request ID="2" Action="CREATE"><FB Name="MBCLIENT_RTUOVERTCP" Type="MBCLIENTRTUOVERTCP" Options="Address=11.0.0.102 Port=503 SlaveId=1 Window=1 Timeout=100 "/></Request>
+;<Request ID="2" Action="CREATE"><FB Name="MBCLIENT_RTUOVERTCP" Type="MBCLIENTRTUOVERTCP" Options="Address=11.0.0.102 Port=503 SlaveId=1 Timeout=100"/></Request>
 MBCLIENT_RTUOVERTCP;<Request ID="3" Action="START"/>
 ```
 

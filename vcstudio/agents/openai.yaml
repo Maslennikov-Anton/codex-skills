@@ -1,0 +1,7 @@
+interface:
+  display_name: "VCStudio"
+  short_description: "Проекты, ST, загрузка, HSB и мониторинг VCStudio"
+  default_prompt: "Используй vcstudio skill, чтобы разобрать проект VCStudio, ST-блоки, загрузку в VCont, HSB boundary, мониторинг или коммуникации Modbus/OPC UA."
+
+policy:
+  allow_implicit_invocation: true

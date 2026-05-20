@@ -1,6 +1,6 @@
 # Licensing, Trial And Demo Builds
 
-Этот reference фиксирует актуальную модель лицензирования VCont. Основные источники: локальные документы из `/home/ant/IdeaProjects/vcont-hsb/source` от 2026-05-15 (`vcontwork.txt`, `litsenzirovanie_sredy_ispolnenija_doc-000248.pdf`, `litsenzirovanie_virtual_nyh_mashin_doc-000240.pdf`, `litsenzirovanie_fizicheskih_mashin_doc-000244.pdf`, `proverka_litsenzij_doc-000242.pdf`) и Allure TestOps project `VCont` (`projectId=3`) как источник тест-кейсов.
+Этот reference фиксирует актуальную модель лицензирования VCont. Сводка ниже самодостаточна для работы skill; локальные документы и TestOps использовались как provenance при составлении, но открывать их для обычных ответов не требуется.
 
 ## Runtime Environment
 
@@ -241,7 +241,7 @@ Demo / Trial Full - расширенная демо-сборка:
 - программа из `vcont.fboot` реально исполняется, что подтверждается ростом счетчика через IDE `READ`;
 - live-команды VCStudio/IDE для создания ФБ, связей, assignment и `START` выполняются.
 
-Не применяй TestOps oracle `trial-lite` к `trial-full`/demo пакету. Если пакет `trial-full` грузит bootfile и работает 24 часа, это соответствует demo-модели из `source/vcontwork.txt`.
+Не применяй TestOps oracle `trial-lite` к `trial-full`/demo пакету. Если пакет `trial-full` грузит bootfile и работает 24 часа, это соответствует demo-модели, уже отраженной в этом reference; обращаться к исходному `source/vcontwork.txt` не требуется.
 
 ## Special Licenses
 

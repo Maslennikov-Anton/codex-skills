@@ -1,14 +1,20 @@
 # VCont Bootfile Patterns
 
+For how VCStudio project objects map into bootfile commands and VCont runtime execution, see `studio-vcont-contract.md`.
+
 `vcont.fboot` - текстовый сценарий XML-команд IDE рядом с бинарником VCont. Используй эти patterns как skeleton; конкретные типы ФБ, пины и alias-регистры сверяй с текущей typelibrary и задачей.
+
+VCStudio создает `vcont.fboot` как набор команд загрузки, идентичный командам из `Консоль загрузки`. При старте VCont читает этот файл и создает описанную database алгоритмов.
 
 ## Guardrails
 
 - Имя файла для runtime-startup path: `vcont.fboot`.
+- VCStudio пишет `vcont.fboot` в директорию с исполняемым файлом VCont.
 - Порядок `CREATE FB` внутри лупа семантически важен и задает исходную очередность исполнения.
 - Если блок `B` должен видеть результат `A` в том же цикле, создай `A` раньше `B` или используй `ASSIGN Before`.
 - Пустой task ничего не исполняет: луп нужно назначить на task, затем запустить task.
 - HSB не синхронизирует проект: одинаковую или совместимую программу нужно загрузить во все VCont-инстансы.
+- Успешная генерация bootfile из Studio должна содержать `CREATE` для задач и завершающие `START` без ошибок в `Консоль загрузки`.
 
 ## Minimal Task And Loop
 
@@ -35,7 +41,8 @@ mainTask;<Request ID="6" Action="START"></Request>
 
 ```xml
 mainTask;<Request ID="20" Action="STOP" />
-mainTask;<Request ID="21" Action="START" />
+<Request ID="21" Action="READ"><Connection Source="APPLICATION1.LOOP1.CNT_A.OUT" Destination="*"/></Request>
+mainTask;<Request ID="22" Action="START" />
 ```
 
 ## HSB Pattern
