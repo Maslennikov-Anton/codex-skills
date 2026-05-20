@@ -1,0 +1,42 @@
+[
+  {
+    "prompt": "запуш изменения в GitLab, проверь git remote и создай merge request если нужно",
+    "expected": "gitlab-operations"
+  },
+  {
+    "prompt": "проверь свежую официальную документацию OpenAI API и подбери текущую модель",
+    "expected": "openai-docs"
+  },
+  {
+    "prompt": "в vcont-hsb проверь HSBSTATUS, fboot, vcontcfg.json и Modbus failover",
+    "expected": "vcont"
+  },
+  {
+    "prompt": "перед финальным ответом подтверди что тесты, lint, commit и push реально прошли",
+    "expected": "verification-before-completion"
+  },
+  {
+    "prompt": "обнови локальный инженерный стандарт для skills, descriptions и preferred workflows",
+    "expected": "team-engineering-style"
+  },
+  {
+    "prompt": "сделай код-ревью PR, найди регрессии, риски и missing tests",
+    "expected": "code-review-professional"
+  },
+  {
+    "prompt": "напиши Playwright проверку UI, открой браузер и собери screenshots",
+    "expected": "browser-automation"
+  },
+  {
+    "prompt": "собери Terraform CI/CD pipeline, docker compose и deployment runbook",
+    "expected": "devops-engineer"
+  },
+  {
+    "prompt": "проанализируй Yandex Tracker issue, transitions, comments и attachments через API",
+    "expected": "yandex-tracker-operations"
+  },
+  {
+    "prompt": "создай или улучши Codex skill с SKILL.md, references, scripts и validation",
+    "expected": "skill-creator"
+  }
+]

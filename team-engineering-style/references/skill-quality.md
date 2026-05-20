@@ -22,7 +22,9 @@ Description должен отвечать на два вопроса:
 1. Что skill делает.
 2. Когда его использовать.
 
-Пиши конкретные триггеры: файлы, инструменты, типы задач, пользовательские формулировки. Не прячь условия использования только в body: агент увидит body уже после срабатывания.
+Пиши конкретные триггеры: файлы, инструменты, типы задач, пользовательские формулировки. Ставь самый важный trigger в начало description: список skills имеет ограниченный context budget, и длинные descriptions могут быть усечены. Не прячь условия использования только в body: агент увидит body уже после срабатывания.
+
+Проверяй description на 2-3 реалистичных user prompts. Если новый или измененный skill не всплывает по естественной формулировке задачи, меняй description, а не добавляй общий текст в body.
 
 ## Progressive disclosure
 
@@ -46,8 +48,11 @@ Description должен отвечать на два вопроса:
 
 - Размер: `SKILL.md` содержит только routing, workflow и hard guardrails.
 - Description: короткий, конкретный, с реальными trigger terms.
+- One job: skill покрывает один повторяемый класс задач, а не несколько профессий или workflow сразу.
 - Progressive disclosure: подробные команды, payloads, схемы и edge cases вынесены в `references/` или `scripts/`.
 - Duplication: правило не повторяет system/developer instructions и не конфликтует с ними.
 - Scope: skill не смешивает профессию, локальную политику, проектный workaround и разовую заметку.
 - Links: все `references/*.md` существуют и названы из `SKILL.md`.
-- Validation: `quick_validate.py`, проверка ссылок и `git diff --check`.
+- External skills: не устанавливай community skills без read-only review `SKILL.md`, scripts и permission/tool behavior.
+- Trigger smoke: для важных изменений проверь sample prompts, чтобы ожидаемый skill попадал в top matches.
+- Validation: `quick_validate.py`, `python3 scripts/audit_skills.py`, проверка ссылок и `git diff --check`.
