@@ -63,6 +63,7 @@ description: >
 
 ## Практические правила
 
+- Для repo publish/push-задач сначала проверь `git remote -v` или явный URL. Если remote указывает на GitLab (`gitlab.*`, `gitlab.com`, self-managed GitLab), используй этот skill и обычный `git`/`glab`, а не GitHub publish skills или GitHub connector.
 - Для первичной настройки предпочитай `glab auth login`, но в automation лучше использовать env vars или `--stdin`.
 - Предпочитай `-R/--repo`, когда работаешь вне целевого repository.
 - Предпочитай `glab mr`, `glab issue`, `glab ci`, `glab release` и `glab variable` перед `glab api`.
