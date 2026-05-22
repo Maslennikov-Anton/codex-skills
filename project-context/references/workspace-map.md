@@ -181,12 +181,18 @@ This file is a compact map of Ant's local repositories and recurring commands. K
   - The script creates `.venv`, installs `.[dev]`, runs `ruff check .`, and runs `pytest --alluredir allure-results`.
   - Compose wrapper for the same local checks: `docker compose run --rm tests` or `docker compose up --build`.
   - Translator archive lives at `sources/st2lua-translator.tar.gz`; harness unpacks to `.work/translator-dist`.
+  - If `sources/st2lua-translator.tar.gz` changes, remove `.work/translator-dist` or let the harness refresh it before trusting old run results.
+  - Strict GitHub cases live in `tests/github_projects/manifest.json`; entries can declare `translation.must_succeed = false` with `failure_contains` when a real snippet is expected to be rejected by the translator policy.
+  - `docs/BUG_LIMITATIONS_REPORT.md` is a local ignored report, not a tracked deliverable. Use it to summarize current test signals, but do not stage/push it when following `.gitignore`.
 - Verification commands:
   - Full test suite: `./.venv/bin/python -m pytest -q`.
   - Declarative translation/runtime cases: `./.venv/bin/python -m pytest -q tests/test_translation_cases.py`.
   - Strict GitHub cases: `./.venv/bin/python -m pytest -q tests/test_github_projects.py`.
+  - Targeted metadata/oracle smoke: `./.venv/bin/python -m pytest tests/test_translation_cases.py::test_case_metadata_contract tests/test_translation_cases.py::test_translation_strict[function_block_internal_state_translation] tests/test_translation_cases.py::test_translation_negative[negative_missing_semicolon] tests/test_github_projects.py::test_real_github_snippets_require_semantic_match[canopen_segment_copy_checksum] tests/test_github_projects.py::test_real_github_snippets_require_semantic_match[utilities_byte_base64_alphabet_lookup] -q`.
+  - Python lint for GitHub strict harness edits: `./.venv/bin/python -m ruff check tests/test_github_projects.py`.
+  - Python syntax check for harness edits: `./.venv/bin/python -m compileall tests/test_github_projects.py`.
   - Allure report: `allure serve allure-results`.
-- Notes: `compose.yaml` runs `bash scripts/run_local_checks.sh` in a `tests` service; no `pytest.ini`; pytest config is in `pyproject.toml`. Markers include `bug`, `github_projects`, `runtime`, `smoke`, `regression`. GitLab CI installs `lua5.4`, runs `ruff check .` and `python3 -m compileall src tests scripts`; CI test job runs `python3 -m pytest --alluredir allure-results || true`, so known translator regressions can be collected as artifacts without failing the job. Some known regression cases can intentionally make pytest fail; use Allure results and local bug limitation reports to understand current translator defects.
+- Notes: `compose.yaml` runs `bash scripts/run_local_checks.sh` in a `tests` service; no `pytest.ini`; pytest config is in `pyproject.toml`. Markers include `bug`, `github_projects`, `runtime`, `smoke`, `regression`. GitLab CI installs `lua5.4`, runs `ruff check .` and `python3 -m compileall src tests scripts`; CI test job runs `python3 -m pytest --alluredir allure-results || true`, so current translator failures can be collected as artifacts without failing the job. Some supported negative cases intentionally expect translator rejection; do not convert policy rejections into bugs without product confirmation. `.gitignore` excludes `.codex`, `.venv`, `.work`, `.tools`, `artifacts`, `allure-results`, and `docs`; for pushes, stage explicit tracked paths only and keep ignored reports/caches local.
 
 ### `/home/ant/IdeaProjects/fuzzing`
 
