@@ -110,6 +110,26 @@ cp -r ~/codex-skills ~/.codex/skills
 - `~/.codex/config.toml`;
 - `~/.codex/memories/`.
 
+## Локальный аудит Codex-сессий
+
+Для быстрой проверки workflow-антипаттернов есть read-only утилита:
+
+```bash
+python3 scripts/audit_codex_sessions.py --days 30
+```
+
+Она читает `~/.codex/sessions/**/*.jsonl` и строит отчет по практичным правилам, адаптированным из AI Engineering Coach:
+
+- слишком длинные сессии и drift между типами задач;
+- повторяющиеся промпты и слабая структура старта задачи;
+- низкое использование ограничений, verbose output и тяжелые tool-сессии.
+
+Markdown-отчет можно сохранить так:
+
+```bash
+python3 scripts/audit_codex_sessions.py --days 30 --format markdown --output reports/codex-session-audit.md
+```
+
 ## Правило обновления
 
 Если меняется локальный стандарт работы, workflow команды или поведение skills, изменение нужно:
