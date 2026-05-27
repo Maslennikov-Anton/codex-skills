@@ -18,6 +18,9 @@ description: "Работать с VCStudio: проекты .vcsys, иерарх�
    - `references/vc024sa-section-map.md` -> карта полного встроенного текста VC024SA.B; открывай перед поиском редких деталей.
    - `references/vc024sa-complete.md` -> полный embedded extract VC024SA.B с параграфами и таблицами; открывай для исчерпывающих ответов, точных подписей, таблиц, UI labels и спорных формулировок.
    - `references/project-workflow.md` -> проект `.vcsys`, workspace, авторизация, системные логи, backup/history, иерархия `Project -> Device -> Resource -> Application -> Loop`, задачи, ФБ, связи, порядок выполнения.
+   - `references/fb-typelibrary.md` -> verified local VCStudio typelibrary из `/home/ant/IdeaProjects/vcstudio`: формат `.fbt`, source counts, runtime mapping, guardrails, high-value communication blocks; открывай при вопросах про входы/выходы/порты/типы ФБ.
+   - `references/fb-typelibrary-catalog.md` -> полный generated snapshot всех 473 `.fbt` интерфейсов ФБ; не открывай целиком без необходимости, сначала ищи блок через `rg` по имени.
+   - `references/source-repo-map.md` -> verified local VCStudio source repo map: Tycho build, product packaging, plugins/features/tests, custom `ru.isource.*` bundles, EMF model, DTO/JSON layer, CI/release; открывай при вопросах про устройство проекта, сборку, исходники, product packaging или gaps между документацией и кодом.
    - `references/st-language.md` -> Structured Text в VCStudio, ST->Lua, пользовательские ФБ, синтаксис, типы, массивы, enum/state-machine patterns.
    - `references/loading-monitoring.md` -> запуск VCont из Studio, offline/online операции, создание/загрузка `vcont.fboot`, cold/warm start, connect, мониторинг, изменение значений, форсирование, ручные события.
    - `references/communications.md` -> настройка Modbus Serial/TCP, runtime `Options` mirror, публикация портов ФБ в Modbus memory, `MBREAD_PACK`/`MBWRITE_PACK`, diagnostic blocks, OPC UA `CLIENT`/`SUBSCRIBE`/`PUBLISH`.
