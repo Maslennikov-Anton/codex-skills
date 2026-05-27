@@ -1,11 +1,11 @@
 ---
 name: vcont
-description: "Работать с VCont runtime: vcontcfg.json, vcont.fboot, XML-команды IDE, функциональные блоки, Modbus, OPC UA runtime-семантика, Hot Standby/HSB, синхронизация, лицензирование/trial, логи и автотесты."
+description: "Работать с VCont runtime: vcontcfg.json, vcont.fboot, XML-команды IDE, функциональные блоки, Modbus, OPC UA, Profibus/PRBDEV runtime-семантика, Hot Standby/HSB, синхронизация, лицензирование/trial, логи и автотесты."
 ---
 
 # VCont
 
-Используй этот skill для задач вокруг VCont runtime: конфигурация, `vcont.fboot`, XML-команды IDE, ФБ, Modbus, OPC UA runtime-семантика, Hot Standby/HSB, синхронизация, лицензирование, логи и автотесты. Runtime-facing сведения из VC024SA.B сохранены внутри skill в `references/vc024sa-runtime-contract.md`; внешний DOCX не нужен. Полная пользовательская/GUI-документация VCStudio живет в `vcstudio` skill; общий контракт связки - в `references/studio-vcont-contract.md`.
+Используй этот skill для задач вокруг VCont runtime: конфигурация, `vcont.fboot`, XML-команды IDE, ФБ, Modbus, OPC UA, Profibus/PRBDEV runtime-семантика, Hot Standby/HSB, синхронизация, лицензирование, логи и автотесты. Runtime-facing сведения из VC024SA.B сохранены внутри skill в `references/vc024sa-runtime-contract.md`; внешний DOCX не нужен. Полная пользовательская/GUI-документация VCStudio живет в `vcstudio` skill; общий контракт связки - в `references/studio-vcont-contract.md`.
 
 ## Workflow
 
@@ -17,6 +17,7 @@ description: "Работать с VCont runtime: vcontcfg.json, vcont.fboot, XML
    - `references/runtime-options.md` -> `Options="name=value ..."` для `MBCLIENTTCP`, `MBCLIENTRTU`, `MBCLIENTRTUOVERTCP`, `MBSERIALPORT`, `MBSERVER`, `EIPDEV`, `KNXDEV`, `PRBDEV`.
    - `references/protocol.md` -> VCStudio/VCont protocol, `vcont.fboot`, `LOADFILE`/`EXECBOOT`, `AUTH`, `HSBSTATUS`, XML-команды IDE, ФБ, связи, таски, лупы.
    - `references/modbus.md` -> `MBSERVER`, `MBCLIENT*`, `HsbAlg`, alias-регистры, Modbus memory map, `MBREAD`/`MBWRITE`, `MBREAD_PACK`/`MBWRITE_PACK`, diagnostic blocks, `modbusbatch`, `modbus_async`, OPC UA runtime-facing ID formats.
+   - `references/profibus.md` -> Profibus/PRBDEV тестовая инфра, PTY slave emulator, closed `librtprofibus.a` caveats, counter journal oracle для HSB.
    - `references/hot-standby.md` -> HSB-состояния, `HSBSTATUS`, MAIN/RESERVE/STANDALONE/NONE, heartbeat, failover.
    - `references/synchronization.md` -> peer-to-peer TCP, sync data model, Docker/eCAL.
    - `references/logs.md` -> `vcont.log`, bootfile/HSB/heartbeat/sync diagnostics, ограничения логов как oracle.
