@@ -1,0 +1,4 @@
+interface:
+  display_name: "Harbor Registry"
+  short_description: "Inspect corporate Harbor images safely"
+  default_prompt: "Use $harbor-registry to find available corporate Harbor images and tags for this task."
