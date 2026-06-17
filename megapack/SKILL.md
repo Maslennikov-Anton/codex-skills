@@ -1,6 +1,6 @@
 ---
 name: megapack
-description: "Work with the VCont Megapack project and delivered .run artifacts: explain purpose, inspect artifact composition, diagnose installer behavior, design artifact-only validation, review packaging risks, and operate around /home/ant/IdeaProjects/megapack, Nexus paths, makeself installers, VCont variants, OPC UA, legacy builds, install/uninstall/purge flows."
+description: "Validate VCont Megapack .run artifacts and inspect /home/ant/IdeaProjects/megapack: installer behavior, package matrix, Nexus paths, artifact-only checks, install/uninstall/purge risks."
 ---
 
 # Megapack

@@ -51,20 +51,22 @@
 - `MAIN candidate: <uuid> (reason: ...)` - механизм выбора MAIN зафиксировал кандидата и причину.
 - `The current copy becomes MAIN.` - текущий инстанс стал MAIN.
 - `The current copy becomes RESERVE.` - текущий инстанс стал RESERVE.
-- `Global mode changed to MAIN|RESERVE|UNKNOWN` - текущая глобальная HSB-роль; очень шумная строка, может повторяться тысячами раз.
+- `Global mode changed to INITIALIZING|MAIN|RESERVE|STANDALONE|ERROR|UNKNOWN` - текущая глобальная HSB-роль; очень шумная строка, может повторяться тысячами раз.
+- Строки с `checksum`, `mismatch`, `majority` или `manual intervention` важны для диагностики несовместимого `vcont.fboot` и неразрешимого выбора роли.
 
 Практически для assertions:
 
 - после старта пары должен быть один узел с устойчивым `MAIN` и второй с `RESERVE`;
 - `MAIN candidate` и `becomes MAIN/RESERVE` полезны для анализа election/failover;
-- `Global mode changed...` лучше агрегировать или брать последние значения, а не проверять каждую строку.
+- `Global mode changed...` лучше агрегировать или брать последние значения, а не проверять каждую строку;
+- `UNKNOWN` в актуальной модели означает выключенный HSB (`EnableHsb == false` или `HsbEnable == false`), а не нормальную startup-роль.
 
 ## Heartbeat
 
 Полезные признаки:
 
-- `Heartbeat sent from node: <uuid>. Mode: MAIN|RESERVE|UNKNOWN, Diagnostics: OK, Priority: <N>, Count: <C>` - локальный узел шлет heartbeat; видны режим, диагностика, приоритет и счетчик.
-- `Heartbeat received from node: <uuid>. Mode: MAIN|RESERVE|UNKNOWN, Diagnostics: OK, Priority: <N>, Count: <C>` - локальный узел получает heartbeat от peer.
+- `Heartbeat sent from node: <uuid>. Mode: INITIALIZING|MAIN|RESERVE|STANDALONE|ERROR|UNKNOWN, Diagnostics: OK, Priority: <N>, Count: <C>` - локальный узел шлет heartbeat; видны режим, диагностика, приоритет и счетчик.
+- `Heartbeat received from node: <uuid>. Mode: INITIALIZING|MAIN|RESERVE|STANDALONE|ERROR|UNKNOWN, Diagnostics: OK, Priority: <N>, Count: <C>` - локальный узел получает heartbeat от peer.
 - `Local node changed mode to <MODE>. Priority is <N>` - heartbeat-сервис увидел смену локальной роли.
 - `Remote node <uuid> changed mode to <MODE>. Priority is <N>` - heartbeat-сервис увидел смену роли peer.
 - `Remote node <uuid> removed due to missed heartbeats` - peer потерян по heartbeat; полезный признак failover или нестабильности сети/процесса.
@@ -90,7 +92,7 @@
 - Если MAIN остановлен, оставшийся узел выбирает MAIN и пишет `MAIN candidate: <own-or-peer-uuid> (...)` и `The current copy becomes MAIN.`.
 - Если peer возвращается, когда уже есть явный MAIN, он обычно становится RESERVE: `MAIN candidate: <main-uuid> (reason: explicit MAIN present)` и `The current copy becomes RESERVE.`.
 - После rejoin steady-state снова виден как связка: на MAIN идут `Heartbeat sent ... Mode: MAIN`, на RESERVE идут `Heartbeat received ... Mode: MAIN`.
-- `Global mode changed to UNKNOWN` может массово появляться во время startup/rejoin. Для assertions лучше отделять transient window после start/stop от stable window после election.
+- Для assertions отделяй transient window после start/stop от stable window после election. В актуальной модели поздний `UNKNOWN` в stable window проверяй как выключенный HSB или версионный drift, а не как нормальный этап rejoin.
 
 Полезные проверки для failover-теста по логам:
 

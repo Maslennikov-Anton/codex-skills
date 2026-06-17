@@ -18,8 +18,8 @@ description: "Работать с VCont runtime: vcontcfg.json, vcont.fboot, XML
    - `references/protocol.md` -> VCStudio/VCont protocol, `vcont.fboot`, `LOADFILE`/`EXECBOOT`, `AUTH`, `HSBSTATUS`, XML-команды IDE, ФБ, связи, таски, лупы.
    - `references/modbus.md` -> `MBSERVER`, `MBCLIENT*`, `HsbAlg`, alias-регистры, Modbus memory map, `MBREAD`/`MBWRITE`, `MBREAD_PACK`/`MBWRITE_PACK`, diagnostic blocks, `modbusbatch`, `modbus_async`, OPC UA runtime-facing ID formats.
    - `references/profibus.md` -> Profibus/PRBDEV тестовая инфра, PTY slave emulator, closed `librtprofibus.a` caveats, counter journal oracle для HSB.
-   - `references/hot-standby.md` -> HSB-состояния, `HSBSTATUS`, MAIN/RESERVE/STANDALONE/NONE, heartbeat, failover.
-   - `references/synchronization.md` -> peer-to-peer TCP, sync data model, Docker/eCAL.
+   - `references/hot-standby.md` -> HSB-состояния, `HSBSTATUS`, `GlobalModeManager`, checksum `vcont.fboot`, `HBModeSource`, выбор роли, поведение компонентов при потере активной роли.
+   - `references/synchronization.md` -> peer-to-peer TCP, `SyncManager`, ELET full/partial sync packets, Docker/eCAL.
    - `references/logs.md` -> `vcont.log`, bootfile/HSB/heartbeat/sync diagnostics, ограничения логов как oracle.
    - `references/licensing.md` -> internal/licensed/trial-lite/demo-trial-full/no-license, `license.bin`, `data.bin`, TPM/UUID, bootfile behavior.
    - `references/test-cases.md` -> повторяемые сценарии VCont/HSB, включая 3-минутный failover через IDE `READ`.
@@ -43,4 +43,4 @@ description: "Работать с VCont runtime: vcontcfg.json, vcont.fboot, XML
 - Licensed/runtime сборка обычно должна проходить license verification и поддерживать `vcont.fboot`; trial modes отличаются, см. `references/licensing.md`.
 - HSB синхронизирует рабочие данные, но не проект: ФБ, связи и таски должны быть загружены во все инстансы, обычно через bootfile каждого узла.
 - Для failover-тестов проверяй непрерывность по синхронизируемым DI/DO конкретных ФБ, а не по внутреннему event-task контексту.
-- `PlcId` используется как приоритет при одновременной HSB-election и reserve takeover; startup/rejoin поведение также зависит от текущей активной роли и uptime.
+- HSB role election сначала фильтрует кандидатов по готовности/ошибкам/checksum, затем сравнивает heartbeat `count`, потом `PlcId`, потом node `id`; не своди выбор MAIN только к большему `PlcId` или uptime.
