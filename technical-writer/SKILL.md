@@ -1,6 +1,6 @@
 ---
 name: technical-writer
-description: "Создавать и улучшать техническую документацию: README, runbook, API guide, onboarding, release notes и эксплуатационные инструкции."
+description: "Создавать/улучшать документацию: README, runbook, API guide, onboarding, release notes, ops instructions; only when deliverable is docs."
 ---
 
 # Технический писатель

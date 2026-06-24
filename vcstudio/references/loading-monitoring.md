@@ -2,6 +2,8 @@
 
 For the exact handoff from Studio load/monitoring operations into VCont runtime effects, see `studio-vcont-contract.md`.
 
+For ST->Lua integration checks, mirror Studio's load path as closely as possible: create/load the Lua-backed FB type, instantiate it under application/control-loop paths, assign/start the task, then verify through IDE `READ`. A translator-only pass is not enough for Studio compatibility claims.
+
 ## Запуск VCont для отладки из VCStudio
 
 Для загрузки logic и отладки нужно запустить VCont с правами администратора. Окно VCont после запуска закрывать нельзя. После запуска runtime доступен через локальный сетевой адрес, порт по умолчанию `61499`.

@@ -194,6 +194,21 @@ This file is a compact map of Ant's local repositories and recurring commands. K
   - Allure report: `allure serve allure-results`.
 - Notes: `compose.yaml` runs `bash scripts/run_local_checks.sh` in a `tests` service; no `pytest.ini`; pytest config is in `pyproject.toml`. Markers include `bug`, `github_projects`, `runtime`, `smoke`, `regression`. GitLab CI installs `lua5.4`, runs `ruff check .` and `python3 -m compileall src tests scripts`; CI test job runs `python3 -m pytest --alluredir allure-results || true`, so current translator failures can be collected as artifacts without failing the job. Some supported negative cases intentionally expect translator rejection; do not convert policy rejections into bugs without product confirmation. `.gitignore` excludes `.codex`, `.venv`, `.work`, `.tools`, `artifacts`, `allure-results`, and `docs`; for pushes, stage explicit tracked paths only and keep ignored reports/caches local.
 
+### `/home/ant/IdeaProjects/st-lua-translator-integration`
+
+- Purpose: Integration qualification harness for `ST -> Lua -> VCont -> IDE READ`, validating translated Lua through both `vcont.fboot` and Studio-like XML command loading.
+- Stack: Python 3.12, pytest, ruff, mypy, yamllint, Allure, Docker Compose VCont runtime, JSON case matrix under `tests/cases`.
+- Known workflows:
+  - Fast contract gate: `bash scripts/run_local_checks.sh -m contract`.
+  - Runtime VCont slice: `docker compose run --rm vcont-integration -m vcont -k "<case_id or expression>" --require-vcont --junitxml=<file>.xml`.
+  - Stop runtime containers after VCont runs: `docker compose down --remove-orphans`.
+  - Case matrix docs: `docs/TRANSLATOR_STANDARD_COVERAGE.md`; Studio load research: `docs/STUDIO_COMMAND_LOAD_RESEARCH.md`.
+- Verification commands:
+  - Matrix count/schema smoke: `PYTHONPATH=src python3 - <<'PY'` with `load_cases()` and `validate_cases()`.
+  - Standard local gate: `bash scripts/run_local_checks.sh -m contract`.
+  - Whitespace gate before commit: `git diff --check` or `git diff --cached --check`.
+- Notes: Keep the suite integration-only: cases should be `supported_runtime`, load into VCont, and be checked through `READ` in both `fboot` and `studio` modes. Expected-positive product gaps stay as red tests in JUnit/Allure; do not move them into negative/xfail/inventory files. `.gitignore` excludes `.venv`, `.work`, Allure/JUnit, caches and temporary exit-code files; leave runtime artifacts local unless the user explicitly asks for cleanup.
+
 ### `/home/ant/IdeaProjects/fuzzing`
 
 - Purpose: Early VCont fuzzing/proxy experiments; README is default GitLab template, real surface is compose plus `src/` and `fuzzing/`.
@@ -230,13 +245,13 @@ This file is a compact map of Ant's local repositories and recurring commands. K
 - Known workflows:
   - Inspect local changes: `git status --short`, `git diff --stat`, `git diff`.
   - Validate one skill: `python3 .system/skill-creator/scripts/quick_validate.py <skill-dir>`.
-  - Validate all skills: loop over top-level dirs with `SKILL.md` and run `quick_validate.py`.
+  - Validate repo-wide/common-rule changes: `python3 scripts/audit_skills.py --root /home/ant/codex-skills`.
   - Check markdown/reference link targets with `rg` and file existence.
 - Verification commands:
   - `git diff --check`
   - `python3 .system/skill-creator/scripts/quick_validate.py <skill-dir>`
-  - For all skills, run the all-skill validation loop instead of assuming one changed skill is representative.
-- Notes: Keep `SKILL.md` small and route detailed content to `references/`. Use `para-memory-files` for memory recall/update behavior; this repo documents local skills and validation. Skill sync/push is in scope only when the user asks; otherwise stop at local diff/validation recommendations. Validate changed skills with `quick_validate.py`; validate all top-level skills when trigger rules, shared conventions, or common validation behavior changes.
+  - `python3 scripts/audit_skills.py --root /home/ant/codex-skills`
+- Notes: Keep `SKILL.md` small and route detailed content to `references/`. Use `para-memory-files` for memory recall/update behavior; this repo documents local skills and validation. Skill sync/push is in scope only when the user asks; otherwise stop at local diff/validation recommendations. Use `quick_validate.py` for narrow single-skill edits; use `audit_skills.py` for trigger rules, shared conventions, or common validation behavior changes.
 
 ## Local Tooling Preferences
 

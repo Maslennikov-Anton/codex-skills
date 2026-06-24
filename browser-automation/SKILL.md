@@ -34,6 +34,8 @@ description: "Автоматизировать браузерные сценар
 
 ## Какие references открывать
 
+Открывай references только если сценарий сложный, нестабилен или нужен Playwright-specific pattern.
+
 - Практики Playwright-сценариев, селекторов и диагностики:
   [references/playwright-patterns.md](references/playwright-patterns.md)
 - Verification checklist для browser evidence:

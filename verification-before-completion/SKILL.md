@@ -1,11 +1,11 @@
 ---
 name: verification-before-completion
-description: "Использовать перед заявлениями о готовности, исправлении, прохождении тестов, успешном build/lint, commit, push, PR или финальным ответом о завершенной работе."
+description: "Use before evidence-backed success claims after implementation, fix, tests, build/lint, commit, push, PR, or completed verification; skip pure analysis/status."
 ---
 
 # Verification Before Completion
 
-Используй этот skill перед любым claim о состоянии работы: "готово", "починил", "тесты проходят", "build успешен", "можно мержить", "задача завершена". Принцип: сначала свежая проверка, потом claim.
+Используй этот skill перед evidence-backed claim о состоянии работы: "готово", "починил", "тесты проходят", "build успешен", "можно мержить", "задача завершена". Для чистого анализа или статуса без readiness claim этот skill не нужен. Принцип: сначала свежая достаточная проверка, потом claim.
 
 Этот gate закрывает типовой anti-rationalization pattern: нельзя заменять проверку формулировками "изменение маленькое", "должно работать", "я уже видел похожее" или "subagent проверил".
 
@@ -13,8 +13,8 @@ description: "Использовать перед заявлениями о го
 
 Перед success claim выполни:
 
-1. Определи, какая команда или проверка реально доказывает claim.
-2. Запусти проверку свежим полным прогоном.
+1. Определи, какая минимальная свежая команда или проверка реально доказывает claim.
+2. Запусти ее. Полный прогон нужен для release/shared/high-risk claim или когда narrow check не доказывает заявленное.
 3. Прочитай output и exit code.
 4. Сопоставь output с claim.
 5. Для bug fix проверь prove-it condition: исходный симптом воспроизведен и исчез, либо regression test покрывает именно его.
@@ -59,8 +59,9 @@ description: "Использовать перед заявлениями о го
 Перед claim о готовности изменений в `/home/ant/codex-skills` проверь:
 
 1. `git diff --check`
-2. `quick_validate.py` для всех измененных skills или для всех top-level skills, если менялись общие правила.
-3. Наличие всех reference-файлов, на которые ссылаются измененные `SKILL.md`.
+2. `python3 scripts/audit_skills.py --root /home/ant/codex-skills` для repo-wide/common-rule changes.
+3. `quick_validate.py <skill-dir>` для узких single-skill edits, если repo-wide audit не запускался.
+4. Наличие всех reference-файлов, на которые ссылаются измененные `SKILL.md`.
 
 Если менялись trigger/description, отдельно проверь, что description остается коротким, конкретным и не конфликтует с более высоким уровнем инструкций.
 
@@ -75,9 +76,8 @@ description: "Использовать перед заявлениями о го
 
 ## Формат ответа
 
-Перед финальным ответом по завершенной работе включай:
+Перед финальным ответом по завершенной работе включай только то, что нужно для понимания evidence:
 
-1. Проверка: команда или метод.
+1. Команду или метод проверки.
 2. Результат: pass/fail/not run.
-3. Evidence: краткий output, exit code или наблюдаемый факт.
-4. Ограничение: что не проверено, если такое есть.
+3. Короткое ограничение, если проверка была частичной.

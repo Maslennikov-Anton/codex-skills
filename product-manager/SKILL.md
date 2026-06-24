@@ -1,6 +1,6 @@
 ---
 name: product-manager
-description: "Управлять продуктовым выбором: vision, MVP, backlog, приоритизация, гипотезы, value, success metrics и product scope."
+description: "Управлять продуктовым выбором: vision, MVP, backlog, priority, hypotheses, value, success metrics, scope; not detailed requirements or engineering plan."
 ---
 
 # Продуктовый менеджер

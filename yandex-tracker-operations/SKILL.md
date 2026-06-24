@@ -31,7 +31,7 @@ description: >
    - comments/attachments;
    - transitions/status workflow.
 2. Если credentials или org context неизвестны, начни с [references/auth-and-request-format.md](references/auth-and-request-format.md).
-3. Для проверки доступа сначала вызови `GET /v3/myself`.
+3. Если credentials или org context неизвестны, проверь доступ через `GET /v3/myself`; иначе target read/search может быть достаточным access check.
 4. Перед записью в issue или переходом статуса проверь queue-specific fields и доступные переходы через [references/discovery-and-troubleshooting.md](references/discovery-and-troubleshooting.md).
 5. Для типовых операций предпочитай готовые формы из [references/common-operations.md](references/common-operations.md) и [references/endpoint-matrix.md](references/endpoint-matrix.md).
 6. Если поведение выглядит нестабильным, сначала локализуй причину через troubleshooting, а не списывай проблему на token или API bug.

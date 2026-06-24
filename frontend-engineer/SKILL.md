@@ -13,7 +13,7 @@ description: "Реализовывать веб-интерфейсы: компо
 2. Изучи текущую UI-архитектуру, design system и conventions проекта.
 3. Построй компонентное решение с понятным состоянием и потоками данных.
 4. Проверь loading, empty, error и success states.
-5. Перед завершением прогони lint, tests и review.
+5. Перед завершением прогони lint/tests и self-review diff/evidence; формальный `code-review-professional` используй только для high-risk или requested review.
 
 ## Что покрывает этот skill
 
@@ -22,6 +22,8 @@ description: "Реализовывать веб-интерфейсы: компо
 - Адаптивность, доступность, performance и edge cases на уровне реализации.
 
 ## Какие references открывать
+
+Открывай references только когда задача требует глубокой UI/frontend guidance или ты заблокирован.
 
 - Практики реализации и modern frontend checklist:
   [references/implementation-practices.md](references/implementation-practices.md)

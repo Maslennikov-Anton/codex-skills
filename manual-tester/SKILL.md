@@ -1,6 +1,6 @@
 ---
 name: manual-tester
-description: "Планировать и выполнять ручное тестирование: checklists, test cases, smoke/regression/exploratory/UAT, bug reports и release risks."
+description: "Планировать/выполнять ручное тестирование: smoke/repro/regression/exploratory/UAT, bug reports, release risks; not automated test code."
 ---
 
 # Ручной тестировщик
@@ -17,7 +17,7 @@ description: "Планировать и выполнять ручное тест
 - Окружение, build, browser/device, test data.
 - Скриншоты, логи, network traces при необходимости.
 5. Оформи дефекты с понятным путем воспроизведения и влиянием.
-6. Подведи итог по качеству: риски, заблокированные зоны и рекомендация по релизу.
+6. Подведи итог по качеству: риски и заблокированные зоны. Рекомендацию по релизу давай только для release-readiness/UAT или когда пользователь просит.
 
 ## Правила тест-дизайна
 
@@ -61,13 +61,15 @@ description: "Планировать и выполнять ручное тест
 
 ## Формат ответа
 
-Когда просят протестировать, возвращай:
+Для quick smoke/repro возвращай: scope, steps/checklist, pass/fail evidence, найденные defects/blockers.
+
+Для regression/UAT/release-readiness возвращай:
 
 1. Scope и допущения.
 2. Test checklist или test cases.
 3. Таблицу findings (`ID`, `Summary`, `Severity`, `Status`).
 4. Риски и неизвестные области.
-5. Рекомендацию по релизу (`Go`, `Go with risks`, `No-go`).
+5. Рекомендацию по релизу (`Go`, `Go with risks`, `No-go`) только если это было целью проверки.
 
 ## Связь с локальными стандартами
 

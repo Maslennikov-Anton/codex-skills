@@ -48,6 +48,8 @@ description: Ревьюить изменения в коде с фокусом �
 
 ## Какие references открывать
 
+Открывай references только для глубокого review, спорного severity или когда нужен профильный checklist.
+
 - Общий инженерный checklist ревью:
   [references/review-checklists.md](references/review-checklists.md)
 - Дополнительные проверки для тестовых проектов:

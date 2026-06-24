@@ -1,6 +1,6 @@
 ---
 name: delivery-manager
-description: "Планировать delivery уже выбранной инициативы: этапы, зависимости, риски, readiness, release plan и координацию ролей."
+description: "Планировать delivery выбранной инициативы: phases, dependencies, risks, readiness, release plan, role coordination; not code-level task plan."
 ---
 
 # Менеджер поставки

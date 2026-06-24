@@ -1,6 +1,6 @@
 ---
 name: solution-architect
-description: "Проектировать архитектуру решения: границы компонентов, интеграции, NFR, data flows, contracts, scalability/reliability trade-offs."
+description: "Проектировать архитектуру: component boundaries, integrations, NFR, data flows, contracts, trade-offs; not task-level plan or ADR-only writeup."
 ---
 
 # Архитектор решения

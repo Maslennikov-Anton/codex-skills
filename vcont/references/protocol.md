@@ -2,6 +2,8 @@
 
 Для общей границы Studio(front)/VCont(back), lifecycle и object mapping см. `studio-vcont-contract.md`.
 
+Для ST->Lua qualification сценариев проверочный минимум: загрузить Lua-backed FB так же, как Studio или `vcont.fboot`, создать instance под application/loop path, назначить loop на task, выполнить `START`, затем читать outputs через IDE `READ`. Если generated Lua переводится, но `READ` возвращает `NO_SUCH_OBJECT`, `UNSUPPORTED_TYPE` или не достигает oracle, это runtime/load-path signal, а не повод считать standalone translation достаточной проверкой.
+
 ## Модель взаимодействия VCont и VCStudio
 
 Инициатором связи выступает VCStudio. Команды отправляются в VCont TCP-пакетами на адрес/порт, заданный параметром `IpPort` в `vcontcfg.json`.

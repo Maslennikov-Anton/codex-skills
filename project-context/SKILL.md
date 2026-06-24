@@ -1,16 +1,17 @@
 ---
 name: project-context
-description: "Use in Ant's local repos under /home/ant/IdeaProjects: repo orientation, workspace map, commands, build/test/run workflows, release steps, and conventions."
+description: "Use for non-trivial /home/ant/IdeaProjects repo work needing orientation, trusted commands, dirty-worktree, push/test workflows, or local conventions; skip obvious scoped edits."
 metadata:
   short-description: Local project map and command conventions
 ---
 
 # Project Context
 
-Use this skill before changing, diagnosing, testing, pushing, or explaining a
-local project under `/home/ant/IdeaProjects`. Its job is to replace generic
-repo guesses with verified local context: repo purpose, trusted commands,
-known generated files, dirty-worktree risks, and related domain skills.
+Use this skill before unfamiliar, repo-wide, push/test, diagnostic, or
+context-dependent work under `/home/ant/IdeaProjects`. Its job is to replace
+generic repo guesses with verified local context: repo purpose, trusted
+commands, known generated files, dirty-worktree risks, and related domain
+skills.
 
 The compact source of truth is [references/workspace-map.md](references/workspace-map.md).
 For refreshing or extending the map, use
@@ -21,11 +22,12 @@ For refreshing or extending the map, use
 1. Confirm the repo root with `git rev-parse --show-toplevel` when inside a repo.
 2. If the task may depend on prior local decisions, recurring repo history, or user preferences, do a quick memory lookup and verify drift-prone facts against the repo.
 3. Check `git status --short --ignored` before edits when the task can touch files, commits, pushes, generated outputs, Docker artifacts, reports, or test results.
-4. Match the repo path/name against `references/workspace-map.md`.
-5. Prefer the documented commands and notes over generic build/test assumptions.
-6. If the map is missing, stale, or contradicted by executable files, inspect local evidence first: `README*`, `pyproject.toml`, `package.json`, `pom.xml`, `build.gradle*`, `Makefile`, `.gitlab-ci.yml`, `.github/workflows`, `docker-compose*`, `compose.yaml`, Dockerfiles, `requirements*.txt`, `setup.py`, `pytest.ini`, Terraform files, `.env.example`, `scripts/`, and test config.
-7. Combine with the domain skill named in the map when the task needs protocol, framework, CI, security, database, or testing depth.
-8. When you learn a reusable stable fact, update the map only if the user requested skill/context maintenance or explicitly asked to remember/sync it.
+4. Match the repo path/name against `references/workspace-map.md` when the repo is unfamiliar, the command is not obvious, or generated artifacts/push/test behavior matters.
+5. If the task is to commit/push/sync according to `.gitignore`, use `gitignore-scoped-push` after this orientation.
+6. Prefer the documented commands and notes over generic build/test assumptions.
+7. If the map is missing, stale, or contradicted by executable files, inspect local evidence first: `README*`, `pyproject.toml`, `package.json`, `pom.xml`, `build.gradle*`, `Makefile`, `.gitlab-ci.yml`, `.github/workflows`, `docker-compose*`, `compose.yaml`, Dockerfiles, `requirements*.txt`, `setup.py`, `pytest.ini`, Terraform files, `.env.example`, `scripts/`, and test config.
+8. Combine with the domain skill named in the map when the task needs protocol, framework, CI, security, database, or testing depth.
+9. When you learn a reusable stable fact, update the map only if the user requested skill/context maintenance or explicitly asked to remember/sync it.
 
 ## Guardrails
 

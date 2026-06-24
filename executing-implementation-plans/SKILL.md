@@ -5,7 +5,7 @@ description: "Использовать, когда есть written implementati
 
 # Executing Implementation Plans
 
-Используй этот skill для выполнения уже написанного implementation plan. Если плана нет или он слишком расплывчатый, сначала используй `implementation-planner`.
+Используй этот skill для выполнения уже написанного implementation plan. Если плана нет, сначала используй `implementation-planner`; если есть только мелкие gaps, восполни их из локального evidence и продолжай.
 
 ## Workflow
 
@@ -15,7 +15,7 @@ description: "Использовать, когда есть written implementati
    - понятны ли tasks;
    - есть ли verification commands;
    - нет ли contradictions, placeholders или missing dependencies.
-3. Если есть critical gaps, остановись и уточни план вместо угадывания.
+3. Если есть critical gaps, остановись и уточни план вместо угадывания. Minor gaps закрывай по repo evidence, не превращая выполнение в новый план.
 4. Создай рабочий checklist по tasks.
 5. Выполняй task-by-task:
    - отметь task in progress;
@@ -36,11 +36,11 @@ description: "Использовать, когда есть written implementati
 
 ## Stop Conditions
 
-Остановись и спроси, если:
+Остановись и спроси только если gap нельзя безопасно закрыть по локальному evidence:
 
-- task unclear;
-- план содержит TODO/TBD/placeholders;
-- verification command отсутствует для risky task;
+- task unclear enough to change behavior or scope;
+- план содержит TODO/TBD/placeholders в critical path;
+- verification command отсутствует для risky task and no equivalent local gate is obvious;
 - risky step не имеет source/doubt gate, хотя зависит от внешнего API, миграции, security или irreversible action;
 - dependency не установлена или недоступна;
 - test/build fails не из-за ожидаемого red step;

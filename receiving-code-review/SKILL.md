@@ -54,6 +54,8 @@ description: "Использовать при получении code review fee
 
 ## Какие references открывать
 
+Открывай references только если feedback неоднозначен, спорен или нужно подготовить structured response.
+
 - Шаблон triage и ответа:
   [references/feedback-triage.md](references/feedback-triage.md)
 

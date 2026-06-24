@@ -1,6 +1,6 @@
 ---
 name: team-engineering-style
-description: "Поддерживать локальные инженерные стандарты: стиль работы, preferred stacks, статусы технологий, границы skills и правила их эволюции."
+description: "Use only to define/update durable local engineering standards, technology lifecycle statuses, or resolve conflicts between local skills; not ordinary style cleanup."
 ---
 
 # Локальный инженерный стиль
@@ -24,11 +24,13 @@ description: "Поддерживать локальные инженерные �
 
 ## Defaults
 
-- Agentic engineering lifecycle: refine/spec -> plan -> small implementation slices -> test/debug -> review -> verify -> ship.
+- Agentic engineering lifecycle: refine/spec -> plan when useful -> small implementation slices -> test/debug -> self-review diff/evidence -> verify -> ship. Use `code-review-professional` only for requested, high-risk, shared-contract, or externally reviewed changes.
 - Для новых/спорных библиотек и внешних API используй `source-driven-development`.
 - Для high-risk, security-sensitive, irreversible или дорогих ошибочных выводов используй `doubt-driven-development`.
 - Перед финальным claim о готовности, исправлении, успешных тестах, build/lint, commit, push или PR используй `verification-before-completion`.
-- Для тестовых проектов источник истины - текущий прогон. Тесты не являются bug inventory, `xfail` не используем, supported positive-кейсы не переводим в negative ради зеленого статуса.
+- Для локальных qualification/test-product repo источник истины - текущий прогон. Тесты не являются bug inventory; не используй `xfail` и не переводи supported positive-кейсы в negative ради зеленого статуса, если repo policy не говорит обратное.
+- Generated/runtime artifacts не удаляй после каждого прогона автоматически. Cleanup - отдельная операция по явной просьбе; по умолчанию артефакты остаются локально и отсеиваются через `.gitignore`.
+- Для push/sync-задач в шумных repo используй `gitignore-scoped-push`: явный staged allowlist, проверка ignored preview и remote SHA.
 
 ## Технологии
 

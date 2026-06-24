@@ -1,6 +1,6 @@
 ---
 name: implementation-planner
-description: "Использовать перед multi-step реализацией, когда нужен исполнимый engineering plan: точные файлы, маленькие шаги, команды проверки и expected output."
+description: "Use before multi-step implementation when an executable engineering plan is needed: exact files, small steps, verification; not roadmap/backlog."
 ---
 
 # Implementation Planner
@@ -62,6 +62,8 @@ description: "Использовать перед multi-step реализаци�
 Если деталь неизвестна, сначала исследуй ее или явно вынеси как open question, а не маскируй placeholder.
 
 ## Какие references открывать
+
+Открывай references только если нужен готовый шаблон или не хватает структуры.
 
 - Шаблон implementation plan:
   [references/plan-template.md](references/plan-template.md)

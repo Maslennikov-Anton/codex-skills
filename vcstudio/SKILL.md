@@ -1,6 +1,6 @@
 ---
 name: vcstudio
-description: "Работать с VCStudio: проекты .vcsys, иерархия устройство/ресурс/приложение/контур, задачи, ФБ, ST, загрузка vcont.fboot, онлайн-операции, мониторинг, Modbus/OPC UA через Studio, HSB boundary и загрузка каждого узла."
+description: "Use for VCStudio GUI/project/docs tasks: .vcsys, hierarchy, library, ST editor, load/monitoring UI, Studio-generated fboot; skip runtime-only debug."
 ---
 
 # VCStudio
@@ -33,6 +33,7 @@ description: "Работать с VCStudio: проекты .vcsys, иерарх�
    - онлайн-загрузка КУ не должна сбрасывать текущие значения на начальные.
 4. Для GUI-инструкций сохраняй русские названия объектов и команд из Studio: `Структура системы`, `Свойства`, `Библиотека`, `Консоль загрузки`, `Загрузить`, `Онлайн загрузить КУ`, `Создать файл загрузки`, `Создать и загрузить файл загрузки`, `Подключиться к ресурсу`, `Мониторинг`, `Форсировать`.
 5. Документация содержит опечатки и местами противоречивые формулировки. Если значение критично для кода или теста, сверяй с generated `vcont.fboot`, логами, typelibrary, поведением текущей сборки Studio/runtime.
+6. Для ST->Lua/Studio compatibility claims standalone перевод не считается достаточным: Lua должен загружаться в VCont и проверяться через Studio-like `READ`.
 
 ## Core Model
 

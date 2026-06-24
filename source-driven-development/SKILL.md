@@ -1,11 +1,11 @@
 ---
 name: source-driven-development
-description: "Опирайтесь на официальные источники при работе с framework/library/API: версии, документация, breaking changes, устаревшие паттерны и citations."
+description: "Use when a decision depends on exact current version, official docs, deprecations, external API behavior, security defaults, or citations; skip local-only code."
 ---
 
 # Source-Driven Development
 
-Используй этот skill, когда реализация зависит от внешнего API, библиотеки, фреймворка, протокола, CLI, облачного сервиса или продукта, где память модели может быть устаревшей.
+Используй этот skill, когда решение зависит от точной текущей версии внешнего API, библиотеки, фреймворка, протокола, CLI, облачного сервиса или продукта. Если поведение полностью определяется локальным кодом/lockfile и version-specific claim не нужен, не запускай полный source-doc pass.
 
 ## Workflow
 
@@ -32,7 +32,7 @@ description: "Опирайтесь на официальные источник�
 - Решение берется из старого blog post вместо официального migration guide.
 - Breaking change предполагается на память.
 - Security/config default выбран без документации.
-- Python/JS/Playwright/GitHub/OpenAI/Allure API используется без проверки текущей версии или official docs.
+- Python/JS/Playwright/GitHub/OpenAI/Allure API меняется или диагностируется без проверки текущей версии или official docs.
 
 ## Формат ответа
 

@@ -59,19 +59,18 @@ chmod 600 /home/ant/.harbor/harbor.env
 
 ## Workflow
 
-1. Check whether Docker already has registry credentials before asking the user
-   for anything:
-   `docker pull harbor.isource.dev/docker/ubuntu:24.04` or another known image
-   relevant to the task.
-2. If API inventory is needed, use `scripts/harbor_inventory.py` with env vars
+1. Inspect local task scope first: Dockerfiles, compose files, CI image refs,
+   README, or the requested Harbor project/repository.
+2. Check whether Docker/API credentials are available without printing secrets.
+3. If API inventory is needed, use `scripts/harbor_inventory.py` with env vars
    or `--env-file`. The script masks credentials and does not print secrets.
-3. Search narrowly first: project names from the repo or CI such as `docker`,
+4. Search narrowly first: project names from the repo or CI such as `docker`,
    `builders`, `vcont-qa`, `vcont-runtime`, `vcont-runtime-runner`.
-4. Prefer internal Harbor images over Docker Hub/public registries when they
+5. Prefer internal Harbor images over Docker Hub/public registries when they
    exist and match the required OS, toolchain, architecture, and freshness.
-5. For VCont work, verify the exact image/tag currently used by local
+6. For VCont work, verify the exact image/tag currently used by local
    Dockerfiles, `.gitlab-ci.yml`, compose files, or README before changing it.
-6. Before declaring an image usable, verify one of:
+7. Before declaring an image usable, verify one of:
    - `docker pull <image>` succeeds;
    - `docker build --check` or a narrow build reaches metadata/layer access;
    - the Harbor API shows a recent artifact with tags and digest.

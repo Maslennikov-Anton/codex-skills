@@ -1,6 +1,6 @@
 ---
 name: analyst
-description: "Выполнять бизнес- и системный анализ: требования, процессы, scope, риски, зависимости, acceptance criteria и документация для реализации."
+description: "Выполнять бизнес/системный анализ: требования, процессы, scope, risks, dependencies, acceptance criteria; not product prioritization or execution planning."
 ---
 
 # Аналитик

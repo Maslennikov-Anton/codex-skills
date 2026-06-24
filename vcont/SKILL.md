@@ -1,6 +1,6 @@
 ---
 name: vcont
-description: "Работать с VCont runtime: vcontcfg.json, vcont.fboot, XML-команды IDE, функциональные блоки, Modbus, OPC UA, Profibus/PRBDEV runtime-семантика, Hot Standby/HSB, синхронизация, лицензирование/trial, логи и автотесты."
+description: "Use for VCont runtime behavior: vcontcfg, fboot/XML load commands, logs, licensing, HSB, Modbus/OPC UA/Profibus semantics, runtime tests."
 ---
 
 # VCont
@@ -32,9 +32,10 @@ description: "Работать с VCont runtime: vcontcfg.json, vcont.fboot, XML
 6. Для trial/demo сначала классифицируй пакет:
    - Trial Lite (`tria-lite`): 30 минут, `vcont.fboot` запрещен.
    - Demo / Trial Full (`tria-full`): 24 часа, OPC UA, лимит 15 I/O, `vcont.fboot` допускается.
-7. Для автотестов сначала изучи `/home/ant/IdeaProjects/vcont-autotests`: структуру, fixtures, helpers, стиль и команды. Для разных программ подменяй `vcont.fboot` fixture-ом перед стартом контейнеров, а не собирай отдельный Docker image на каждый тест.
-8. Сохраняй терминологию: VCont/ВК, VCStudio, VCSystem, PLC/PlcId, HSB_MAIN, HSB_RESERVE, HSB_STANDALONE, `HSBSTATUS`, `MAIN`, `RESERVE`, `STANDALONE`, `NONE`, heartbeat, таск, луп, контур управления, ФБ, internal build, licensed/runtime license, Trial Lite, Demo / Trial Full, no-license, `license.bin`, `data.bin`, `ControllerId`, `VARS`, `CopiesMBServer`.
-9. Факты из `references/` считай продуктовыми требованиями, а не доказательством поведения текущих бинарников. Реализацию проверяй отдельно по бинарникам, конфигам, логам или тестам.
+7. Для задач именно в `/home/ant/IdeaProjects/vcont-autotests` сначала изучи структуру, fixtures, helpers, стиль и команды. Для разных программ подменяй `vcont.fboot` fixture-ом перед стартом контейнеров, а не собирай отдельный Docker image на каждый тест.
+8. Для ST->Lua/Studio compatibility claims проверяй load into VCont and IDE `READ` oracle; успешная генерация Lua сама по себе не доказывает runtime compatibility.
+9. Сохраняй терминологию: VCont/ВК, VCStudio, VCSystem, PLC/PlcId, HSB_MAIN, HSB_RESERVE, HSB_STANDALONE, `HSBSTATUS`, `MAIN`, `RESERVE`, `STANDALONE`, `NONE`, heartbeat, таск, луп, контур управления, ФБ, internal build, licensed/runtime license, Trial Lite, Demo / Trial Full, no-license, `license.bin`, `data.bin`, `ControllerId`, `VARS`, `CopiesMBServer`.
+10. Факты из `references/` считай продуктовыми требованиями, а не доказательством поведения текущих бинарников. Реализацию проверяй отдельно по бинарникам, конфигам, логам или тестам.
 
 ## Core Model
 

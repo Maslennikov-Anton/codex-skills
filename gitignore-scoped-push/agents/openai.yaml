@@ -1,0 +1,4 @@
+interface:
+  display_name: "Gitignore Scoped Push"
+  short_description: "Push tracked changes without generated artifacts"
+  default_prompt: "Use $gitignore-scoped-push to commit and push this repository according to .gitignore."
