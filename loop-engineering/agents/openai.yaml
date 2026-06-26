@@ -1,0 +1,4 @@
+interface:
+  display_name: "Loop Engineering"
+  short_description: "Bounded autonomous iteration loops"
+  default_prompt: "Use $loop-engineering to run bounded improvement loops with checkpoints, evidence, and clear stopping rules."

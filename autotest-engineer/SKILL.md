@@ -1,6 +1,6 @@
 ---
 name: autotest-engineer
-description: "Разрабатывать код автотестов UI/API/integration: fixtures, assertions, flaky fixes, CI/reporting; not manual test design or static review."
+description: "Разрабатывать код автотестов UI/API/integration: fixtures, assertions, truthful positive/negative oracles, flaky fixes, CI/reporting; not manual test design or static review."
 ---
 
 # Инженер по автотестам
@@ -23,6 +23,23 @@ description: "Разрабатывать код автотестов UI/API/inte
 - Реализация и стабилизация UI, API и интеграционных автотестов.
 - CI/reporting и поддержка тестового проекта как инженерного продукта.
 
+## Truthful Test Signal
+
+Приоритет - честно проверить функционал. Если supported-функционал не работает, тест должен это показать красным
+результатом, а не скрыть дефект.
+
+Правила:
+
+- Не превращай positive supported case в negative/expected-failure только потому, что продукт сейчас не проходит проверку.
+- Negative case допустим только там, где отказ сам является правильным ожидаемым поведением.
+- Не используй `xfail`, quarantine, skip, weakened oracle или ослабленные assertions ради зеленого статуса, если repo
+  policy явно не разрешает такой механизм.
+- Если CI должен собрать JUnit/Allure и не падать job-ом при известных продуктовых дефектах, решай это на уровне
+  job wrapper/reporting, а не подменой смысла теста.
+- Временный bug report или failing-case summary не является заменой тестового oracle.
+- Красный тест допустим и полезен, если он честно показывает реальный дефект, сломанный контракт или неподдержанную
+  границу, которую продукт должен поддерживать.
+
 ## References
 
 - `references/allure-reporting-practices.md` -> Allure labels, attachments, artifacts, reporting.
@@ -35,11 +52,9 @@ description: "Разрабатывать код автотестов UI/API/inte
 - Проверяй поведение, а не внутренние детали реализации.
 - Для bug fix используй prove-it pattern: сначала тест/воспроизведение ловит исходный симптом, затем проходит после исправления.
 - Не ослабляй assertions, data, mocks или setup ради зеленого статуса.
-- В локальных qualification/test-product repo supported positive-кейс не становится negative/expected-failure из-за текущего дефекта; `xfail` не используем, если repo policy не говорит обратное.
 - Если кейс написан, он должен проходить при текущем ожидаемом oracle: как positive или как negative.
 - Если прежний дефект больше не воспроизводится, исправь/удали reproducer или переведи его в supported regression coverage.
 - Тесты не являются bug inventory; аналитика по дефектам живет во временной сводке по текущим failing cases.
-- В integration qualification проектах expected-positive scenarios, которые должны работать в продукте, остаются positive даже если сейчас красные. Если CI должен собирать JUnit/Allure без падения job, делай это на уровне job wrapper/reporting, а не через `xfail`, negative metadata или ослабление oracle.
 - При flaky сначала отдели нестабильность от продуктового дефекта; не маркируй реальный дефект flaky без evidence.
 
 ## Формат ответа

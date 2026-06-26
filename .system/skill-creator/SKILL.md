@@ -329,7 +329,7 @@ Only include other optional interface fields when the user explicitly provides t
 
 When editing the (newly-generated or existing) skill, remember that the skill is being created for another instance of Codex to use. Include information that would be beneficial and non-obvious to Codex. Consider what procedural knowledge, domain-specific details, or reusable assets would help another Codex instance execute these tasks more effectively.
 
-After substantial revisions, or if the skill is particularly tricky, consider subagent forward-testing on realistic tasks or artifacts. Do it when the risk justifies the cost; otherwise rely on validation scripts and focused self-review. When forward-testing, pass the artifact under validation rather than your diagnosis of what is wrong, and keep the prompt generic enough that success depends on transferable reasoning rather than hidden ground truth.
+After substantial revisions, or if the skill is particularly tricky, you should use subagents to forward-test the skill on realistic tasks or artifacts. When doing so, pass the artifact under validation rather than your diagnosis of what is wrong, and keep the prompt generic enough that success depends on transferable reasoning rather than hidden ground truth.
 
 #### Start with Reusable Skill Contents
 
@@ -393,7 +393,7 @@ Not:
   `Review the skill at /path/to/skill-x; pretend a user asks you to...`
 
 Decision rule for forward-testing:
-  - Forward-test when trigger behavior, safety rules, or workflow quality is hard to judge from static review.
+  - Err on the side of forward-testing
   - Ask for approval if you think there's a risk that forward-testing would:
     * take a long time,
     * require additional approvals from the user, or

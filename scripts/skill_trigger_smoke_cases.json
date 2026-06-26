@@ -38,5 +38,13 @@
   {
     "prompt": "создай или улучши Codex skill с SKILL.md, references, scripts и validation",
     "expected": "skill-creator"
+  },
+  {
+    "prompt": "продолжай луп инжиниринг на заданное мной число итераций: улучшай артефакт, фиксируй checkpoints и evidence",
+    "expected": "loop-engineering"
+  },
+  {
+    "prompt": "сделай честные автотесты: если positive supported функционал не работает, пусть тест падает, не превращай его в negative",
+    "expected": "autotest-engineer"
   }
 ]
