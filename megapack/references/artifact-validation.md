@@ -49,12 +49,28 @@ sudo ./artifact.run uninstall
 sudo ./artifact.run purge
 ```
 
-For `x86_64 lic` OPC UA:
+For an OPC UA-capable artifact:
 
 ```bash
 sudo ./artifact.run install opcua
 /usr/local/sbin/vcont/vcont -v
 dpkg -s vcont
+```
+
+For agent coverage:
+
+```bash
+sudo ./artifact.run install agent
+/usr/local/sbin/vcont/vcont -v
+dpkg -s agent-vcmonitor
+```
+
+For combined optional features:
+
+```bash
+sudo ./artifact.run install opcua agent
+/usr/local/sbin/vcont/vcont -v
+dpkg -s vcont agent-vcmonitor isource_opcua_server isource_opcua_sb_api
 ```
 
 Use the real artifact filename in logs, not `artifact.run`.
@@ -64,14 +80,13 @@ Use the real artifact filename in logs, not `artifact.run`.
 | Artifact | Install command | Required oracle |
 | --- | --- | --- |
 | `x86_64/lic` | `install` | variant `lic`, no OPC UA flag |
-| `x86_64/lic` | `install opcua` | variant `lic`, OPC UA flag present |
 | `x86_64/developer` | `install` | variant `developer`, no OPC UA flag |
-| `x86_64/trial-light` | `install` | variant `trial-light`, OPC UA expected by product matrix |
-| `x86_64/trial-full` | `install` | variant `trial-full`, OPC UA expected by product matrix |
-| `x86_64-legacy/lic` | `install` | variant `lic`, legacy artifact accepted on target |
-| `x86_64-legacy/developer` | `install` | variant `developer`, legacy artifact accepted on target |
+| each supported `<arch>/<variant>` | `install` | variant matches filename, no OPC UA/agent flag unless expected by current artifact docs |
+| representative `<arch>/<variant>` | `install opcua` | variant matches filename, OPC UA packages installed, `vcont -v` reports OPC UA |
+| representative `<arch>/<variant>` | `install agent` | variant matches filename, `agent-vcmonitor` installed, `vcont -v` reports agent monitoring when supported |
+| representative `<arch>/<variant>` | `install opcua agent` | variant, OPC UA, and agent oracles all match |
 
-If the product owner changes trial OPC UA semantics, update this reference before changing the oracle.
+Run at least one full optional-feature case per architecture family before claiming the entire release matrix is covered. If product owners change trial/developer OPC UA semantics, update this reference before changing the oracle.
 
 ## Negative Scenarios
 
@@ -81,7 +96,8 @@ Run as separate snapshot-isolated cases:
 - missing system dependencies: on clean OS, `install` must list missing dependency names and exit non-zero;
 - architecture mismatch: artifact must fail before package install;
 - variant conflict: installing `trial-full` over `lic`, or vice versa, must fail before package install;
-- OPC UA mismatch for optional `lic`: installing without `opcua` over an existing OPC UA install must fail with a clear diagnostic;
+- OPC UA mismatch: installing without `opcua` over an existing OPC UA install must fail with a clear diagnostic or converge according to documented rules;
+- agent mismatch: installing without `agent` over an existing agent-enabled install, or with `agent` over an incompatible state, must fail clearly or converge according to documented rules;
 - repeated same-variant install: installing a newer same-variant artifact should update/reinstall without variant conflict.
 
 ## Artifact Introspection
@@ -94,6 +110,7 @@ sha256sum ./artifact.run
 find /tmp/megapack-extract -maxdepth 4 -type f | sort
 sed -n '1,200p' /tmp/megapack-extract/metadata.ini
 dpkg-deb -f /tmp/megapack-extract/packages/<arch>/*.deb Package Version Depends
+test ! -d /tmp/megapack-extract/packages/<arch>/opcua || dpkg-deb -f /tmp/megapack-extract/packages/<arch>/opcua/*.deb Package Version Depends
 ```
 
 Adjust extraction command if the `makeself` version uses different flags. Keep extracted contents as CI artifacts on failure.
@@ -107,6 +124,7 @@ An artifact passes only if:
 - `/usr/local/sbin/vcont/vcont -v` runs;
 - installed variant matches the artifact variant;
 - OPC UA presence matches the matrix and command;
+- agent presence matches the command and package state (`agent-vcmonitor`);
 - expected Debian packages are installed according to `dpkg -s`;
 - `uninstall` exits `0` and removes package registrations while preserving documented data;
 - `purge` exits `0` on a target where packages are installed and removes package-managed state.

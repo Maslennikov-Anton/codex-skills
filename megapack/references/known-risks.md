@@ -1,6 +1,6 @@
 # Megapack Known Risks
 
-These are high-signal risks found from local review of `/home/ant/IdeaProjects/megapack` on 2026-06-02. Re-verify against current files before claiming they still exist.
+These are high-signal risks from local Megapack review plus later developer README changes. Re-verify against current files before claiming a risk still exists.
 
 ## Artifact Behavior Risks
 
@@ -19,13 +19,24 @@ Artifact oracle:
 
 - `x86_64/lic install opcua` must yield `vcont -v` with variant `lic` and OPC UA flag.
 
-### Trial variants and OPC UA
+### Stale OPC UA assumptions for trial/developer variants
 
-Project docs say `trial-light` and `trial-full` always include OPC UA and install with plain `install`. If the installer only installs OPC UA server packages when the `opcua` argument is passed, trial artifacts can be incomplete.
+Older project notes treated `trial-light` and `trial-full` as OPC UA-implied. The newer developer README documents `opcua` as an explicit install flag for the installer command. Do not carry the old oracle into new artifacts without checking current product intent and the artifact's `version`/metadata output.
 
 Artifact oracle:
 
-- `trial-light install` and `trial-full install` must satisfy the agreed OPC UA expectation without requiring `install opcua`, unless product requirements changed.
+- plain `install` and `install opcua` must produce distinct, documented states;
+- the reported `vcont -v` flags must match the command and current matrix.
+
+### Agent package naming and optional install
+
+The file `agent.deb` installs Debian package `agent-vcmonitor`, not `agent`. The current installer interface treats agent as optional via `install agent` or `install opcua agent`.
+
+Artifact oracle:
+
+- plain `install` must not silently install agent unless current docs say it should;
+- `install agent` must install `agent-vcmonitor` and pass post-install verification;
+- uninstall/purge checks must query `agent-vcmonitor`, not `agent`.
 
 ### Build allows missing OPC UA package directory
 
@@ -64,7 +75,8 @@ Treat as Critical:
 
 - artifact installs wrong VCont variant;
 - `install opcua` produces non-OPC UA runtime;
-- trial artifact contradicts product-required OPC UA behavior;
+- artifact installs or omits agent contrary to the command;
+- artifact contradicts current product-required OPC UA behavior;
 - artifact succeeds but `vcont -v` oracle is wrong.
 
 Treat as Important:

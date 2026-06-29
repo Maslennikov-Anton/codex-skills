@@ -1,6 +1,6 @@
 ---
 name: megapack
-description: "Validate VCont Megapack .run artifacts and inspect /home/ant/IdeaProjects/megapack: installer behavior, package matrix, Nexus paths, artifact-only checks, install/uninstall/purge risks."
+description: "Validate VCont Megapack .run artifacts and inspect /home/ant/IdeaProjects/megapack: release-build CI, manifest versions, x86_64/aarch64 matrix, Nexus paths, opcua/agent flags, install/uninstall/purge risks."
 ---
 
 # Megapack
@@ -16,16 +16,17 @@ Use this skill for VCont Megapack work: ready `.run` artifacts, their install be
    - review, debugging, or suspicious behavior -> read `references/known-risks.md`.
 2. If the user says they only care about delivered artifacts, do not propose unit tests for repository scripts. Validate the `.run` on a clean target VM/container and treat repository code only as diagnostic context.
 3. Prefer VM snapshots for real VCont packages. Use Docker only for lightweight artifact smoke checks when package postinst/service behavior does not require full `systemd`, udev, privileged device access, or production-like networking.
-4. Treat `README.md` and `TODO.md` in the repo as useful but not authoritative when they conflict with executable scripts or actual `.run` behavior.
+4. Treat developer `README.md`/repo docs as current intent, but verify against executable scripts and actual `.run` behavior before release claims.
 5. For VCont runtime semantics, licensing, trial behavior, boot files, logs, or HSB behavior, combine with the `vcont` skill. Keep Megapack-specific decisions here: package composition, installer commands, artifact matrix, and validation oracle.
 6. Before claiming an artifact is installable or release-ready, use `verification-before-completion`: provide the exact artifact, environment, command sequence, exit codes, and post-install evidence.
 
 ## Core Model
 
 - Megapack creates self-extracting `makeself` `.run` installers for offline VCont deployment on customer hardware.
-- The delivered artifact bundles Debian packages and `installer/install.sh`; it supports `help`, `version`, `install [opcua]`, `uninstall`, and `purge`.
-- The main supported matrix is `x86_64` developer/lic/trial-light/trial-full plus `x86_64-legacy` developer/lic.
-- The field-use goal is one command on the target host: `sudo ./vcont-<arch>-<variant>-<version>-<pipeline_id>.run install [opcua]`.
+- The delivered artifact bundles Debian packages and `installer/install.sh`; it supports `help`, `version`, `install [opcua] [agent]`, `uninstall`, and `purge`.
+- The current matrix covers `x86_64`, `x86_64-legacy`, `aarch64`, and `aarch64-legacy` for `developer`, `lic`, `trial-light`, and `trial-full`.
+- The field-use goal is one command on the target host: `sudo ./vcont-<arch>-<variant>-<version>-<pipeline_id>.run install [opcua] [agent]`.
+- Release artifacts are normally produced through the manual GitLab `release-build` job with `BUILD_ARCH` and `BUILD_VARIANT`; component versions fall back to `manifest.ini` unless `VERSION_VCONT`/`VERSION_CONFIGURATOR` are supplied.
 - Artifact validation should prove the delivered `.run`, not just the source repository scripts.
 
 ## Guardrails

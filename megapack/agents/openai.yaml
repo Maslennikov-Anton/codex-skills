@@ -1,4 +1,4 @@
 interface:
   display_name: "Megapack"
-  short_description: "VCont Megapack .run validation"
-  default_prompt: "Use $megapack to validate a VCont Megapack .run artifact or inspect the local Megapack repo."
+  short_description: "VCont Megapack CI and .run validation"
+  default_prompt: "Use $megapack to validate a VCont Megapack .run artifact, inspect release-build behavior, or review installer flags and package matrix."

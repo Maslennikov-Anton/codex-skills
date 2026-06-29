@@ -6,7 +6,7 @@ Megapack packages VCont and required dependencies into offline self-extracting `
 
 The project path is `/home/ant/IdeaProjects/megapack`.
 
-## Artifact Naming
+## Artifact Naming And Release Path
 
 Format:
 
@@ -22,28 +22,43 @@ Nexus path:
 
 Snapshot repository is normally `generic-vcont-snapshot`. Release repository is normally `generic-vcont-release`.
 
+Release CI uploads to:
+
+```text
+generic-vcont-release/vcont-runtime/megapack/<arch>/<variant>/vcont-<arch>-<variant>-<version>-<pipeline_id>.run
+```
+
 ## Matrix
 
-| Architecture | Variant | OPC UA expectation | VCont debs inside |
-| --- | --- | --- | --- |
-| `x86_64` | `lic` | optional via `install opcua` | both OPC UA and non-OPC UA licensed debs |
-| `x86_64` | `trial-light` | always expected | one OPC UA trial-light deb |
-| `x86_64` | `trial-full` | always expected | one OPC UA trial-full deb |
-| `x86_64` | `developer` | no | one developer deb |
-| `x86_64-legacy` | `lic` | no | one legacy licensed deb |
-| `x86_64-legacy` | `developer` | no | one legacy developer deb |
+| Architecture | Variants | Filename pattern |
+| --- | --- | --- |
+| `x86_64` | `developer`, `lic`, `trial-light`, `trial-full` | `vcont-x86_64-<variant>-<version>-<pipeline_id>.run` |
+| `x86_64-legacy` | `developer`, `lic`, `trial-light`, `trial-full` | `vcont-x86_64-legacy-<variant>-<version>-<pipeline_id>.run` |
+| `aarch64` | `developer`, `lic`, `trial-light`, `trial-full` | `vcont-aarch64-<variant>-<version>-<pipeline_id>.run` |
+| `aarch64-legacy` | `developer`, `lic`, `trial-light`, `trial-full` | `vcont-aarch64-legacy-<variant>-<version>-<pipeline_id>.run` |
 
-`aarch64` and `aarch64-legacy` are future work and currently blocked by missing ARM eCAL wheel support in the known project notes.
+Current developer README presents OPC UA and agent as install-time options, not variant-implied defaults. Validate the artifact command actually used: plain `install`, `install opcua`, `install agent`, or `install opcua agent`.
 
 ## Bundled Components
 
 Expected package categories:
 
-- `vcont`: one or two `.deb` depending on variant.
-- `configurator`: `.deb`, chosen as latest snapshot.
-- `agent`: `.deb`, chosen as latest snapshot; eCAL wheel handling is expected inside agent package.
-- `ecal`: `.deb`, fixed release package under `vcont-runtime/vcont-libraries/<arch>/ecal.deb`.
-- `opcua`: server/API `.deb` packages for OPC UA variants.
+- `vcont`: non-OPC UA and OPC UA `.deb` variants where available.
+- `configurator`: `.deb`.
+- `agent`: `.deb`, package name `agent-vcmonitor`.
+- `ecal`: `.deb`.
+- `opcua`: `isource_opcua_server` and `isource_opcua_sb_api` packages.
+
+Important package-name mapping:
+
+| Deb file | Debian package |
+| --- | --- |
+| `vcont.lin.{arch}.deb` and variant/opcua forms | `vcont` |
+| `configurator.deb` | `configurator` |
+| `agent.deb` | `agent-vcmonitor` |
+| `ecal.deb` | `ecal` |
+| `isource_opcua-SERVER.deb` | `isource_opcua_server` |
+| `isource_opcua-SB_API.deb` | `isource_opcua_sb_api` |
 
 ## Installer Commands
 
@@ -54,22 +69,32 @@ sudo ./artifact.run help
 sudo ./artifact.run version
 sudo ./artifact.run install
 sudo ./artifact.run install opcua
+sudo ./artifact.run install agent
+sudo ./artifact.run install opcua agent
 sudo ./artifact.run uninstall
 sudo ./artifact.run purge
+```
+
+If `/tmp` is mounted `noexec`, run with an executable extraction directory:
+
+```bash
+sudo TMPDIR=/var/tmp ./artifact.run install
 ```
 
 Expected install order:
 
 1. Check root.
-2. Check architecture.
-3. Check system dependencies extracted from bundled `.deb` `Depends`, plus `pip3`.
-4. Check installed VCont variant and OPC UA conflict through `/usr/local/sbin/vcont/vcont -v`.
-5. Install `ecal`.
-6. Install OPC UA packages if selected/required.
-7. Install `agent`.
-8. Install `configurator`.
-9. Install selected `vcont` package.
-10. Verify `vcont -v`.
+2. Load `metadata.ini`.
+3. Detect OS: Ubuntu 22.04/24.04 and Debian 11/12 are supported; Pop!_OS, Astra Linux, RedOS, RHEL/CentOS/Fedora/Rocky/AlmaLinux are warnings; other OS families are errors.
+4. Check system dependencies extracted from bundled `.deb` `Depends`, plus `pip3`.
+5. Check installed VCont variant, OPC UA, and agent conflicts through `/usr/local/sbin/vcont/vcont -v`.
+6. Run `dpkg --dry-run -i` preflight for all selected `.deb` files.
+7. Install `ecal`.
+8. Install OPC UA packages if the `opcua` flag is selected.
+9. Install `agent` if the `agent` flag is selected.
+10. Install `configurator`.
+11. Install selected `vcont` package.
+12. Verify `vcont -v`, variant, OPC UA, and agent state.
 
 `uninstall` removes packages while preserving data. `purge` removes packages and package-managed config/data.
 

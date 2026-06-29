@@ -11,10 +11,13 @@ Use this reference only when repository behavior matters: explaining how artifac
 ├── TODO.md
 ├── installer/
 │   └── install.sh
-└── scripts/
-    ├── build_megapack.sh
-    ├── download_deps.sh
-    └── fetch_latest.sh
+├── scripts/
+│   ├── build_megapack.sh
+│   ├── download_deps.sh
+│   └── fetch_latest.sh
+├── manifest.ini
+├── develop_manifest.ini
+└── packages/
 ```
 
 Generated/local paths:
@@ -36,9 +39,21 @@ Generated/local paths:
 `scripts/download_deps.sh`:
 
 - downloads VCont `.deb` packages by direct Nexus URL;
-- downloads configurator, agent, and OPC UA packages via `fetch_latest.sh`;
+- downloads configurator, agent, eCAL, and OPC UA packages using branch-specific rules;
 - writes `develop_manifest.ini` with downloaded versions and build metadata;
 - supports `-a/--arch`, `-V/--variant`, `-v/--version`, `-b/--branch`.
+
+Branch/component strategy from the developer README:
+
+| Component | develop snapshot | master/release |
+| --- | --- | --- |
+| `vcont` | latest from Nexus Assets API | fixed version from `manifest.ini` or `VERSION_VCONT` |
+| `configurator` | latest from Nexus Assets API | fixed version from `manifest.ini` or `VERSION_CONFIGURATOR` |
+| `agent` | latest from Nexus Assets API | fixed version from `manifest.ini` key `agent`; skip if absent |
+| `ecal` | latest from `generic-vcont-release` | latest from `generic-vcont-release` |
+| `opcua` | latest from `generic-vcont-release` | latest from `generic-vcont-release` |
+
+`manifest.ini` OPC UA version keys are informational for the README-described flow; verify scripts before assuming they control downloads.
 
 `scripts/build_megapack.sh`:
 
@@ -55,25 +70,30 @@ Generated/local paths:
 - reads `metadata.ini`;
 - checks root, arch, dependencies, and variant conflicts;
 - installs packages through `dpkg -i`;
-- supports `help`, `version`, `install [opcua]`, `uninstall`, and `purge`.
+- supports `help`, `version`, `install [opcua] [agent]`, `uninstall`, and `purge`.
 
 ## CI Shape
 
 Known GitLab stages:
 
-- `build`: six jobs download dependencies and run `build_megapack.sh`.
+- `build`: parallel jobs download dependencies and run `build_megapack.sh`.
 - `upload`: uploads `vcont-*.run` to Nexus.
 
-Known build variants:
+Current matrix from the developer README:
 
-- `build-x86_64-developer`
-- `build-x86_64-lic`
-- `build-x86_64-trial-light`
-- `build-x86_64-trial-full`
-- `build-x86_64-legacy-lic`
-- `build-x86_64-legacy-developer`
+- architectures: `x86_64`, `x86_64-legacy`, `aarch64`, `aarch64-legacy`;
+- variants: `developer`, `lic`, `trial-light`, `trial-full`.
 
-Legacy jobs were observed as `allow_failure: true` in the repo snapshot reviewed on 2026-06-02.
+Manual `release-build` requires:
+
+| Variable | Values |
+| --- | --- |
+| `BUILD_ARCH` | `x86_64`, `x86_64-legacy`, `aarch64`, `aarch64-legacy` |
+| `BUILD_VARIANT` | `developer`, `lic`, `trial-light`, `trial-full` |
+
+Optional release overrides: `VERSION_VCONT`, `VERSION_CONFIGURATOR`. If unset, release versions come from `manifest.ini`. Release upload runs automatically after `release-build` according to the README.
+
+For ordinary CI, only `build-x86_64-developer` and `upload-snapshot-x86_64-developer` were described as blocking jobs; other jobs may be manual or `allow_failure: true` depending on branch/tag. Re-check `.gitlab-ci.yml` before reporting current pipeline gates.
 
 ## Useful Local Checks
 
