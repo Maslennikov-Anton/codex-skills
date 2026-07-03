@@ -1,6 +1,6 @@
 # VC024SA.B Key Facts
 
-This reference is a self-contained distilled knowledge base for `VC024SA.B Руководство разработчика VCStudio`, revision B, 2025. The full VC024SA.B extract lives in the `vcstudio` skill. The `vcont` skill keeps a runtime-facing subset in its own `vc024sa-runtime-contract.md`. For exact wording, table rows, figure captions, or rare Studio details, use `vc024sa-complete.md`.
+This reference is a self-contained distilled knowledge base for the current `VC024SA.B Руководство разработчика VCStudio` PDF (`Руководство_правки_июнь.pdf`, metadata source `VC024SA.B Руководство разработчика по VCStudio_Ред_7_05_26(1).docx`, created 2026-06-25). The full VC024SA.B extract lives in the `vcstudio` skill. The `vcont` skill keeps a runtime-facing subset in its own `vc024sa-runtime-contract.md`. For exact wording, table rows, figure captions, or rare Studio details, use `vc024sa-complete.md`.
 
 ## Document Identity And Revisions
 
@@ -8,9 +8,11 @@ This reference is a self-contained distilled knowledge base for `VC024SA.B Ру�
 - Document: `Руководство разработчика VCStudio`.
 - Code: `VC024SA`.
 - Revision: `B`, year `2025`.
+- Current embedded source: June corrections PDF created 2026-06-25. The title page still says revision `B` / `2025`.
 - Revision history:
   - `A`, `20.10.2024`: first revision.
   - `B`, `25.03.2025`: description of new hierarchy.
+- Caveat: the PDF table of contents still has old numbering for sections after `6.6`; the body text is authoritative. In the body, ST is `6.7`, VCont startup is `6.8`, offline operations are `6.9`, online resource operations are `6.10`, and monitoring is `6.11`.
 
 ## VCSystem Model
 
@@ -47,6 +49,7 @@ Hardware/software requirements from the document:
 - Archive files are not cleaned automatically:
   - Studio system messages: `/project_name/.metadata/.log`.
   - Backup/history: `/workspace_name/.metadata/.plugins/org.eclipse.core.resources/.history/`.
+- Backups are also created on project save. Restore flow: toolbar `История изменений` -> choose backup date -> `Заменить`; double-clicking a backup opens text comparison against the current `.vcsys`.
 
 ## UI Areas And Common Commands
 
@@ -120,6 +123,7 @@ Creation flows:
 
 - FBs are added from `Библиотека`; the library includes IEC 61131-3 blocks and VCont-specific blocks.
 - FB search is available through the library search field, by double-clicking the work area and typing a block name, and globally via `Ctrl+F`.
+- Quick search accepts the beginning of a control-loop name, FB instance name, FB type, resource name, or device name; double-click a result or press `Открыть` to jump to and select the FB.
 - FB visual model: instance name on first row, inputs on the left, outputs on the right, event ports separated at the top, type and execution number at bottom.
 - Hovering a port shows its description.
 - Port properties show initial value, data type, comment, default value, incoming/outgoing connections, and allow connection removal.
@@ -137,7 +141,7 @@ Variable port count:
 
 - Copy an existing FB from base library into `User Library`.
 - Rename according to documented pattern `<имя блока>_N_K`, where `N` is input count and `K` is output count. Example: `ADD_5` for ADD with five inputs.
-- Edit data/interface and connect new inputs to `REQ` where required.
+- Edit data/interface and connect new variable rows to event `REQ` where required; the document explicitly shows this after adding ports.
 - For Modbus blocks the same approach is used, e.g. `MBWRITE_PACK3`.
 
 Block type maintenance:
@@ -241,17 +245,18 @@ Bootfile:
 - Bootfile is a set of commands Runtime uses to create its database.
 - It is identical to commands sent during `Загрузка` and visible in `Консоль загрузки`.
 - Runtime reads bootfile at startup.
-- `Создать файл загрузки` creates `vcont.fboot` in the directory with VCont executable.
+- `Создать файл загрузки` opens dialog `Формирование FBOOT-файла`: left side selects hierarchy objects, right side selects FBs, buttons include `Выбрать именные` and `Выбрать загруженные`, then `Загрузить`.
+- `Создать файл загрузки` creates `vcont.fboot` in the directory with VCont executable; if the file exists, Studio asks for overwrite confirmation.
 - Successful bootfile creation: `CREATE` commands for every task, ending `START`, no errors.
 - To make controller read a new bootfile: reboot resource, reset resource, or manually restart controller.
-- `Создать и загрузить файл загрузки`: creates and sends `vcont.fboot` to controller; success phrases: `The Load File command was sent successfully` and `Check BootSuccess`.
+- `Создать и загрузить файл загрузки`: creates and sends `vcont.fboot` to controller; flow includes overwrite confirmation if needed and separate confirmation to load into controller. Success phrases: `The Load File command was sent successfully` and `Check BootSuccess`.
 
 Monitoring:
 
 - Preconditions: controller reachable by resource IP/port, VCont running, algorithms loaded.
 - Connect methods: resource context menu `Подключиться к ресурсу`, toolbar button, `Ctrl+O`.
 - Successful connection: green indicator next to resource name.
-- Add to monitoring: select FBs in loop editor or `Ctrl+A`, context menu `Мониторинг`.
+- Add to monitoring: select FBs in loop editor, menu `Правка` -> `Выбрать всё`, or `Ctrl+A`; then open context menu while cursor is over a selected block and choose `Мониторинг`.
 - Online values have yellow background by default.
 - Changing an input value during monitoring is a direct write to controller database and affects the real algorithm.
 - `Форсировать` forces a variable, causing the block to use forced value instead of real value. Treat the document's safety wording cautiously in real equipment contexts.
@@ -267,6 +272,13 @@ Service / restore:
 - Double-clicking a backup can compare backup `.vcsys` with current `.vcsys`; comparison window is `Сравнение текста`.
 
 ## Modbus Configuration In VCStudio
+
+Supported communication surfaces in the current PDF:
+
+- Modbus RTU Master over RS-485/RS-232.
+- Modbus TCP Client/Server; Modbus TCP Client can reach Modbus RTU Slave devices through a TCP->RTU gateway-converter block/configuration.
+- OPC UA.
+- ETHERNET IP is listed in the protocol support list, but the extracted PDF text does not expand it in section 8.
 
 General Modbus workflow:
 
@@ -309,9 +321,8 @@ Modbus TCP Server rows:
 | Parameter | Meaning | Examples |
 |---|---|---|
 | `Имя сервера` | Project name for server config | `MBSRV1` |
-| `IP-адрес` | Listen address; `0.0.0.0` usually means all interfaces | `0.0.0.0`, `192.168.0.20` |
-| `Порт` | Listen TCP port | `502`, `1503`, `1505` |
-| `Опции` | Detailed runtime options | `Address=0.0.0.0 Port=1505 Mode=tcp SlaveId=1` |
+| `IP-адрес` / `Порт` | PDF says these fields are inactive for server setup | treat GUI behavior as version-specific |
+| `Опции` | Detailed runtime options in `parameter=value` form; `Address=0.0.0.0` means local/all interfaces | `Address=0.0.0.0 Port=1505 Mode=tcp SlaveId=1` |
 
 Server memory map:
 
@@ -361,7 +372,7 @@ Write functions: `05` Force Single Coil, `06` Preset Single Register, `15` Multi
 | `ENABLE` | `TRUE` connect/enable, `FALSE` disconnect/disable |
 | `ADDRESS` | `start_address:function` |
 | `FORMAT` | Data format |
-| `WD01...` | Document table says value for write; verify current block interface for read outputs |
+| `RD01...` | Actual local typelibrary uses read data outputs; PDF table incorrectly repeats write wording and `WD01` |
 | `STATUS` | Current status code |
 
 Read functions: `01` Read Coils, `02` Read Input Status, `03` Read Holding Register, `04` Read Input Register.
@@ -391,9 +402,9 @@ Common `_PACK` status codes:
 
 Diagnostics:
 
-- `MBSERIALDIAG`: `PORT`, `RST_CNT`, `CONNECTED`, `BAUD`, `PARITY`, `TIMOUT`, `DELAY`, `MSGS_TX`, `MSGS_RX`, `MSGS_TO`, `MSGS_TA`, `T_ERR`, `QUEUE`, `DUPLICATES`, `EMBBADCRC`, `EMBBADDATA`, `EMBBADEXC`, `EMBUNKEXC`, `EMBMDATA`, `EMBBADSLAVE`.
-- `MBDEVICERTU`: `DEVICE`, `RST_CNT`, `CONNECTED`, `PORT`, `SLAVEID`, `MSGS_TX`, `MSGS_RX`, `MSGS_TO`, `MSGS_TA`, `T_ERR`, `EMBBADCRC`, `EMBBADEXC`, `EMBBADDATA`, `EMBUNKEXC`, `EMBMDATA`, `EMBBADSLAVE`.
-- `MBDEVICETCP`: `DEVICE`, `RST_CNT`, `ADDRESS`, `PORT`, `WINDOW`, `TIMOUT`, `CONNECTED`, `MSGS_TX`, `MSGS_RX`, `MSGS_TO`, `PENDING`, `QUEUE`, `DUPLICATES`.
+- `MBSERIALDIAG`: diagnoses ports from `Modbus Serial Ports`; key ports `PORT`, `RST_CNT`, `CONNECTED`, `BAUD`, `PARITY`, `TIMOUT`, `DELAY`, `MSGS_TX`, `MSGS_RX`, `MSGS_TO`, `MSGS_TA`, `T_ERR`, `QUEUE`, `DUPLICATES`, `EMBBADCRC`, `EMBBADDATA`, `EMBBADEXC`, `EMBUNKEXC`, `EMBMDATA`, `EMBBADSLAVE`.
+- `MBDEVICERTU`: diagnoses RTU slave devices from `Modbus RTU Client`; key ports `DEVICE`, `RST_CNT`, `CONNECTED`, `PORT`, `SLAVEID`, `MSGS_TX`, `MSGS_RX`, `MSGS_TO`, `MSGS_TA`, `T_ERR`, `EMBBADCRC`, `EMBBADEXC`, `EMBBADDATA`, `EMBUNKEXC`, `EMBMDATA`, `EMBBADSLAVE`.
+- `MBDEVICETCP`: diagnoses TCP slave devices from `Modbus TCP Client`; key ports `DEVICE`, `RST_CNT`, `ADDRESS`, `PORT`, `WINDOW`, `TIMOUT`, `CONNECTED`, `MSGS_TX`, `MSGS_RX`, `MSGS_TO`, `PENDING`, `QUEUE`, `DUPLICATES`.
 
 ## OPC UA Blocks
 

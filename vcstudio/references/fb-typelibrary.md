@@ -136,6 +136,13 @@ Modbus:
 - `UserLibrary/MBREAD_PACK_50`, `UserLibrary/MBWRITE_PACK_50`: expanded pack
   variants with 50 data pins.
 
+Catalog/document discrepancy to preserve: the current PDF documents
+`MBSERIALDIAG` and `MBDEVICERTU`, but the local catalog snapshot has no
+`MBSERIALDIAG`, and local `.fbt` files for `MBDEVICERTU`/`MBDEVICERTUTCP`
+declare `FBType Name="MBDEVICETCP"` in their XML. For exact pin names, prefer
+`fb-typelibrary-catalog.md`; for product-document wording, preserve the PDF
+names and mark the mismatch.
+
 OPC UA / Common communication:
 
 - `CLIENT_*`, `SERVER_*`, `PUBLISH_*`, `SUBSCRIBE_*`: `QI`, `ID`, `STATUS`,

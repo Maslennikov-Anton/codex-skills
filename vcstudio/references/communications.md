@@ -2,6 +2,13 @@
 
 This file describes Studio-side communication setup. For VCont runtime surfaces produced by that setup, such as `MBSERVER`, aliases, `_PACK` status codes, and OPC UA ID execution, see `studio-vcont-contract.md` and the VCont runtime references.
 
+The current PDF lists these supported communication surfaces:
+
+- Modbus RTU Master over RS-485/RS-232;
+- Modbus TCP Client/Server; Modbus TCP Client may connect to Modbus RTU Slave devices through a TCP->RTU gateway-converter setup;
+- OPC UA;
+- ETHERNET IP, listed but not expanded in the extracted communication chapter.
+
 ## Общий Modbus Workflow
 
 Для Modbus algorithms:
@@ -40,7 +47,7 @@ Controller as client initiates exchange with remote Modbus TCP servers or RTU sl
 
 Controller can act as Modbus TCP server and publish FB port values into internal Runtime memory.
 
-Server is added in resource editor tab `Modbus TCP`, table `Modbus TCP Server`. Studio shows user-facing fields such as server name, address, port and options. Runtime may later represent this as `MBSERVER` options such as `Address=0.0.0.0 Port=1505 Mode=tcp SlaveId=1`; treat that as backend artifact, not as the primary GUI instruction.
+Server is added in resource editor tab `Modbus TCP`, table `Modbus TCP Server`. The current PDF describes server rows as using `Имя сервера` plus `Опции`; `IP-адрес` and `Порт` are shown as inactive for server setup. Put detailed server settings in `Опции` as `parameter=value`, for example `Address=0.0.0.0 Port=1505 Mode=tcp SlaveId=1`. `Address=0.0.0.0` means local/all interfaces. Runtime may later represent this as `MBSERVER` options; treat that as backend artifact, not as the primary GUI instruction.
 
 Each Modbus TCP server has its own address space; `MBSRV1.QX1` is not equal to `MBSRV2.QX1`.
 
@@ -60,6 +67,8 @@ Address map:
 Studio can publish input/output ports of almost any FB into internal Runtime memory.
 
 In control loop editor select FB, open `Свойства`, and set port field `Modbus` in format `ServerName.MemoryAddress`, for example `MBSRV1.QX1`. For BOOL values prefer `QX` or `IX` because they are 1-bit areas.
+
+Second GUI method: double-click or right-click the `Modbus` field and use `Регистры`; the selector supports searching registers and renaming them before binding.
 
 ## Runtime Artifact Mapping
 
@@ -104,13 +113,21 @@ Built-in library folder: `Communication\Modbus`.
 
 `MBREAD_PACK` read functions: `01`, `02`, `03`, `04`.
 
-Common ports: `REQ`, `CNF`, `DEVICE`, `ENABLE`, `ADDRESS`, `FORMAT`, `WD01...`, `STATUS`. `ADDRESS` format is `start_address:function`.
+Common control/config ports: `REQ`, `CNF`, `DEVICE`, `ENABLE`, `ADDRESS`, `FORMAT`, `STATUS`. Write packs use `WD01...` value inputs; read packs use `RD01...` value outputs in the local typelibrary. The PDF table for `MBREAD_PACK` incorrectly repeats write wording and `WD01`, so prefer typelibrary evidence for pin direction. `ADDRESS` format is `start_address:function`.
+
+`MBWRITE_PACK1` and `MBREAD_PACK1` default to one data port. To change data port count, copy the existing block from `Communication\Modbus` into `UserLibrary`, rename/edit it using the generic variable-port workflow, and create variants such as `MBWRITE_PACK3` / `MBREAD_PACK3`.
 
 Formats: `C` bool 1 bit, `F4` real 32 bit, `F8` lreal 64 bit, `S2` int/uint 16 bit, `S4` dint 32 bit.
 
 Common status codes: `0` no connection/wrong fields, `1` OK, `101` illegal function, `102` illegal address, `103` illegal value or bad `FORMAT`, `104` slave failure, `105` acknowledge, `106` busy, `107` negative acknowledge, `108` parity, `110` gateway path unavailable, `111` gateway target no response, `112` bad CRC, `113` bad data, `114` illegal exception, `116` too much data, `117` response from wrong slave, `200+` user codes.
 
-Diagnostic blocks: `MBSERIALDIAG`, `MBDEVICERTU`, `MBDEVICETCP`. Recognize counters `MSGS_TX`, `MSGS_RX`, `MSGS_TO`, `MSGS_TA`, `T_ERR`, `QUEUE`, `DUPLICATES`, `PENDING`, `EMBBADCRC`, `EMBBADDATA`, `EMBBADEXC`, `EMBUNKEXC`, `EMBMDATA`, `EMBBADSLAVE`.
+Diagnostic blocks:
+
+- `MBSERIALDIAG`: diagnoses ports from `Modbus Serial Ports`; input focus `PORT`, `RST_CNT`, outputs include `CONNECTED`, `BAUD`, `PARITY`, `TIMOUT`, `DELAY` and counters/errors.
+- `MBDEVICERTU`: diagnoses slave devices from `Modbus RTU Client`; input focus `DEVICE`, `RST_CNT`, outputs include `CONNECTED`, `PORT`, `SLAVEID` and counters/errors.
+- `MBDEVICETCP`: diagnoses slave devices from `Modbus TCP Client`; input focus `DEVICE`, `RST_CNT`, outputs include `CONNECTED`, `ADDRESS`, `PORT`, `WINDOW`, `TIMOUT`, `PENDING`, `QUEUE`, `DUPLICATES`.
+
+Recognize counters/errors `MSGS_TX`, `MSGS_RX`, `MSGS_TO`, `MSGS_TA`, `T_ERR`, `QUEUE`, `DUPLICATES`, `PENDING`, `EMBBADCRC`, `EMBBADDATA`, `EMBBADEXC`, `EMBUNKEXC`, `EMBMDATA`, `EMBBADSLAVE`. Preserve documented typo `TIMOUT` when answering about port names.
 
 ## OPC UA
 
@@ -132,6 +149,6 @@ Actions: `READ`, `WRITE`, `SUBSCRIBE`. For local server, IP/port can be omitted.
 
 Guardrails:
 
-- configure `CLIENT` with either only inputs or only outputs;
-- `SUBSCRIBE` should have only read outputs;
-- `PUBLISH` should have only value inputs and targets the local server.
+- `CLIENT` ports: `INIT` reads `ID` and connects when `QI=TRUE`, disconnects when `QI=FALSE`; `REQ` performs read/write; `SD_1...` are write inputs, `RD_1...` are read outputs, `QO` is operation quality, `STATUS` is status. Configure `CLIENT` with either only inputs or only outputs.
+- `SUBSCRIBE` ports: `INIT`, `RSP`, `QI`, `ID`, `RD_1...`, `QO`, `STATUS`; document says `RSP` is unused and there should be no value inputs.
+- `PUBLISH` ports: `INIT`, `REQ`, `QI`, `ID`, `SD_1...`, `QO`, `STATUS`; only value inputs and local server target.
