@@ -1,7 +1,7 @@
 interface:
   display_name: "VCStudio"
-  short_description: "Проекты, ST, загрузка, HSB и мониторинг VCStudio"
-  default_prompt: "Используй vcstudio skill, чтобы разобрать проект VCStudio, ST-блоки, загрузку в VCont, HSB boundary, мониторинг или коммуникации Modbus/OPC UA."
+  short_description: "VCStudio, ST->Lua, загрузка и мониторинг"
+  default_prompt: "Используй $vcstudio для работы с проектом VCStudio, ST->Lua-транслятором, его ограничениями, загрузкой в VCont и мониторингом."
 
 policy:
   allow_implicit_invocation: true

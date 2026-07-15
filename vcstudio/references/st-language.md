@@ -103,6 +103,56 @@ Studio treats translation as failed when:
 
 Current translator limits are source-defined as 250 `VAR_INPUT`, 250 `VAR_OUTPUT`, 2000 internal `VAR`, and 200 total service variables.
 
+## Known ST->Lua Translator Limitations
+
+Считай следующие конструкции неподдержанными в текущем Studio-bundled ST->Lua path, пока новая версия бинарника не доказана end-to-end. Валидность по IEC 61131-3, распознанный lexer/parser token, exit code `0` или созданный Lua-файл сами по себе не доказывают корректную семантику в Studio и VCont.
+
+### Прагмы `{...}`
+
+- Не используй `{attribute ...}` и другие vendor pragmas в коде, передаваемом транслятору.
+- Не трактуй текст в фигурных скобках как обычный комментарий: по ST это контейнер прагмы, а её семантика зависит от реализации.
+- Удали pragma из effective translator input или перенеси metadata во внешний Studio/project configuration. Для обычных пояснений используй `(* ... *)` или `//`, проверяя их отдельно от pragma behavior.
+- Не удаляй неизвестную или семантически значимую pragma молча: сначала выясни её назначение и воспроизведи эффект поддерживаемой конфигурацией либо останови перенос как behavior-changing.
+
+### Кириллица и другие non-ASCII identifiers
+
+- Имена переменных, полей, типов и других ST symbols задавай ASCII-идентификаторами, например `counter` вместо `счётчик`.
+- Текущий lexer может выдать серию `Illegal character`, затем syntax/parse error без пригодного Lua artifact.
+- При автоматическом переименовании сохраняй явную таблицу `original -> effective`, чтобы диагностика и связь с исходным проектом не потерялись.
+- Не обобщай это ограничение на комментарии и string literals: UTF-8 data является отдельной capability и требует отдельного теста.
+
+### Прямая адресация `AT %...`
+
+- Не полагайся на declarations вида `Input AT %IX0.0`, `Flag AT %QX0.1` или `Word AT %MW10` внутри translated ST.
+- Даже если Studio interface parser извлёк `AT` metadata или translator принял declaration, это не доказывает реальную привязку к process image VCont.
+- Передавай данные через явные `VAR_INPUT`/`VAR_OUTPUT` порты и настраивай физическую, Modbus или иную runtime-привязку вне ST algorithm через Studio/VCont configuration.
+
+### `VAR_GLOBAL`
+
+- Не считай `VAR_GLOBAL` поддерживаемой общей памятью controller scope между POU, типами ФБ или экземплярами.
+- Узкий standalone пример может распознаться и понизиться до обычной Lua `local`; такой green test доказывает только локальное вычисление, но не shared lifetime, visibility или synchronization semantics.
+- Помести состояние в один owning FB и передавай его через явные порты/соединения. Если нужна product-specific shared storage, моделируй и проверяй её отдельно на runtime contract.
+
+### `VAR_EXTERNAL`
+
+- Внешнее связывание имени с controller-global storage не поддержано; parser обычно завершается syntax/parse error и не создаёт пригодный Lua artifact.
+- Не эмулируй `VAR_EXTERNAL` неявным Lua global: это меняет lifetime, isolation и поведение нескольких экземпляров.
+- Замени external dependency явным входом/выходом и Studio connection от owning FB.
+
+### Вложенные и многомерные массивы
+
+- Не используй `ARRAY[1..2] OF ARRAY[1..3] OF INT` как поддерживаемый тип. Также не считай `ARRAY[1..2, 1..3] OF INT` безопасной заменой только потому, что standalone translation завершилась.
+- Текущий end-to-end path не гарантирует корректные `interfaceSpec`, initialization, indexing и VCont runtime mapping для nested/multidimensional shapes.
+- Не приписывай direct nested syntax конкретный parser diagnostic без минимального repro: это compatibility guardrail, а смежные multidimensional формы могут пройти translation и сломаться только в runtime.
+- Разверни данные в одномерный `ARRAY[1..N] OF T` и вычисляй индекс явно, либо используй несколько отдельных одномерных массивов. Проверяй чтение/запись через фактический load и Watch/`READ` oracle.
+
+### Handling rule
+
+1. Перед переводом найди эти конструкции в effective ST input; сохрани отдельно original и rewritten payload для диагностики.
+2. Если usable Lua не создан, классифицируй результат как translator limitation, а не VCont runtime failure.
+3. Если Lua создан, но load/initialization/`READ` неверны, классифицируй конструкцию как end-to-end unsupported; не повышай status по одному translation pass.
+4. После замены translator binary перепроверь минимальный repro, Studio wrapper/load path и VCont oracle. Только после этого меняй этот compatibility contract.
+
 ## Lua InterfaceSpec
 
 Studio Java builds `interfaceSpec` around translator output.
@@ -129,14 +179,14 @@ With auth disabled, the Lua request body is XML-escaped for `&`, `<`, `>`, `"`, 
 
 ## Translator-Supported Syntax For Candidate Tests
 
-The bundled translator parser supports more syntax than the Studio editor:
+The bundled translator parser recognizes more syntax than the Studio editor, but parser recognition is not the same as supported semantics:
 
 - `TYPE` with enum, struct, type alias, and named subrange;
-- `VAR_INPUT`, `VAR_OUTPUT`, `VAR`, `VAR_TEMP`, `VAR_GLOBAL`;
+- `VAR_INPUT`, `VAR_OUTPUT`, `VAR`, `VAR_TEMP`; limited `VAR_GLOBAL` forms may parse, but shared global semantics is unsupported, and `VAR_EXTERNAL` is unsupported;
 - `IF` / `ELSIF` / `ELSE`;
 - `CASE`, including comma labels and numeric ranges;
 - `FOR`, `WHILE`, `REPEAT`, `EXIT`, `CONTINUE`, `RETURN`;
-- arrays, array literals, repeated initializer groups, and multidimensional arrays;
+- one-dimensional arrays, array literals, and repeated initializer groups; nested and multidimensional arrays are not end-to-end supported;
 - `REFERENCE TO` for non-primitive/non-enum/non-subrange types;
 - member access, array indexing, named FB-call arguments, and `=>` output assignments.
 
@@ -168,6 +218,7 @@ Supported built-in function families are source-derived from `StructuredTextSupp
 ## Integration-Test Guardrails
 
 - Studio-like ST tests should use editor-safe fragment syntax unless testing a known Studio/compiler mismatch.
+- Consult `Known ST->Lua Translator Limitations` before generating or normalizing ST; do not silently preserve an unsupported construct.
 - Keep translator-only tests separate from Studio-integration tests.
 - Do not infer Studio acceptance from `data/st-lua/linux.dist/main.bin` alone.
 - Do not infer runtime behavior from generated Lua shape alone; load into VCont and observe through Studio-like Watch protocol or an explicitly marked deterministic runtime oracle.

@@ -33,7 +33,7 @@ description: "Use for VCont runtime behavior: vcontcfg, fboot/XML load commands,
    - Trial Lite (`tria-lite`): 30 минут, `vcont.fboot` запрещен.
    - Demo / Trial Full (`tria-full`): 24 часа, OPC UA, лимит 15 I/O, `vcont.fboot` допускается.
 7. Для задач именно в `/home/ant/IdeaProjects/vcont-autotests` сначала изучи структуру, fixtures, helpers, стиль и команды. Для разных программ подменяй `vcont.fboot` fixture-ом перед стартом контейнеров, а не собирай отдельный Docker image на каждый тест.
-8. Для ST->Lua/Studio compatibility claims проверяй load into VCont and IDE `READ` oracle; успешная генерация Lua сама по себе не доказывает runtime compatibility.
+8. Для ST->Lua/Studio compatibility claims проверяй load into VCont and IDE `READ` oracle; успешная генерация Lua сама по себе не доказывает runtime compatibility. Ограничения ST syntax и translator semantics (`pragma`, non-ASCII identifiers, `AT %`, `VAR_GLOBAL`/`VAR_EXTERNAL`, nested arrays) принадлежат `vcstudio` skill и его ST language reference; в VCont диагностируй только load/runtime часть контракта.
 9. Сохраняй терминологию: VCont/ВК, VCStudio, VCSystem, PLC/PlcId, HSB_MAIN, HSB_RESERVE, HSB_STANDALONE, `HSBSTATUS`, `MAIN`, `RESERVE`, `STANDALONE`, `NONE`, heartbeat, таск, луп, контур управления, ФБ, internal build, licensed/runtime license, Trial Lite, Demo / Trial Full, no-license, `license.bin`, `data.bin`, `ControllerId`, `VARS`, `CopiesMBServer`.
 10. Факты из `references/` считай продуктовыми требованиями, а не доказательством поведения текущих бинарников. Реализацию проверяй отдельно по бинарникам, конфигам, логам или тестам.
 

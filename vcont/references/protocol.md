@@ -15,6 +15,38 @@
 
 Перечень команд основан на IEC 61499-1-2012 и расширен продуктовой версией VCont.
 
+## TCP/ASN.1 framing и расширенная длина
+
+Studio отправляет IDE-команды как ASN.1-like IEC strings поверх TCP/TLS: tag `0x50`, затем длина, затем bytes. В `sendREQ` идут две строки подряд: `destination` и XML `request`; ответ VCont - одна такая строка с XML response.
+
+Есть два несовместимых режима длины строки:
+
+- regular: 2-byte unsigned/big-endian length, исторический формат, предел payload одной строки около `65535` bytes;
+- large/extended: 4-byte unsigned/big-endian length, формат для больших загрузочных пакетов и больших `CIEC_STRING`.
+
+Совместимость должна совпадать с обеих сторон:
+
+| Studio mode | VCont build | Result |
+|---|---|---|
+| regular / `UseExtendedLength=false` | regular, `mBytesHeader=2` | compatible |
+| extended / `UseExtendedLength=true` | large, `LARGE_CIEC_STRING`, `mBytesHeader=4` | compatible |
+| extended Studio | regular VCont | incompatible: runtime reads the wrong length width and the stream shifts |
+| regular Studio | large VCont | incompatible: runtime waits/parses a 4-byte length from a 2-byte frame |
+
+Runtime-side implementation markers:
+
+- `src/core/cominfra/fbdkasn1layer.h`: `mBytesHeader` is `4` under `LARGE_CIEC_STRING`, otherwise `2`;
+- `src/core/cominfra/fbdkasn1layer.cpp`: `serializeValueString`/`deserializeValueString` must read/write 4 bytes in large builds;
+- `src/core/datatypes/forte_any_string.h`: large builds store string `size`/`capacity` as `TForteUInt32` rather than `TForteUInt16`.
+
+When diagnosing a specific `.deb` or runtime artifact, do not rely only on the current source checkout. Verify the artifact:
+
+- `dpkg-deb -x <vcont.deb> /tmp/vcont-extract`;
+- `nm -C /tmp/vcont-extract/usr/local/sbin/vcont/vcont | rg 'serializeValueString|deserializeValueString'`;
+- `objdump -d --demangle --start-address=<addr> --stop-address=<addr+range> ...` and check whether string serialization/deserialization advances by `0x4` and uses 32-bit byte swaps (`bswap`) for the length.
+
+Known trap: some source snapshots around `VCONT-1627` contain a suspicious large-mode `deserializeValueString` expression masking shifted bytes with `0xFF00`. Treat source and shipped binary as separate evidence; if a shipped binary disassembles to true 32-bit length handling, it may not match the local checkout.
+
 ## Загрузка программы через fboot
 
 Когда пользователь в VCStudio выбирает загрузку полного проекта в ресурс или ресурсы, VCStudio должна сформировать `fboot`-файл для каждого ресурса. Каждый такой файл должен быть подписан ЭЦП.

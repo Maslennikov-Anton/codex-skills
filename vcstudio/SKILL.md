@@ -1,6 +1,6 @@
 ---
 name: vcstudio
-description: "Use for VCStudio GUI/project/docs tasks: .vcsys, hierarchy, library, ST editor, load/monitoring UI, Studio-generated fboot; skip runtime-only debug."
+description: "Use for VCStudio GUI/project/docs and Studio-bundled ST-to-Lua translator tasks: .vcsys, hierarchy, library, ST editor, translator limitations, load/monitoring UI, Studio-generated fboot; skip runtime-only VCont debug."
 ---
 
 # VCStudio
@@ -21,7 +21,7 @@ description: "Use for VCStudio GUI/project/docs tasks: .vcsys, hierarchy, librar
    - `references/fb-typelibrary.md` -> verified local VCStudio typelibrary из `/home/ant/IdeaProjects/vcstudio`: формат `.fbt`, source counts, runtime mapping, guardrails, high-value communication blocks; открывай при вопросах про входы/выходы/порты/типы ФБ.
    - `references/fb-typelibrary-catalog.md` -> полный generated snapshot всех 473 `.fbt` интерфейсов ФБ; не открывай целиком без необходимости, сначала ищи блок через `rg` по имени.
    - `references/source-repo-map.md` -> verified local VCStudio source repo map: Tycho build, product packaging, plugins/features/tests, custom `ru.isource.*` bundles, EMF model, DTO/JSON layer, CI/release; открывай при вопросах про устройство проекта, сборку, исходники, product packaging или gaps между документацией и кодом.
-   - `references/st-language.md` -> Structured Text в VCStudio: editor grammar vs translator grammar, Studio wrapper paths, interfaceSpec/index rules, ST->Lua codegen profile, user ST FB vs ST loop behavior.
+   - `references/st-language.md` -> Structured Text в VCStudio: editor grammar vs translator grammar, Studio wrapper paths, interfaceSpec/index rules, ST->Lua codegen profile, известные ограничения транслятора, user ST FB vs ST loop behavior.
    - `references/loading-monitoring.md` -> запуск VCont из Studio, full/online load command streams, ST/Lua instance creation, protocol framing, Watch monitoring, live writes, forcing, manual event trigger.
    - `references/communications.md` -> настройка Modbus Serial/TCP, runtime `Options` mirror, публикация портов ФБ в Modbus memory, `MBREAD_PACK`/`MBWRITE_PACK`, diagnostic blocks, OPC UA `CLIENT`/`SUBSCRIBE`/`PUBLISH`.
 2. Если вопрос может относиться к мелкой детали документа VC024SA.B, сначала ищи в тематическом reference, затем в `references/vc024sa-complete.md`. Этот skill должен уметь отвечать сам, без обращения к исходному PDF/DOCX. Если вопрос переходит от Studio intent к фактическому runtime behavior (`vcont.fboot`, TCP XML-команды, logs, HSB, лицензирование, trial/demo behavior, автотесты), используй `references/studio-vcont-contract.md` и при необходимости `vcont` skill.
@@ -34,6 +34,7 @@ description: "Use for VCStudio GUI/project/docs tasks: .vcsys, hierarchy, librar
 4. Для GUI-инструкций сохраняй русские названия объектов и команд из Studio: `Структура системы`, `Свойства`, `Библиотека`, `Консоль загрузки`, `Загрузить`, `Онлайн загрузить КУ`, `Онлайн удалить КУ`, `Создать файл загрузки`, `Формирование FBOOT-файла`, `Создать и загрузить файл загрузки`, `Подключиться к ресурсу`, `Мониторинг`, `Форсировать`, `Отключить форсирование`, `TriggerEvent`.
 5. Документация содержит опечатки и местами противоречивые формулировки; в актуальном PDF оглавление отстает от фактической нумерации body после вставки раздела ST. Для разделов `6.7+` опирайся на `vc024sa-section-map.md` и фактические заголовки в `vc024sa-complete.md`, а не только на оглавление. Если значение критично для кода или теста, сверяй с generated `vcont.fboot`, логами, typelibrary, поведением текущей сборки Studio/runtime.
 6. Для ST->Lua/Studio compatibility claims standalone перевод не считается достаточным: Lua должен загружаться в VCont и проверяться через Studio-like Watch monitoring; direct `READ` можно использовать только как явно помеченный runtime oracle.
+7. Перед генерацией, переносом или исправлением ST проверь `Known ST->Lua Translator Limitations` в `references/st-language.md`. Не выдавай распознанный parser token или созданный Lua-файл за поддержку общей памяти, адресной привязки или сложной структуры данных.
 
 ## Core Model
 

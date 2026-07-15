@@ -100,7 +100,11 @@ TCP/TLS framing:
 - send two IEC strings in order: destination, then XML request;
 - each string is tag byte `0x50`, then length, then UTF-8 bytes;
 - default non-extended length uses 2-byte `writeShort`; extended length uses 4-byte `writeInt`;
-- default frame max is 65535 bytes without extended length, and approximately 1 MB with extended length;
+- current VCStudio source routes this through `ExtraPreferences.isUseExtendedLength()` in both Ethernet and TLS-PSK handlers; `USE_EXTENDED_LENGTH` defaults to `true` in `ExtraPreferencesInitializer`;
+- extended mode changes even small packets: `sendREQ` contains two length-prefixed strings, so the frame grows by 4 bytes versus regular mode;
+- `sendPublicKey()` uses the same length-width switch; raw `sendBytes()` file uploads still write the supplied bytes without adding this IEC string envelope;
+- regular mode fits VCont builds expecting 2-byte string lengths; extended mode fits VCont builds compiled with large `CIEC_STRING` / 4-byte ASN.1 string lengths;
+- when Studio cannot load/connect after this change, first verify Studio and VCont agree on this length mode before debugging XML command semantics;
 - response is one IEC string containing XML response;
 - when auth is enabled Studio first sends `<Request Action="AUTH"><Auth Token="<jwt>"/></Request>`.
 
