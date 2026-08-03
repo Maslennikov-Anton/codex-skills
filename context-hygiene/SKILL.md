@@ -1,6 +1,6 @@
 ---
 name: context-hygiene
-description: "Управлять длинным контекстом agent-сессий: сжимать историю, делать handoff, сохранять решения, продолжать после compaction и снижать токеновый шум."
+description: "Управлять контекстом текущей agent-сессии: compaction/resume, handoff, state snapshot и снижение токенового шума; not persistent memory writes."
 ---
 
 # Context Hygiene

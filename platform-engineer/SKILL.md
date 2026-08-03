@@ -1,6 +1,6 @@
 ---
 name: platform-engineer
-description: "Развивать engineering platform: internal services, self-service tools, templates, environment standards, build/release foundations и DX."
+description: "Развивать reusable engineering platform для многих команд: internal services, self-service, templates, standards и DX; not one-project CI/CD."
 ---
 
 # Платформенный инженер

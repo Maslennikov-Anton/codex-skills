@@ -1,6 +1,6 @@
 ---
 name: devops-engineer
-description: Строить CI/CD, deployment pipelines, IaC, release automation, observability, incident workflows и операционную надежность.
+description: "Строить CI/CD, IaC, deploy, observability и reliability конкретных систем; not reusable internal platform/product work."
 ---
 
 # DevOps-инженер

@@ -1,4 +1,4 @@
 interface:
   display_name: "Yandex Tracker Operations"
-  short_description: "Yandex Tracker: очереди, issue workflows, transitions и operational API."
+  short_description: "Yandex Tracker: очереди, transitions и API workflows."
   default_prompt: "Используй $yandex-tracker-operations, чтобы работать с очередями, issue workflows, transitions и API-операциями в Yandex Tracker."

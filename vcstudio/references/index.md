@@ -1,17 +1,31 @@
-# VCStudio References Index
+# Карта reference-файлов VCStudio
 
-Open this first when choosing which VCStudio reference to load.
+Открывай только минимальный набор файлов для текущего вопроса. Не загружай большие snapshots целиком.
 
-- `studio-vcont-contract.md`: Studio(front)/VCont(back) lifecycle, ownership boundary, object mapping, load/runtime command mapping, HSB boundary.
-- `vc024sa-key-facts.md`: compact complete facts from the current VC024SA.B Studio manual PDF for most Studio questions.
-- `vc024sa-section-map.md`: navigation map for the full extracted VC024SA.B text; prefer it over the PDF TOC for sections `6.7+`, where the TOC is stale.
-- `vc024sa-complete.md`: full embedded text extracted from `Руководство_правки_июнь.pdf` for exact wording, rare table rows, figure captions, and typo-sensitive details.
-- `project-workflow.md`: project/workspace, device/resource/application/loop hierarchy, tasks, FBs, connections, order, event-loop authoring.
-- `st-language.md`: Studio ST emulation rules: editor grammar vs bundled translator grammar, known ST->Lua limitations and workarounds, wrapper paths, interfaceSpec/index/codegen rules, and ST loop vs user ST FB behavior.
-- `loading-monitoring.md`: load command streams, ST/Lua instance creation, TCP/TLS IEC string framing, `UseExtendedLength` packet-size compatibility, Watch monitoring, live writes, forcing, and manual event trigger protocol.
-- `communications.md`: Studio-side Modbus/OPC UA setup, runtime `Options` mirror, and generated artifact mapping.
-- `fb-typelibrary.md`: verified local VCStudio FB typelibrary shape, `.fbt` format, source counts, runtime mapping, guardrails, and high-value communication blocks.
-- `fb-typelibrary-catalog.md`: full generated snapshot of all 473 `.fbt` block interfaces from `/home/ant/IdeaProjects/vcstudio/data/typelibrary`; search with `rg` by block name before opening because it is large.
-- `source-repo-map.md`: verified local VCStudio source repo map: Tycho build, product packaging, plugins/features/tests, custom `ru.isource.*` bundles, EMF model, DTO/JSON layer, CI/release, dirty-worktree notes.
+## Архитектура и пользовательская работа
 
-Routing: use VCStudio references for how to model/configure/click/edit. For actual runtime execution, logs, bootfile diagnostics, HSB behavior, or test oracles, cross over through `studio-vcont-contract.md` to the `vcont` skill.
+- `studio-vcont-contract.md` — граница ответственности Studio/VCont, lifecycle, object mapping, load/runtime commands и HSB boundary.
+- `project-workflow.md` — `.vcsys`, workspace, иерархия, задачи, ФБ, связи, порядок выполнения и event-loop authoring.
+- `loading-monitoring.md` — full/online load, ST/Lua instance creation, framing, Watch, live write, forcing и `TriggerEvent`.
+- `communications.md` — настройка Modbus/OPC UA в Studio и соответствие generated/runtime artifacts.
+
+## Structured Text
+
+- `st-language.md` — основной compatibility contract: editor и translator grammar, Studio wrapper, interface indexes, ограничения с обходами, codegen и test guardrails. Открывай перед генерацией, исправлением или оценкой ST-теста.
+
+## Библиотека и исходники
+
+- `fb-typelibrary.md` — формат `.fbt`, проверенные свойства typelibrary, runtime mapping и guardrails.
+- `source-repo-map.md` — Tycho build, plugins/features/tests, EMF/DTO, packaging, CI/release и карта локального исходного репозитория.
+
+## Руководство VC024SA.B
+
+- `vc024sa-key-facts.md` — плотная база для большинства вопросов по актуальному руководству.
+- `vc024sa-section-map.md` — навигация по полному тексту; для разделов `6.7+` точнее устаревшего оглавления PDF.
+- `vc024sa-complete.md` — полный embedded extract для точных формулировок, подписей и редких таблиц. Сначала найди раздел по карте, затем читай только нужный диапазон.
+
+## Большой generated-каталог
+
+- `fb-typelibrary-catalog.md` — snapshot 473 интерфейсов `.fbt`. Сначала ищи блок командой `rg -n 'имя_блока' references/fb-typelibrary-catalog.md`, не открывай файл целиком.
+
+Для фактического runtime execution, логов, bootfile, HSB или тестовых oracle переходи через `studio-vcont-contract.md` к skill `vcont`.

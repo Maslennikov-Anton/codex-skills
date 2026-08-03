@@ -1,7 +1,7 @@
 interface:
   display_name: "Project Context"
   short_description: "Local repo map and recurring commands"
-  default_prompt: "Use $project-context to orient on this local repository before changing code or running project commands."
+  default_prompt: "Use $project-context to orient in a non-trivial /home/ant/IdeaProjects task: repo purpose, trusted commands, generated files and dirty-worktree risks."
 
 policy:
   allow_implicit_invocation: true

@@ -77,42 +77,10 @@ chmod 600 /home/ant/.harbor/harbor.env
 
 ## Commands
 
-List projects:
-
-```bash
-python3 /home/ant/codex-skills/harbor-registry/scripts/harbor_inventory.py \
-  --env-file /home/ant/.harbor/harbor.env projects
-```
-
-List repositories in a project:
-
-```bash
-python3 /home/ant/codex-skills/harbor-registry/scripts/harbor_inventory.py \
-  --env-file /home/ant/.harbor/harbor.env repos --project docker
-```
-
-List tags for a repository:
-
-```bash
-python3 /home/ant/codex-skills/harbor-registry/scripts/harbor_inventory.py \
-  --env-file /home/ant/.harbor/harbor.env tags \
-  --project docker --repository library/python
-```
-
-Show latest tags with pull-ready references:
-
-```bash
-python3 /home/ant/codex-skills/harbor-registry/scripts/harbor_inventory.py \
-  --env-file /home/ant/.harbor/harbor.env latest \
-  --project docker --repository library/python
-```
-
-Search projects, repositories, and tags:
-
-```bash
-python3 /home/ant/codex-skills/harbor-registry/scripts/harbor_inventory.py \
-  --env-file /home/ant/.harbor/harbor.env search vcont
-```
+Run `python3 scripts/harbor_inventory.py --help`. The helper exposes `projects`,
+`repos`, `tags`, `latest`, and `search`; pass `--env-file
+/home/ant/.harbor/harbor.env` before the subcommand when using the standard
+local credential file.
 
 For nested repository names, Harbor API paths require slash escaping. The helper
 normalizes names returned as `project/repository` and double-encodes nested

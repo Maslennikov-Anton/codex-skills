@@ -8,6 +8,7 @@ Open this first when choosing which VCont reference to load.
 - `runtime-options.md`: `Options="name=value ..."` parameter grammar and defaults for Modbus, EtherNet/IP, KNX, and PROFIBUS runtime devices.
 - `protocol.md`: IDE TCP XML commands, ASN.1/IEC string framing, extended 2-byte vs 4-byte length compatibility, auth, `HSBSTATUS`, bootfile signing/validation, FB/task/connection command patterns.
 - `bootfile-patterns.md`: minimal `vcont.fboot` skeletons and execution-order guardrails.
+- `standard-blocks.md`: product-specific runtime semantics of standard blocks, including VCont `CTUD` counting and input priorities.
 - `modbus.md`: VCont Modbus server/client runtime behavior, `HsbAlg`, aliases, async client, RTU-over-TCP, scenario caveats.
 - `profibus.md`: Profibus/PRBDEV test infrastructure, PTY slave emulator, closed master-library caveats, and HSB counter journal oracle.
 - `hot-standby.md`: HSB roles, `HSBSTATUS`, `GlobalModeManager`, bootfile checksum rules, `HBModeSource`, election, component behavior on role loss.

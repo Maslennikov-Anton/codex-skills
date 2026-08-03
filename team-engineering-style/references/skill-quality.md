@@ -55,4 +55,4 @@ Description должен отвечать на два вопроса:
 - Links: все `references/*.md` существуют и названы из `SKILL.md`.
 - External skills: не устанавливай community skills без read-only review `SKILL.md`, scripts и permission/tool behavior.
 - Trigger smoke: для важных изменений проверь sample prompts, чтобы ожидаемый skill попадал в top matches.
-- Validation: `quick_validate.py`, `python3 scripts/audit_skills.py`, проверка ссылок и `git diff --check`.
+- Validation: `quick_validate.py`, `python3 scripts/audit_skills.py --strict --require-smoke-coverage` для repo-wide изменений, проверка ссылок и `git diff --check`.

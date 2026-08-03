@@ -20,15 +20,6 @@ Use this skill for VCont Megapack work: ready `.run` artifacts, their install be
 5. For VCont runtime semantics, licensing, trial behavior, boot files, logs, or HSB behavior, combine with the `vcont` skill. Keep Megapack-specific decisions here: package composition, installer commands, artifact matrix, and validation oracle.
 6. Before claiming an artifact is installable or release-ready, use `verification-before-completion`: provide the exact artifact, environment, command sequence, exit codes, and post-install evidence.
 
-## Core Model
-
-- Megapack creates self-extracting `makeself` `.run` installers for offline VCont deployment on customer hardware.
-- The delivered artifact bundles Debian packages and `installer/install.sh`; it supports `help`, `version`, `install [opcua] [agent]`, `uninstall`, and `purge`.
-- The current matrix covers `x86_64`, `x86_64-legacy`, `aarch64`, and `aarch64-legacy` for `developer`, `lic`, `trial-light`, and `trial-full`.
-- The field-use goal is one command on the target host: `sudo ./vcont-<arch>-<variant>-<version>-<pipeline_id>.run install [opcua] [agent]`.
-- Release artifacts are normally produced through the manual GitLab `release-build` job with `BUILD_ARCH` and `BUILD_VARIANT`; component versions fall back to `manifest.ini` unless `VERSION_VCONT`/`VERSION_CONFIGURATOR` are supplied.
-- Artifact validation should prove the delivered `.run`, not just the source repository scripts.
-
 ## Guardrails
 
 - Do not run `install`, `uninstall`, or `purge` on the shared workstation unless the user explicitly asks and accepts system mutation. Use disposable targets.

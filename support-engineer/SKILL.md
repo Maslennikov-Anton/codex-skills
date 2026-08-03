@@ -1,6 +1,6 @@
 ---
 name: support-engineer
-description: "Разбирать поддержку и инциденты: симптомы, impact, воспроизведение, evidence, локализация, workaround, bug report и эскалация."
+description: "Триажить поддержку и инциденты: impact, environment, reproduction, workaround и эскалация; not deep root-cause debugging."
 ---
 
 # Инженер поддержки

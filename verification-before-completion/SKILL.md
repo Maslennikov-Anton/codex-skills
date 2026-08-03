@@ -59,8 +59,8 @@ description: "Use before evidence-backed success claims after implementation, fi
 Перед claim о готовности изменений в `/home/ant/codex-skills` проверь:
 
 1. `git diff --check`
-2. `python3 scripts/audit_skills.py --root /home/ant/codex-skills` для repo-wide/common-rule changes.
-3. `quick_validate.py <skill-dir>` для узких single-skill edits, если repo-wide audit не запускался.
+2. `python3 scripts/audit_skills.py --root /home/ant/codex-skills --strict --require-smoke-coverage` для repo-wide/common-rule changes.
+3. `python3 .system/skill-creator/scripts/quick_validate.py <skill-dir>` для узких single-skill edits, если repo-wide audit не запускался.
 4. Наличие всех reference-файлов, на которые ссылаются измененные `SKILL.md`.
 
 Если менялись trigger/description, отдельно проверь, что description остается коротким, конкретным и не конфликтует с более высоким уровнем инструкций.

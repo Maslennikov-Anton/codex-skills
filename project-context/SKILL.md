@@ -1,8 +1,6 @@
 ---
 name: project-context
 description: "Use for non-trivial /home/ant/IdeaProjects repo work needing orientation, trusted commands, dirty-worktree, push/test workflows, or local conventions; skip obvious scoped edits."
-metadata:
-  short-description: Local project map and command conventions
 ---
 
 # Project Context

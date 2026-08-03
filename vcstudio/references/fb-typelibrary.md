@@ -9,7 +9,7 @@
 по имени:
 
 ```bash
-rg -n "^[-] `EIPDIAG`|EIPDIAG" /home/ant/codex-skills/vcstudio/references/fb-typelibrary-catalog.md
+rg -n '^[-] `EIPDIAG`|EIPDIAG' /home/ant/codex-skills/vcstudio/references/fb-typelibrary-catalog.md
 ```
 
 ## Source
@@ -110,6 +110,10 @@ rg -n "^[-] `EIPDIAG`|EIPDIAG" /home/ant/codex-skills/vcstudio/references/fb-typ
   `InterfaceList`; их конфигурация живет в runtime `Options`.
 - `ANY` и `SyncAnyType="true"` означают, что строгий тип может определяться
   подключением/контекстом; при тестах проверяй фактический runtime type.
+- Не выводи поддержку встроенной ST-функции из наличия одноимённого `.fbt`:
+  например, `TIME_TO_DINT(...)` работает в ST и возвращает текущее значение
+  `TIME` в наносекундах, хотя `TIME_TO_DINT.fbt` в FBD-библиотеке отсутствует.
+  Подробную границу ST/FBD смотри в `st-language.md`.
 - Порядок ФБ в `vcont.fboot` остается runtime-семантикой. Catalog дает интерфейс,
   но не заменяет правила order/task assignment.
 

@@ -1,4 +1,4 @@
 interface:
   display_name: "Профессиональное Code Review"
   short_description: "Профессиональное ревью рисков и регрессий."
-  default_prompt: "Используй $code-review-professional, чтобы провести профессиональное ревью изменений перед завершением задачи."
+  default_prompt: "Используй $code-review-professional для запрошенного или high-risk ревью diff: найди баги, регрессии, test gaps и архитектурные риски."

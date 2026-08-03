@@ -19,6 +19,7 @@
 | Нужно выполнить уже написанный implementation plan | `executing-implementation-plans` | `subagent-driven-development`, если tasks независимы; `verification-before-completion` для финального claim |
 | Нужно принять решение по внешнему API, framework/library behavior или версии инструмента | `source-driven-development` | профильный engineering skill для реализации; `security-engineer`, если источник влияет на security default |
 | Нужно проверить рискованный claim, irreversible change, migration или спорное решение | `doubt-driven-development` | `code-review-professional` для diff review; `source-driven-development`, если риск связан с внешним API |
+| Нужно зафиксировать уже выбранное значимое архитектурное решение и последствия | `architecture-decision-records` | `solution-architect`, если варианты еще не спроектированы |
 | Нужно написать или изменить Python-код | `python-developer` | `database-engineer` для data-layer; `code-review-professional` для сильного review |
 | Нужно выполнить сложную реализацию через независимые subtasks или agent workflow | `subagent-driven-development` | профильные engineering skills по областям задач; `code-review-professional` для финального review |
 | Нужно разработать frontend | `frontend-engineer` | `product-designer` для сильного UX-фокуса; `autotest-engineer` для UI automation |
@@ -30,14 +31,17 @@
 | Нужно настроить CI/CD, деплой или observability | `devops-engineer` | `platform-engineer`, если задача уже про внутреннюю платформу, а не один проект |
 | Нужно развивать внутреннюю платформу и developer experience | `platform-engineer` | `devops-engineer`, если есть сильный operational/infrastructure слой |
 | Нужно написать автотесты или стабилизировать тестовый контур | `autotest-engineer` | `manual-tester`, если сначала нужен ручной test design; `code-review-professional`, если нужен review тестового решения |
+| Нужно исследовать matrix/grammar failure surface и найти новые defect families | `fuzzing-bug-hunter` | `systematic-debugging` после нахождения конкретного repro; `autotest-engineer` для regression coverage |
 | Нужно подготовить checklist, test cases или вручную проверить поведение | `manual-tester` | `autotest-engineer`, если сценарии затем нужно автоматизировать |
 | Нужно провести профессиональное ревью изменений | `code-review-professional` | `security-engineer`, если ревью security-sensitive; `database-engineer`, если изменение тяжелое по DB |
 | Нужно спланировать поставку, зависимости и readiness релиза | `delivery-manager` | `product-manager` для приоритетов; `devops-engineer` для release/infra readiness |
 | Нужно локализовать инцидент, воспроизвести проблему или подготовить эскалацию | `support-engineer` | `manual-tester` для формального bug report; `devops-engineer` для operational incidents |
 | Нужно продолжить длинную задачу, подготовить handoff или сжать историю после compaction | `context-hygiene` | `para-memory-files`, если знание нужно сохранить между сессиями; профильный skill текущей задачи |
+| Нужно автономно продолжать bounded итерации с checkpoints и stopping rules | `loop-engineering` | профильный skill текущей поверхности; не использовать вместо written-plan execution |
 | Нужно проанализировать метрики, воронку или влияние фичи | `data-analyst` | `product-manager`, если по результатам нужно принять продуктовое решение |
 | Нужно написать README, runbook, guide или release notes | `technical-writer` | профильный skill по содержанию документа |
 | Нужно обновить локальные стандарты, skills или ввести новый стек | `team-engineering-style` | профильный skill той области, которую меняем |
+| Нужно сориентироваться в non-trivial локальном repo, его командах и dirty worktree | `project-context` | профильный domain/engineering skill после ориентации |
 
 ## Инструментальные и доменные skills
 
@@ -50,8 +54,12 @@
 | Нужно работать с файловой PARA-памятью, daily notes или recall | `para-memory-files` | `context-hygiene`, если сначала нужно сжать длинную сессию |
 | Нужно работать с Allure TestOps | `allure-testops-operations` | `autotest-engineer`, если задача связана с test results и reporting strategy |
 | Нужно работать с GitLab issues, MRs, pipelines или releases | `gitlab-operations` | `devops-engineer` для CI/CD incidents; `code-review-professional` для MR review |
+| Нужно commit/push/sync согласно `.gitignore` в шумном repo | `gitignore-scoped-push` | `project-context` для локальных conventions; GitLab/GitHub skill только для host-specific операций |
+| Нужно найти или проверить внутренний Docker image в Harbor | `harbor-registry` | `devops-engineer` для изменения CI/deploy image references |
 | Нужно работать с Yandex Tracker | `yandex-tracker-operations` | `analyst` для требований; `delivery-manager` для release coordination |
+| Нужно валидировать Megapack `.run`, installer matrix или release artifact | `megapack` | `vcont` для runtime semantics готового пакета |
 | Нужно работать с VCont runtime, bootfile, Modbus или HSB | `vcont` | `autotest-engineer`, если нужна автоматизация проверки; `systematic-debugging` для расследования сбоя |
+| Нужно работать с VCStudio GUI, `.vcsys`, ST->Lua, typelibrary или monitoring UI | `vcstudio` | `vcont` только для runtime-owned поведения |
 
 ## Как отличать похожие роли
 
@@ -89,18 +97,16 @@
 - `database-engineer` углубляется в схему БД, миграции, ограничения и SQL.
 - `solution-architect` решает общую архитектуру системы и границы между ее частями.
 
-## Рекомендуемые связки
+## Последовательные handoff
 
-- Новая feature: `product-manager` + `analyst` + `solution-architect` + `python-developer` + `autotest-engineer` + `code-review-professional`
-- Сложная DB-задача: `solution-architect` + `database-engineer` + `python-developer` + `autotest-engineer`
-- Подготовка релиза: `delivery-manager` + `devops-engineer` + `manual-tester` + `code-review-professional`
-- Инцидент в эксплуатации: `support-engineer` + `devops-engineer` + профильный инженерный skill
-- Изменение стандартов команды: `team-engineering-style` + профильный skill по области изменения
-- Длинная агентская задача: `context-hygiene` + профильный skill + при необходимости `para-memory-files`
-- Большая реализация с независимыми частями: `subagent-driven-development` + профильные engineering skills + `code-review-professional`
-- Завершение реализации: профильный engineering skill + `verification-before-completion`
-- Работа с review comments: `receiving-code-review` + профильный engineering skill + `verification-before-completion`
-- Рискованное изменение внешней интеграции: `source-driven-development` + `doubt-driven-development` + профильный engineering skill
+Не активируй все роли жизненного цикла одновременно. Выбери основной skill по текущему deliverable и передавай работу следующему только при смене фазы:
+
+- Новая feature: `product-manager` -> `analyst` -> профильный engineering skill; `solution-architect` нужен только при реальной архитектурной развилке.
+- Сложная DB-задача: `database-engineer` как основной; `solution-architect` добавляй для системных границ, профильный developer skill — для реализации.
+- Подготовка релиза: `delivery-manager` как основной; `devops-engineer` или `manual-tester` добавляй по текущему blocker/readiness-сигналу.
+- Инцидент: начни с `support-engineer`; переходи в `systematic-debugging` или профильный engineering skill после локализации слоя.
+- Большая реализация: профильный engineering skill остается владельцем качества, а `subagent-driven-development` подключается только при разрешенной делегации независимых частей.
+- Финальный claim: добавь `verification-before-completion` к текущему профильному skill; это gate, а не отдельная фаза проектирования.
 
 ## Антипаттерны выбора
 

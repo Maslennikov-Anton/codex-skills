@@ -1,6 +1,6 @@
 ---
 name: systematic-debugging
-description: "Системно расследовать баги, падения тестов и сбои: воспроизведение, evidence по слоям, root cause и только потом fix."
+description: "Доказывать root cause багов, падений тестов и многослойных сбоев через reproduction и evidence; not support triage or workaround selection."
 ---
 
 # Системная отладка

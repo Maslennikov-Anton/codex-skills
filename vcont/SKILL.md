@@ -13,18 +13,11 @@ description: "Use for VCont runtime behavior: vcontcfg, fboot/XML load commands,
    - `references/index.md` -> карта reference-файлов; открывай первой, если не очевидно, какой файл нужен.
    - `references/studio-vcont-contract.md` -> общий handoff contract Studio(front)/VCont(back): ownership, lifecycle, object mapping, load semantics, online operations, Modbus/OPC UA, HSB boundary.
    - `references/vc024sa-runtime-contract.md` -> runtime-facing контракт из VC024SA.B: связь VCStudio/VCont, bootfile, task/order semantics, online load effects, Modbus/OPC UA runtime blocks and caveats.
-   - `references/config.md` -> `vcontcfg.json`, HSB-параметры, runtime defaults.
-   - `references/runtime-options.md` -> `Options="name=value ..."` для `MBCLIENTTCP`, `MBCLIENTRTU`, `MBCLIENTRTUOVERTCP`, `MBSERIALPORT`, `MBSERVER`, `EIPDEV`, `KNXDEV`, `PRBDEV`.
-   - `references/protocol.md` -> VCStudio/VCont protocol, `vcont.fboot`, `LOADFILE`/`EXECBOOT`, `AUTH`, `HSBSTATUS`, XML-команды IDE, ФБ, связи, таски, лупы.
-   - `references/modbus.md` -> `MBSERVER`, `MBCLIENT*`, `HsbAlg`, alias-регистры, Modbus memory map, `MBREAD`/`MBWRITE`, `MBREAD_PACK`/`MBWRITE_PACK`, diagnostic blocks, `modbusbatch`, `modbus_async`, OPC UA runtime-facing ID formats.
-   - `references/profibus.md` -> Profibus/PRBDEV тестовая инфра, PTY slave emulator, closed `librtprofibus.a` caveats, counter journal oracle для HSB.
-   - `references/hot-standby.md` -> HSB-состояния, `HSBSTATUS`, `GlobalModeManager`, checksum `vcont.fboot`, `HBModeSource`, выбор роли, поведение компонентов при потере активной роли.
-   - `references/synchronization.md` -> peer-to-peer TCP, `SyncManager`, ELET full/partial sync packets, Docker/eCAL.
-   - `references/logs.md` -> `vcont.log`, bootfile/HSB/heartbeat/sync diagnostics, ограничения логов как oracle.
-   - `references/licensing.md` -> internal/licensed/trial-lite/demo-trial-full/no-license, `license.bin`, `data.bin`, TPM/UUID, bootfile behavior.
-   - `references/test-cases.md` -> повторяемые сценарии VCont/HSB, включая 3-минутный failover через IDE `READ`.
-   - `references/hsb-local-commands.md` -> локальный `vcont-hsb` stand, prepare/start/test/log/report команды и известные порты.
-   - `references/bootfile-patterns.md` -> минимальные `vcont.fboot` skeletons, порядок ФБ, таск/луп, HSB/Modbus-oriented patterns.
+   - `references/standard-blocks.md` -> фактическая VCont-семантика стандартных runtime-ФБ; открывай для `CTUD`, его level-driven `CU`/`CD`, приоритетов `R`/`LD` и корректных тестовых импульсов.
+   - Конфигурация и протокол: `references/config.md`, `references/runtime-options.md`, `references/protocol.md`, `references/bootfile-patterns.md`.
+   - Протоколы и runtime-семантика: `references/modbus.md`, `references/profibus.md`.
+   - HSB и диагностика: `references/hot-standby.md`, `references/synchronization.md`, `references/logs.md`, `references/hsb-local-commands.md`.
+   - Лицензии и сценарии: `references/licensing.md`, `references/test-cases.md`.
 2. Если задача пришла из пользовательских шагов Studio, `.vcsys`, GUI, Preferences, ST-редактора, UserLibrary, monitoring/forcing UI или backup/history, используй `vcstudio` skill. В `vcont` skill оставляй только то, что влияет на runtime contract, generated `vcont.fboot`, TCP XML-команды, логи, tests или фактическое поведение VCont.
 3. Если работаешь с локальными артефактами, сначала изучи текущий repo/package layout. В HSB-инфре актуальный runtime обычно приходит как `vcont.lin.x86_64.deb` и распаковывается в `.work/vcont-runtime/vcontN/vcont-lin.x86_64-arch`.
 4. `vcont.fboot` трактуй как обязательный текстовый bootfile XML-команд IDE рядом с бинарником. VCStudio создает его как набор команд загрузки, который runtime читает при старте для создания базы алгоритмов. Порядок `FB`/`CREATE FB` семантически важен; не сортируй и не переставляй команды ради читаемости.

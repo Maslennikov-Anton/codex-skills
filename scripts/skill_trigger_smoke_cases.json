@@ -28,7 +28,7 @@
     "expected": "browser-automation"
   },
   {
-    "prompt": "собери Terraform CI/CD pipeline, docker compose и deployment runbook",
+    "prompt": "сделай DevOps CI/CD pipeline, Terraform IaC, docker compose, deploy и observability",
     "expected": "devops-engineer"
   },
   {
@@ -46,5 +46,137 @@
   {
     "prompt": "сделай честные автотесты: если positive supported функционал не работает, пусть тест падает, не превращай его в negative",
     "expected": "autotest-engineer"
+  },
+  {
+    "prompt": "загрузи результаты через allurectl, проверь launch и свяжи defect с test case в Allure TestOps",
+    "expected": "allure-testops-operations"
+  },
+  {
+    "prompt": "собери требования, scope, зависимости и проверяемые критерии приемки без выбора продуктовых приоритетов",
+    "expected": "analyst"
+  },
+  {
+    "prompt": "оформи ADR: контекст решения, рассмотренные варианты, trade-offs, статус и последствия",
+    "expected": "architecture-decision-records"
+  },
+  {
+    "prompt": "сожми длинную историю сессии после compaction и подготовь компактный handoff для продолжения",
+    "expected": "context-hygiene"
+  },
+  {
+    "prompt": "создай Paperclip agent adapter и зарегистрируй его server UI CLI модули и session codec",
+    "expected": "create-agent-adapter"
+  },
+  {
+    "prompt": "проанализируй продуктовые метрики, retention, воронку и эффект изменения по сегментам",
+    "expected": "data-analyst"
+  },
+  {
+    "prompt": "спроектируй схему БД, безопасную миграцию, constraints, индексы и проверку SQL-производительности",
+    "expected": "database-engineer"
+  },
+  {
+    "prompt": "подготовь delivery plan выбранной инициативы: milestones, critical path, owners, readiness и release risks",
+    "expected": "delivery-manager"
+  },
+  {
+    "prompt": "проведи скептический doubt pass рискованной миграции и проверь assumptions, rollback gaps и дорогие ошибки",
+    "expected": "doubt-driven-development"
+  },
+  {
+    "prompt": "выполни уже написанный implementation plan task-by-task с checkpoints и verification commands",
+    "expected": "executing-implementation-plans"
+  },
+  {
+    "prompt": "реализуй веб-интерфейс: компоненты, состояние, API-интеграция, loading, empty и error states",
+    "expected": "frontend-engineer"
+  },
+  {
+    "prompt": "исследуй grammar fuzzing matrix, найди новую defect family и минимизируй reproducer",
+    "expected": "fuzzing-bug-hunter"
+  },
+  {
+    "prompt": "закоммить и запушь изменения согласно .gitignore через явный staged allowlist и проверь remote SHA",
+    "expected": "gitignore-scoped-push"
+  },
+  {
+    "prompt": "найди во внутреннем Harbor подходящий Docker image и проверь project repository tags и digest",
+    "expected": "harbor-registry"
+  },
+  {
+    "prompt": "prepare an executable multi-step implementation plan with exact files, small steps and verification before coding",
+    "expected": "implementation-planner"
+  },
+  {
+    "prompt": "подготовь ручной regression checklist, выполни сценарии и оформи bug reports с evidence",
+    "expected": "manual-tester"
+  },
+  {
+    "prompt": "проверь готовый VCont Megapack .run на чистой машине: install opcua agent, uninstall и purge",
+    "expected": "megapack"
+  },
+  {
+    "prompt": "реализуй мобильный экран iOS Android с навигацией, offline retry и учетом app lifecycle",
+    "expected": "mobile-engineer"
+  },
+  {
+    "prompt": "найди прошлый контекст через qmd в PARA-памяти и по моему запросу обнови entity и daily note",
+    "expected": "para-memory-files"
+  },
+  {
+    "prompt": "спроектируй внутреннюю engineering platform с self-service шаблонами, ownership, adoption и DX",
+    "expected": "platform-engineer"
+  },
+  {
+    "prompt": "спроектируй UX user flow, IA, wireframes и handoff экранов до реализации в коде",
+    "expected": "product-designer"
+  },
+  {
+    "prompt": "определи product vision, MVP, scope, приоритет backlog, гипотезы и success metrics",
+    "expected": "product-manager"
+  },
+  {
+    "prompt": "сориентируйся в незнакомом репозитории IdeaProjects: найди trusted commands, conventions и dirty worktree риски",
+    "expected": "project-context"
+  },
+  {
+    "prompt": "реализуй Python CLI, добавь pytest тесты, типизацию, ruff и исправь production integration bug",
+    "expected": "python-developer"
+  },
+  {
+    "prompt": "разбери полученные code review comments, проверь спорный feedback и исправь actionable requested changes",
+    "expected": "receiving-code-review"
+  },
+  {
+    "prompt": "проведи threat model и security review auth authz secrets attack surface и secure defaults",
+    "expected": "security-engineer"
+  },
+  {
+    "prompt": "спроектируй архитектуру компонентов, data flows, integrations, NFR, contracts и trade-offs",
+    "expected": "solution-architect"
+  },
+  {
+    "prompt": "проверь текущую официальную документацию и version-specific behavior внешней библиотеки перед решением",
+    "expected": "source-driven-development"
+  },
+  {
+    "prompt": "я разрешаю subagents: раздели крупную реализацию на независимые subtasks с disjoint ownership и review gates",
+    "expected": "subagent-driven-development"
+  },
+  {
+    "prompt": "разбери пользовательский инцидент, оцени impact, собери reproduction evidence, workaround и эскалацию",
+    "expected": "support-engineer"
+  },
+  {
+    "prompt": "системно расследуй падение теста: воспроизведи, собери evidence по слоям и докажи root cause до fix",
+    "expected": "systematic-debugging"
+  },
+  {
+    "prompt": "обнови README и runbook так, чтобы команды, аудитория, onboarding и фактическое поведение были согласованы",
+    "expected": "technical-writer"
+  },
+  {
+    "prompt": "разбери VCStudio .vcsys, ST editor, ST-to-Lua limitations, UserLibrary и загрузку через monitoring UI",
+    "expected": "vcstudio"
   }
 ]

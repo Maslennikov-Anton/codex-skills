@@ -245,12 +245,12 @@ This file is a compact map of Ant's local repositories and recurring commands. K
 - Known workflows:
   - Inspect local changes: `git status --short`, `git diff --stat`, `git diff`.
   - Validate one skill: `python3 .system/skill-creator/scripts/quick_validate.py <skill-dir>`.
-  - Validate repo-wide/common-rule changes: `python3 scripts/audit_skills.py --root /home/ant/codex-skills`.
+  - Validate repo-wide/common-rule changes: `python3 scripts/audit_skills.py --root /home/ant/codex-skills --strict --require-smoke-coverage`.
   - Check markdown/reference link targets with `rg` and file existence.
 - Verification commands:
   - `git diff --check`
   - `python3 .system/skill-creator/scripts/quick_validate.py <skill-dir>`
-  - `python3 scripts/audit_skills.py --root /home/ant/codex-skills`
+  - `python3 scripts/audit_skills.py --root /home/ant/codex-skills --strict --require-smoke-coverage`
 - Notes: Keep `SKILL.md` small and route detailed content to `references/`. Use `para-memory-files` for memory recall/update behavior; this repo documents local skills and validation. Skill sync/push is in scope only when the user asks; otherwise stop at local diff/validation recommendations. Use `quick_validate.py` for narrow single-skill edits; use `audit_skills.py` for trigger rules, shared conventions, or common validation behavior changes.
 
 ## Local Tooling Preferences

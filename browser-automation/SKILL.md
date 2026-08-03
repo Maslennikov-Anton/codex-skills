@@ -1,6 +1,6 @@
 ---
 name: browser-automation
-description: "Автоматизировать браузерные сценарии через Playwright: открыть сайт, проверить UI, заполнить формы, собрать скриншоты, диагностировать DOM/network и верифицировать webapp."
+description: "Разово выполнять браузерные сценарии через Playwright: UI, формы, screenshots, DOM/network evidence; not long-lived UI test code."
 ---
 
 # Browser Automation

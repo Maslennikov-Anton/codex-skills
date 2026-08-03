@@ -1,5 +1,12 @@
 # Structured Text In VCStudio
 
+## Навигация
+
+- Создание Studio-compatible ST: `Editor Grammar Vs Translator Grammar`, `Studio ST Paths`, `Interface Extraction`.
+- Проверка возможности языка: `Known ST->Lua Translator Limitations`, затем `Translator-Supported Syntax For Candidate Tests`.
+- Диагностика deploy/codegen: `Translator Run Profile`, `Lua InterfaceSpec`, `Source-Observed Codegen Rules`.
+- Проектирование тестов: `Integration-Test Guardrails`; результат считается поддержанным только после editor/wrapper/translation/load/runtime проверки применимых слоёв.
+
 ## Source Baseline
 
 Source-derived facts here come from local `/home/ant/IdeaProjects/vcstudio` branch `VCONT-2056`:
@@ -107,6 +114,13 @@ Current translator limits are source-defined as 250 `VAR_INPUT`, 250 `VAR_OUTPUT
 
 Считай следующие конструкции неподдержанными в текущем Studio-bundled ST->Lua path, пока новая версия бинарника не доказана end-to-end. Валидность по IEC 61131-3, распознанный lexer/parser token, exit code `0` или созданный Lua-файл сами по себе не доказывают корректную семантику в Studio и VCont.
 
+Быстрый поиск по разделу:
+
+- лексика и текст: прагмы, UTF-8 identifiers, `_` в числах, `STRING`/`WSTRING`/`WCHAR`, `CHAR`;
+- выражения и управление: mixed numeric conversion, `CASE`, SFC, пользовательские `FUNCTION`;
+- объявления и storage: multiple initialization, `VAR_IN_OUT`, pointers/references, `TYPE`/`STRUCT`/`UNION`, `RETAIN`/`PERSISTENT`, `AT`, `VAR_GLOBAL`/`VAR_EXTERNAL`;
+- типы данных: `TIME_TO_DINT`, long time types и массивы.
+
 ### Прагмы `{...}`
 
 - Не используй `{attribute ...}` и другие vendor pragmas в коде, передаваемом транслятору.
@@ -120,30 +134,114 @@ Current translator limits are source-defined as 250 `VAR_INPUT`, 250 `VAR_OUTPUT
 - Кириллица и другие UTF-8/non-ASCII символы в идентификаторах не поддерживаются текущим translator path.
 - Текущий lexer может выдать серию `Illegal character`, затем syntax/parse error без пригодного Lua artifact.
 - При автоматическом переименовании сохраняй явную таблицу `original -> effective`, чтобы диагностика и связь с исходным проектом не потерялись.
-- Не обобщай это ограничение на комментарии и string literals: UTF-8 data является отдельной capability и требует отдельного теста.
+- UTF-8 комментарии являются отдельной capability и проходят текущий translator path; это не доказывает поддержку non-ASCII в идентификаторах или текстовых типах.
+
+### Подчёркивания в числовых литералах
+
+- Не используй `_` как разделитель групп цифр внутри числовых литералов: запись вида `1_000_000` не поддерживается текущим Studio-bundled ST->Lua path.
+- Перед трансляцией удаляй только разделители внутри числа: `1_000_000` -> `1000000`. Это ограничение не относится к `_` в ASCII-идентификаторах, например `motor_speed`.
+- Не сохраняй проверки числовых литералов с `_` как expected-positive `supported_runtime`: они закрепляют неподдерживаемый синтаксис как обязательную возможность продукта.
+
+### Кириллица в `STRING`, `WSTRING` и `WCHAR`
+
+- Для текста на русском языке используй `WSTRING` и типизированные литералы вида `WSTRING#'Привет'`. Обычный `STRING` считай ASCII-only в продуктовом compatibility contract: кириллица в `STRING` не поддерживается, даже если её UTF-8 байты фактически проходят translation/load и узкий `FIND(...) > 0` возвращает `TRUE`.
+- Не сохраняй тест с кириллицей в `STRING` как expected-positive `supported_runtime` и не меняй ожидаемую длину с `6` на `12`: это закрепило бы неподдерживаемое byte-oriented поведение как пользовательскую возможность.
+- На проверенных артефактах кириллический `WSTRING` проходит оба VCont load path как входной, выходной и внутренний `VAR`: прямые `READ`/`WRITE`, equality и проверка наличия подстроки через `FIND(...) > 0` работают. Это подтверждает хранение и transport текста, но не Unicode-aware семантику строковых функций.
+- Текущий codegen понижает операции над `STRING` и `WSTRING` к обычной Lua byte string. Для `WSTRING#'Привет'` подтверждено: `LEN(...) = 12`, `FIND(..., WSTRING#'вет') = 7`, `LEFT(..., 1) <> WSTRING#'П'`, а `LEFT(..., 2) = WSTRING#'П'`. Поэтому длины, позиции и границы `LEFT`/`RIGHT`/`MID` и смежных функций не трактуй как номера Unicode characters; не режь кириллицу ими без отдельного подтверждённого Unicode helper/normalization layer.
+- Не обобщай поддержку `WSTRING` на `WCHAR`. Изолированный внутренний `WCHAR := "П"` переводится в Lua, но VCont отклоняет создание экземпляра с `UNSUPPORTED_TYPE` в Studio path и не создаёт экземпляр через fboot; `WCHAR` остается end-to-end unsupported.
+
+### Граница `TIME_TO_DINT`: ST и FBD
+
+- Считай `TIME_TO_DINT(...)` поддерживаемой встроенной функцией ST, а не пользовательской функцией или обязательным FBD-блоком. Не удаляй ST regression case только потому, что в VCStudio typelibrary отсутствует `TIME_TO_DINT.fbt`.
+- Используй наносекунды в oracle для текущего ST->Lua->VCont path: `TIME_TO_DINT(T#50ms) = 50_000_000`. Транслятор хранит `TIME` как nanosecond-like integer и применяет 32-bit signed conversion; отдельно проверяй переполнение `DINT` для длительных интервалов.
+- Не трактуй runtime mode `studio` в ST integration matrix как FBD-проверку: это загрузка сгенерированного ST FB через Studio-like online command stream. Наличие функции в ST и наличие одноимённого `.fbt` в FBD-библиотеке являются разными capability.
+
+### Длинные типы времени `LTIME`, `LTOD` и `LDT`
+
+- Типы `LTIME`, `LTOD` (`LTIME_OF_DAY`) и `LDT` (`LDATE_AND_TIME`) не поддерживаются текущим Studio-bundled ST->Lua->VCont path.
+- Не используй их в interface/internal declarations, typed literals или встроенных преобразованиях и split-функциях, которым требуется один из этих типов на входе или выходе. Распознанный token, успешная standalone translation или нормализация имени типа в Studio wrapper не доказывают end-to-end поддержку.
+- Для длительности используй `TIME`, для времени суток — `TOD`/`TIME_OF_DAY`, для даты и времени — `DT`/`DATE_AND_TIME`, только если их диапазона и точности достаточно для сценария. После замены отдельно проверь граничные значения и единицы runtime oracle.
+- Не держи cases на `LTIME`, `LTOD`/`LTIME_OF_DAY` или `LDT`/`LDATE_AND_TIME` как expected-positive `supported_runtime`.
+
+### Неявное преобразование смешанных числовых типов
+
+- Не рассчитывай на автоматическое повышение типа в арифметических выражениях: текущий валидатор ST-редактора VCStudio требует совместимых типов операндов. Например, `Numerator : INT; OUT : REAL; OUT := Numerator / 4.0;` не является допустимым REAL-делением и должно диагностироваться как `Operator type mismatch`.
+- Тип переменной назначения не меняет тип уже вычисляемого выражения. Если требуется REAL-арифметика, явно преобразуй целочисленный операнд до операции, например `OUT := INT_TO_REAL(Numerator) / 4.0;`, и отдельно подтверди поддержку самой операции end-to-end.
+- Не считай результат `2` доказательством округления `2.25`: при обходе editor-validation текущий транслятор определяет выражение по левому `INT`-операнду и может сгенерировать Lua floor division `//`, поэтому дробное значение вообще не вычисляется.
+- Не держи implicit-promotion probes как expected-positive `supported_runtime`. Режим `studio` в integration harness проверяет Studio-like command load, но не запускает валидатор ST-редактора и сам по себе не доказывает editor acceptance.
+
+### Допустимый селектор `CASE`
+
+- В Studio-authored коде используй для `CASE` встроенный целочисленный селектор и совместимые целочисленные метки. Числовые диапазоны относятся только к translator-only coverage: bundled translator их понимает, но текущая Studio editor grammar — нет. Не используй `BOOL`, `STRING` или `WSTRING`.
+- Транслятор может синтаксически разобрать недопустимый селектор, но завершает codegen сообщением `Wrong CASE selector type: 'BOOL'` или `Wrong CASE selector type: 'STRING'` и не создаёт пригодный `script.lua`. Parse и exit code процесса `0` не доказывают поддержку.
+- Булево ветвление выражай через `IF ... THEN ... ELSE`; строковое — через `IF` / `ELSIF` с явными сравнениями. Если нужен именно `CASE`, заранее отобрази варианты на целочисленные коды.
+- IEC допускает перечислимую семантику в соответствующих профилях, но текущий Studio path не поддерживает пользовательский `TYPE`/`ENUM`; для совместимости также отображай enum-state на встроенный integer.
+- Не держи `CASE` по `BOOL`, `STRING` или `WSTRING` как expected-positive `supported_runtime` и не классифицируй корректный отказ как дефект продукта.
+
+### SFC-синтаксис в ST payload
+
+- Не передавай конструкции SFC (`INITIAL_STEP`, `STEP ... END_STEP`, `TRANSITION ... END_TRANSITION` и привязки действий с qualifiers `N`/`S`/`R`/`L`) как текст программы в Studio-bundled ST->Lua translator.
+- SFC является отдельной IEC-моделью исполнения: тело действия может быть написано на ST, но шаги, переходы, состояния и action qualifiers должны создаваться и загружаться через SFC-capable путь VCStudio, а не встраиваться внутрь `FUNCTION_BLOCK ... END_FUNCTION_BLOCK` ST payload.
+- Текущий translator process может завершиться с exit code `0`, но пишет `Syntax error ... unexpected '<step name>'` и `Parse error`, не создавая `script.lua`; считай это неуспешной трансляцией, а не VCont runtime defect.
+- Не держи SFC surface cases как expected-positive `supported_runtime` в ST->Lua suite. Проверяй их отдельным SFC integration suite с собственным Studio model/deploy oracle.
 
 ### Пользовательские функции
 
 - Объявления POU вида `FUNCTION ... END_FUNCTION` и вызовы пользовательских функций не поддерживаются текущим Studio-bundled translator path.
 - Не распространяй это ограничение на поддерживаемые встроенные функции вроде `LEN`, `FIND` и преобразований `*_TO_*`, а также на экземпляры стандартных функциональных блоков: это отдельные конструкции.
-- Перенеси пользовательскую функцию в `FUNCTION_BLOCK` с явными `VAR_INPUT`/`VAR_OUTPUT` и вызывай логику через экземпляр ФБ.
+- Для самого надежного обхода перенеси вычисление внутрь одного `FUNCTION_BLOCK` с явными `VAR_INPUT`/`VAR_OUTPUT` или используй подтвержденный стандартный ФБ.
+- Не склеивай родительский и дочерний пользовательские `FUNCTION_BLOCK` в один translator payload: текущий binary отклоняет второй `FUNCTION_BLOCK` как `unexpected 'FUNCTION_BLOCK'`. Отдельно предзагруженный тип из UserLibrary может быть рабочей архитектурой только после проверки реального multi-type Studio load path.
 
-### Пользовательские структуры данных
+### Множественные объявления с инициализацией
 
-- Не используй объявления `TYPE ... STRUCT ... END_STRUCT ... END_TYPE` и переменные пользовательских структур как поддерживаемую end-to-end возможность.
+- Не используй один инициализатор для нескольких имён в общем declaration: `A, B, C : INT := 2;` не поддерживается текущим Studio-bundled ST->Lua path.
+- Объявление нескольких переменных без инициализации допустимо: `A, B, C : INT;`.
+- Если каждой переменной нужно начальное значение, объявляй и инициализируй их отдельно:
+
+```iecst
+A : INT := 2;
+B : INT := 2;
+C : INT := 2;
+```
+
+- Применяй это правило одинаково к `VAR_INPUT`, `VAR_OUTPUT` и внутренним `VAR`; не держи multiple-name declaration с общим `:=` как expected-positive `supported_runtime` case.
+
+### `VAR_IN_OUT`
+
+- Считай секцию `VAR_IN_OUT` неподдерживаемой в текущем Studio-bundled ST->Lua path независимо от типа переменной; это относится и к скалярам, и к `ARRAY`.
+- Не держи `VAR_IN_OUT` cases как expected-positive `supported_runtime`: успешный editor parse сам по себе не доказывает translation/load/runtime semantics.
+- Замени двунаправленный параметр парой явных портов `VAR_INPUT` и `VAR_OUTPUT`: передай исходное значение через вход, вычисли обновлённое значение внутри одного `FUNCTION_BLOCK` и верни его через выход. Обратную связь между экземплярами настраивай соединением Studio/VCont вне ST payload.
+
+### Ссылки и указатели
+
+- Не используй `REFERENCE TO`, `POINTER TO`, `ADR(...)`, присваивание ссылки `REF=` и разыменование через `^` в текущем Studio-bundled ST->Lua path.
+- Для `REFERENCE TO` primitive-типа текущий бинарник явно завершает translation с `Unsupported REFERENCE TO for primitive types`; не держи такую форму как expected-positive runtime case.
+- Считай `POINTER TO`, получение адреса через `ADR(...)` и чтение или запись через `P^` неподдержанными независимо от того, распознаны ли отдельные tokens parser-ом.
+- Замени alias/pointer-семантику явными scalar или одномерными `ARRAY` переменными и передавай значения через `VAR_INPUT`/`VAR_OUTPUT`. Если нужно изменить состояние другого экземпляра, используй явное соединение и отдельный выход, а не скрытую адресную связь.
+
+### Пользовательские `TYPE`, `STRUCT` и `UNION`
+
+- Не используй top-level объявления `TYPE ... END_TYPE` как поддерживаемую конструкцию в Studio-authored ST: текущая `StructuredText.xtext` не включает их в grammar алгоритма.
+- Не повышай capability по успешному standalone parse или translation. Scalar aliases, `ENUM`, subrange, array aliases и `STRUCT` могут распознаться, но текущий codegen теряет корректный internal/interface mapping — например, оставляет обращения `fb[IN_<name>]` при `numIntVars = 0` — либо VCont отклоняет пользовательский тип порта с `UNSUPPORTED_TYPE`.
+- Учитывай, что `UNION` и часть сложных форм могут завершиться parse/translation error; конкретный diagnostic зависит от формы объявления.
 - Распознавание `STRUCT` parser-ом или создание Lua-файла не доказывает корректные initialization, member access, `interfaceSpec` и VCont runtime mapping; Studio editor grammar также не принимает эту конструкцию.
-- Разверни структуру в отдельные скалярные переменные или поддерживаемые одномерные массивы и передавай данные через явные порты.
+- Для editor-safe end-to-end кода используй встроенные типы напрямую, явные скалярные порты и одномерные `ARRAY[1..N]` без alias. Разверни структуру в плоскую схему; `ENUM`/subrange моделируй встроенным integer, именованными константами и явными range checks.
+- Скалярная проекция и одномерный `ARRAY[1..N]` подтверждены в обоих VCont load path, но это не доказывает сохранение layout исходной структуры.
+- Не держи `TYPE ... END_TYPE`, aliases, `ENUM`, subrange, `STRUCT` или `UNION` как expected-positive `supported_runtime`: parser-only evidence относится только к inventory грамматики.
 
 ### `RETAIN` и `PERSISTENT`
 
 - Квалификаторы переменных `RETAIN` и `PERSISTENT` не поддерживаются текущим Studio-bundled ST->Lua path.
 - Не считай обычную внутреннюю переменную эквивалентом retained/persistent storage и не обещай сохранение значения после перезапуска, cold start или повторной загрузки.
 - Если состояние должно переживать перезапуск, используй отдельно подтверждённый механизм хранения Studio/VCont и проверяй lifecycle на реальном runtime.
+- Обычный внутренний `VAR` подтвержден только как состояние между циклами одного запущенного FB. Warm-start persistence относится к VCont DB lifecycle (`DBSAVE`, `LoadDBAtStartup`, `SaveOutputs`/параметры сохранения) и не доказывает семантику ST qualifiers.
 
 ### Тип `CHAR`
 
 - Тип данных `CHAR` не поддерживается текущим Studio-bundled ST->Lua path.
 - Для текстового значения используй подтверждённый для конкретного сценария `STRING`; если требуется ровно один символ, обеспечь это ограничение явно в логике и отдельно проверь encoding/runtime behavior.
+- Считай неподдерживаемыми все встроенные преобразования, которые принимают или возвращают `CHAR`: семейства `CHAR_TO_*` и `*_TO_CHAR`, включая `CHAR_TO_INT(...)`, `INT_TO_CHAR(...)`, `CHAR_TO_STRING(...)` и составные цепочки преобразований. Успешная standalone translation отдельного вызова не доказывает end-to-end поддержку.
+- Для одиночного ASCII-символа используй `STRING := 'A'` и явно проверяй `LEN(...) = 1`; это не предоставляет числовой код символа и не является заменой `CHAR_TO_INT(...)`.
 
 ### Прямая адресация `AT %...`
 
@@ -151,24 +249,24 @@ Current translator limits are source-defined as 250 `VAR_INPUT`, 250 `VAR_OUTPUT
 - Даже если Studio interface parser извлёк `AT` metadata или translator принял declaration, это не доказывает реальную привязку к process image VCont.
 - Передавай данные через явные `VAR_INPUT`/`VAR_OUTPUT` порты и настраивай физическую, Modbus или иную runtime-привязку вне ST algorithm через Studio/VCont configuration.
 
-### `VAR_GLOBAL`
+### `VAR_GLOBAL` и `VAR_EXTERNAL`
 
 - Не считай `VAR_GLOBAL` поддерживаемой общей памятью controller scope между POU, типами ФБ или экземплярами.
 - Узкий standalone пример может распознаться и понизиться до обычной Lua `local`; такой green test доказывает только локальное вычисление, но не shared lifetime, visibility или synchronization semantics.
-- Помести состояние в один owning FB и передавай его через явные порты/соединения. Если нужна product-specific shared storage, моделируй и проверяй её отдельно на runtime contract.
-
-### `VAR_EXTERNAL`
-
 - Внешнее связывание имени с controller-global storage не поддержано; parser обычно завершается syntax/parse error и не создаёт пригодный Lua artifact.
 - Не эмулируй `VAR_EXTERNAL` неявным Lua global: это меняет lifetime, isolation и поведение нескольких экземпляров.
-- Замени external dependency явным входом/выходом и Studio connection от owning FB.
+- Помести состояние в один owning FB и передавай его через явные входы, выходы и Studio connections. Если нужна product-specific shared storage, моделируй и проверяй её отдельно на runtime contract.
 
-### Вложенные и многомерные массивы
+### Массивы
 
+- Используй только массивы с нижней границей `1`: `ARRAY[1..N] OF T`. Начальная индексация с `0`, отрицательного или любого другого значения не поддерживается текущим Studio-bundled ST->Lua path.
+- Считай формы `ARRAY[0..N]`, `ARRAY[2..N]` и `ARRAY[-N..N]` end-to-end unsupported, даже если parser принимает declaration: Studio interface extraction сохраняет размер массива, но не его нижнюю границу, а Lua/VCont mapping использует индексацию от `1`.
+- При переносе `ARRAY[L..U]` в поддерживаемую форму объявляй `ARRAY[1..U-L+1]` и согласованно преобразуй каждое обращение `A[I]` в `A[I-L+1]`, включая циклы, инициализацию и runtime oracle. Не заменяй только границы declaration: это изменит семантику индексов.
 - Не используй `ARRAY[1..2] OF ARRAY[1..3] OF INT` как поддерживаемый тип. Также не считай `ARRAY[1..2, 1..3] OF INT` безопасной заменой только потому, что standalone translation завершилась.
 - Текущий end-to-end path не гарантирует корректные `interfaceSpec`, initialization, indexing и VCont runtime mapping для nested/multidimensional shapes.
 - Не приписывай direct nested syntax конкретный parser diagnostic без минимального repro: это compatibility guardrail, а смежные multidimensional формы могут пройти translation и сломаться только в runtime.
 - Разверни данные в одномерный `ARRAY[1..N] OF T` и вычисляй индекс явно, либо используй несколько отдельных одномерных массивов. Проверяй чтение/запись через фактический load и Watch/`READ` oracle.
+- Не держи lower-bound, nested или multidimensional array cases как expected-positive `supported_runtime`.
 
 ### Handling rule
 
@@ -191,7 +289,7 @@ Event/data rules:
 - `DINames`, `DONames`, `DIDataTypeNames`, `DODataTypeNames` come from parsed interface vars;
 - scalar type is serialized as `"TYPE"`;
 - array type is serialized as `"ARRAY", <size>, "ELEMENT_TYPE"`;
-- time aliases are normalized for deploy type names: `TOD` -> `TIME_OF_DAY`, `LTOD` -> `LTIME_OF_DAY`, `DT` -> `DATE_AND_TIME`, `LDT` -> `LDATE_AND_TIME`.
+- time aliases are normalized for deploy type names: `TOD` -> `TIME_OF_DAY`, `LTOD` -> `LTIME_OF_DAY`, `DT` -> `DATE_AND_TIME`, `LDT` -> `LDATE_AND_TIME`. Это только wrapper serialization rule: оно не отменяет известное ограничение на `LTIME`, `LTOD`/`LTIME_OF_DAY` и `LDT`/`LDATE_AND_TIME`.
 
 After translator output, Studio appends:
 
@@ -210,8 +308,8 @@ The bundled translator parser recognizes more syntax than the Studio editor, but
 - `IF` / `ELSIF` / `ELSE`;
 - `CASE`, including comma labels and numeric ranges;
 - `FOR`, `WHILE`, `REPEAT`, `EXIT`, `CONTINUE`, `RETURN`;
-- one-dimensional arrays, array literals, and repeated initializer groups; nested and multidimensional arrays are not end-to-end supported;
-- `REFERENCE TO` for non-primitive/non-enum/non-subrange types;
+- one-dimensional `ARRAY[1..N]`, array literals, and repeated initializer groups; lower bounds other than `1`, nested arrays, and multidimensional arrays are not end-to-end supported;
+- tokens ссылок и указателей могут распознаваться parser-ом, но `REFERENCE TO`, `POINTER TO`, `ADR(...)`, `REF=` и `^` не входят в поддерживаемый end-to-end subset;
 - member access, array indexing, named FB-call arguments, and `=>` output assignments.
 
 Use this set for translator coverage, but use the editor-safe subset for Studio-integration coverage unless a real Studio log proves the construct passes through the UI path.
@@ -235,9 +333,11 @@ Observed from real Studio logs and the local translator binary:
 Standard FB names recognized by the translator lexer include:
 
 - timers/latches/triggers: `TON`, `TOF`, `TP`, `SR`, `RS`, `R_TRIG`, `F_TRIG`;
-- counters: `CTU`, `CTD`, `CTUD` plus typed variants such as `CTU_INT`, `CTD_UDINT`, `CTUD_LINT`.
+- counters: `CTU`, `CTD`, `CTUD` plus typed variants recognized by the lexer.
 
-Supported built-in function families are source-derived from `StructuredTextSupportedFunctions.java` and `operator_mapper.py`; high-value integration candidates include arithmetic/comparison (`ADD`, `SUB`, `MUL`, `DIV`, `MOD`, `EQ`, `NE`, `GT`, `GE`, `LT`, `LE`), strings (`CONCAT`, `LEN`, `FIND`, `LEFT`, `RIGHT`, `MID`, `INSERT`, `DELETE`, `REPLACE`), selection (`SEL`, `MUX`, `LIMIT`, `MAX`, `MIN`), bit/endian (`SHL`, `SHR`, `ROL`, `ROR`, `TO_BIG_ENDIAN`, `FROM_BIG_ENDIAN`), time split/conversion (`DAY_OF_WEEK`, `SPLIT_DATE`, `SPLIT_TOD`, `SPLIT_DT`), and `*_TO_*` conversions.
+Для фактического имени counter FB сверяй typelibrary, а не только lexer. В текущей VCStudio-библиотеке базовый `CTD` уже является `INT`-вариантом; не используй несуществующий alias `CTD_INT`. Суффиксный вариант допустим только при наличии точного `.fbt`, например `CTD_DINT`; распознанное lexer-ом имя без соответствующего runtime FB может перевестись в `VCont.GetOrCreateFB("<name>", ...)`, но сорвать исполнение всего Lua FB.
+
+Supported built-in function families are source-derived from `StructuredTextSupportedFunctions.java` and `operator_mapper.py`; high-value integration candidates include arithmetic/comparison (`ADD`, `SUB`, `MUL`, `DIV`, `MOD`, `EQ`, `NE`, `GT`, `GE`, `LT`, `LE`), strings (`CONCAT`, `LEN`, `FIND`, `LEFT`, `RIGHT`, `MID`, `INSERT`, `DELETE`, `REPLACE`), selection (`SEL`, `MUX`, `LIMIT`, `MAX`, `MIN`), bit/endian (`SHL`, `SHR`, `ROL`, `ROR`, `TO_BIG_ENDIAN`, `FROM_BIG_ENDIAN`), time split/conversion (`DAY_OF_WEEK`, `SPLIT_DATE`, `SPLIT_TOD`, `SPLIT_DT`), and confirmed `*_TO_*` conversions, excluding `CHAR_TO_*`, `*_TO_CHAR`, and other families covered by the known limitations above.
 
 ## Integration-Test Guardrails
 

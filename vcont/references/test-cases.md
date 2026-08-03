@@ -27,10 +27,10 @@ vcont1 -> IDE port 61499
 vcont2 -> IDE port 61500
 ```
 
-Bootfile для проверки параллельных счетчиков с периодом таска 3 секунды:
+Bootfile для проверки комплексной программы параллельных счетчиков (текущий период таска в файле — 50 мс):
 
 ```text
-/home/ant/IdeaProjects/vcont-hsb/tests/resources/fboot/simple_parallel_counters_3s.vcont.fboot
+/home/ant/IdeaProjects/vcont-hsb/tests/resources/fboot/complex_counters.vcont.fboot
 ```
 
 Он должен быть положен как `vcont.fboot` рядом с бинарником каждого VCont:
@@ -112,7 +112,7 @@ message = bytes([80, 0, 0]) + bytes([80, 0, len(payload)]) + payload
 
 ### Процедура 3-минутного прогона
 
-1. Убедиться, что оба runtime используют один и тот же `simple_parallel_counters_3s.vcont.fboot`.
+1. Убедиться, что оба runtime используют один и тот же `complex_counters.vcont.fboot`.
 2. Перезапустить оба сервиса:
 
 ```bash
@@ -157,7 +157,7 @@ docker compose start vcont1 vcont2
 
 ### Исторический прогон старого 5-минутного варианта 2026-04-30
 
-Этот прогон оставлен как диагностический baseline старого сценария с `complex_counters.vcont.fboot` и длительностью 300 секунд. Для актуального тест-кейса используй `simple_parallel_counters_3s.vcont.fboot` и 180 секунд.
+Этот прогон оставлен только как исторический диагностический baseline сценария с `complex_counters.vcont.fboot` и длительностью 300 секунд. Для текущей проверки используй актуальный файл из репозитория и действующие pytest-сценарии; не переноси результат старого артефакта на текущую сборку.
 
 Артефакт:
 

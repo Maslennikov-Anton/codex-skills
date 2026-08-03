@@ -33,7 +33,7 @@ This reference defines how VCStudio (front-end/project authoring layer) and VCon
 7. VCont receives commands over TCP or reads `vcont.fboot` beside the executable.
 8. VCont creates task resources, FB instances, connections, aliases, and starts tasks.
 9. VCStudio can connect for monitoring, live writes, forcing, online loop load/delete, save/init variables, reset/reboot.
-10. Tests/oracles should observe VCont runtime effects: IDE `READ`, logs, Modbus/OPC UA outputs, HSB role/state, external devices.
+10. Tests/oracles should observe VCont runtime effects: Studio-like Watch monitoring, direct `READ` when explicitly marked as a runtime oracle, logs, Modbus/OPC UA outputs, HSB role/state, external devices.
 
 ## Object Mapping
 
@@ -97,7 +97,7 @@ VCStudio states that `Онлайн загрузить КУ` preserves current va
 4. Create new FBs/connections/aliases in behavior-preserving order.
 5. Reassign the loop to the intended task if needed.
 6. Start the relevant task(s).
-7. Verify through `Консоль загрузки`, IDE `READ`, logs, or external effects.
+7. Verify through `Консоль загрузки`, Studio-like Watch monitoring, an explicitly marked direct runtime `READ` oracle, logs, or external effects.
 
 Do not assume all runtime state survives. Values on retained FB instances may survive; deleted/recreated FBs and changed pins may receive defaults or newly authored initial values. Verify against generated commands and current runtime behavior.
 
@@ -108,7 +108,8 @@ Do not assume all runtime state survives. Values on retained FB instances may su
 - `Сохранение переменных` stores current parameters for warm start.
 - Live value writes during monitoring are actual writes to VCont and affect the running algorithm.
 - Forcing is not just UI highlighting: it changes runtime value selection and must be treated as a control action.
-- Stable test snapshots should stop a task, read pins through IDE `READ`, then start the task again when appropriate.
+- Studio UI monitoring uses Watch lifecycle plus `READ <Watches/>`. Direct single-pin `READ` is a useful deterministic runtime oracle, but it is not the same protocol shape as Studio monitoring.
+- Stopping a task before reading pins is a test stabilization technique only; do not present it as Studio monitoring behavior unless the specific UI action emits that command stream.
 
 
 ## Communication Artifact Mapping

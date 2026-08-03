@@ -1,6 +1,6 @@
 ---
 name: fuzzing-bug-hunter
-description: "Искать скрытые баги через matrix/grammar fuzzing и targeted bug hunting: failure surface, минимальные repro, bug artifacts и regression cases."
+description: "Искать новые defect families через matrix/grammar fuzzing: failure surface и минимальные repro; not ordinary regression, manual exploratory or known-bug root cause."
 ---
 
 # Fuzzing Bug Hunter

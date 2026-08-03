@@ -55,14 +55,15 @@ ln -s ~/codex-skills ~/.codex/skills
 
 ## Как обновлять skills после изменений
 
-Общее правило: если добавлен новый skill или изменен существующий, изменения нужно не только сохранить локально, но и закоммитить с `git push` в GitHub-репозиторий `codex-skills`, если нет явного запрета от пользователя.
+Commit и `git push` выполняются только по явному запросу пользователя. Обычное обновление skill заканчивается локальной проверкой и обзором diff.
 
 Если `~/.codex/skills` указывает на `~/codex-skills` через symlink:
 
 ```bash
 cd ~/codex-skills
-git status
-git add .
+git status --short --ignored
+git add <явный-список-измененных-путей>
+git diff --cached --check
 git commit -m "Update Codex skills"
 git push
 ```
@@ -70,10 +71,11 @@ git push
 Если `~/.codex/skills` хранится как отдельная копия:
 
 ```bash
-rsync -a --delete ~/.codex/skills/ ~/codex-skills/
+rsync -a --exclude '.git/' ~/.codex/skills/ ~/codex-skills/
 cd ~/codex-skills
-git status
-git add .
+git status --short --ignored
+git add <явный-список-измененных-путей>
+git diff --cached --check
 git commit -m "Update Codex skills"
 git push
 ```
@@ -136,7 +138,7 @@ python3 scripts/audit_codex_sessions.py --days 30 --format markdown --output rep
 
 1. внести в соответствующий skill;
 2. проверить локально;
-3. закоммитить в этот репозиторий;
-4. запушить в GitHub.
+3. по явному запросу закоммитить в этот репозиторий;
+4. по явному запросу запушить в GitHub.
 
 Это делает skills переносимыми и воспроизводимыми между машинами.

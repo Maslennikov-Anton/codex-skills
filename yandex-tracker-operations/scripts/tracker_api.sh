@@ -25,11 +25,7 @@ ACCEPT_LANGUAGE="${TRACKER_ACCEPT_LANGUAGE:-}"
 
 METHOD="$1"
 PATH_PART="$2"
-QUERY_PART="${3:-}"
-
-shift 3 || true
-
-url="${BASE_URL}${PATH_PART}${QUERY_PART}"
+shift 2
 
 common_args=(
   --silent
@@ -50,11 +46,17 @@ if [[ "${METHOD}" == "FILE" ]]; then
   fi
 
   FILE_PATH="$1"
+  url="${BASE_URL}${PATH_PART}"
   exec curl -X POST "${url}" \
     "${common_args[@]}" \
     --form "file=@${FILE_PATH}"
 fi
 
+QUERY_PART="${1:-}"
+if [[ $# -gt 0 ]]; then
+  shift
+fi
+url="${BASE_URL}${PATH_PART}${QUERY_PART}"
 JSON_BODY="${1:-}"
 
 if [[ -n "${JSON_BODY}" ]]; then

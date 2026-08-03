@@ -1,4 +1,4 @@
 interface:
   display_name: "Системная отладка"
-  short_description: "Root cause, evidence и поэтапная локализация проблем до исправления."
+  short_description: "Root cause и поэтапная локализация до исправления."
   default_prompt: "Используй $systematic-debugging, чтобы воспроизвести проблему, собрать evidence по слоям системы и найти root cause до попыток fix."
