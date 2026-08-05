@@ -86,6 +86,16 @@ Security note: protocol requirements mention signed `fboot` files and hash valid
 - Event-loop flow should be explicit: `E_RESTART`/`START` -> `E_CYCLE` if needed -> sequential event-chain through FBs.
 - Event branching creates undefined order; event cycles can drive resource load to 100%.
 
+## Dependent User ST FB Types
+
+- Treat each user-defined ST `FUNCTION_BLOCK` type as a separate translator input. A project may contain a dependency graph such as `TOP -> MIDDLE -> LEAF`, but concatenating those declarations into one `source_code.st` is unsupported.
+- Discover the full dependency closure before load. Translate each type independently and emit `CREATE FBType` for every dependency and the root before assigning or starting the task. Preserve Studio's leaf-to-root topological order; reject a dependency cycle instead of silently choosing an order.
+- A parent declaration such as `C : CHILD33;` is lowered to a persisted nested handle like `VCont.GetOrCreateFB("CHILD33", "C", fb)`. Nested instances belong to the parent instance and retain isolated state by instance name.
+- Create a top-level runtime instance for the root type. Do not create top-level instances for dependencies unless the project model explicitly requires them; the parent creates its nested instances lazily during execution.
+- Successful translation and successful `CREATE` of the parent `FBType` do not prove that the dependency exists. If a dependent type is absent at execution, VCont logs `Lua Lib create FB, type <TYPE> not found`, the nested handle is `nil`, and root outputs may remain at their initial values.
+- Verify the root output after task execution with Studio-like Watch or an explicitly marked direct `READ` oracle. For stateful children, execute multiple cycles and assert the state sequence; for recursive composition, include a three-level chain.
+- Keep composition separate from unsupported language features. Plain dependent FB instances are supported on the verified path; `EXTENDS`, `ABSTRACT`, `INTERFACE`/`IMPLEMENTS`, `METHOD`, user-defined `FUNCTION`, and POU `PROGRAM` require independent capability evidence.
+
 
 ## Online Loop Replace Skeleton
 

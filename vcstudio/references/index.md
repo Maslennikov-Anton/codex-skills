@@ -11,7 +11,7 @@
 
 ## Structured Text
 
-- `st-language.md` — основной compatibility contract: editor и translator grammar, Studio wrapper, interface indexes, ограничения с обходами, codegen и test guardrails. Открывай перед генерацией, исправлением или оценкой ST-теста.
+- `st-language.md` — основной compatibility contract: editor и translator grammar, Studio wrapper, interface indexes, композиция зависимых пользовательских ST FB, ограничения с обходами, codegen и test guardrails. Открывай перед генерацией, исправлением или оценкой ST-теста.
 
 ## Библиотека и исходники
 

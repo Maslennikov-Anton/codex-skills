@@ -126,7 +126,7 @@ Current translator limits are source-defined as 250 `VAR_INPUT`, 250 `VAR_OUTPUT
 |---|---|
 | 1. Исходный текст | прагмы, non-ASCII identifiers, `_` в числовых литералах, Unicode в `STRING`/`WSTRING`/`WCHAR` |
 | 2. Типы и выражения | `TIME_TO_DINT`, long time types, mixed numeric conversion, `CASE` |
-| 3. Структура программы | SFC, `PROGRAM`, пользовательские `FUNCTION`, несколько `FUNCTION_BLOCK`, `EXTENDS`, `CLASS`, `INTERFACE`/`IMPLEMENTS`, `ACTION`, `METHOD`, `PROPERTY`, `NAMESPACE`, `CONFIGURATION` |
+| 3. Структура программы | SFC, `PROGRAM`, пользовательские `FUNCTION`, несколько top-level `FUNCTION_BLOCK` в одном input, `EXTENDS`, `CLASS`, `INTERFACE`/`IMPLEMENTS`, `ACTION`, `METHOD`, `PROPERTY`, `NAMESPACE`, `CONFIGURATION` |
 | 4. Библиотека ФБ | отсутствующий vendor-FB `SEMA` |
 | 5. Объявления и данные | общий `:=`, `VAR_IN_OUT`, references/pointers, `TYPE`/`STRUCT`/`UNION`, `RETAIN`/`PERSISTENT`, `CHAR`, `AT %...`, `VAR_GLOBAL`/`VAR_EXTERNAL`, массивы |
 | 6. Runtime management | indexed `READ`/`WRITE` элементов массива |
@@ -223,7 +223,7 @@ Current translator limits are source-defined as 250 `VAR_INPUT`, 250 `VAR_OUTPUT
 - Интерфейсы в текущей VCStudio не поддерживаются. Не используй объявления `INTERFACE ... END_INTERFACE`, ключевое слово `IMPLEMENTS`, переменные интерфейсного типа и полиморфные вызовы через такой тип в Studio-compatible ST.
 - По назначению интерфейс определяет набор методов без реализации и позволяет разным типам предоставить единый контракт. Например, управляющий код может одинаково запускать и останавливать асинхронный или синхронный двигатель, не зная особенностей их внутренней реализации.
 - Для совместимого кода задай нормализованный контракт одного owning `FUNCTION_BLOCK`: общие команды и уставки передавай через `VAR_INPUT`, общие состояния и ошибки возвращай через `VAR_OUTPUT`, а тип реализации задавай целочисленным selector и явно выбирай ветвь через `IF` / `CASE`. Специфику каждого типа двигателя оставь внутри соответствующей ветви.
-- Если реализации уже существуют как отдельно подтвержденные библиотечные ФБ, унифицируй их порты и соединения на уровне модели Studio только после проверки полного пути Studio -> ST/Lua -> VCont. Не заменяй интерфейс `CLASS`, `METHOD`, несколькими пользовательскими типами ФБ или наследованием `EXTENDS`, поскольку эти конструкции также не поддерживаются текущим Studio path. Не держи `INTERFACE` / `IMPLEMENTS` cases как expected-positive `supported_runtime`.
+- Если реализации уже существуют как отдельно подтвержденные библиотечные ФБ, унифицируй их порты и соединения на уровне модели Studio только после проверки полного пути Studio -> ST/Lua -> VCont. Композиция нескольких отдельно транслируемых пользовательских FB типов поддерживается, но не воспроизводит полиморфизм `INTERFACE`; `CLASS`, `METHOD`, `INTERFACE`/`IMPLEMENTS` и `EXTENDS` остаются неподдерживаемыми. Не держи `INTERFACE` / `IMPLEMENTS` cases как expected-positive `supported_runtime`.
 
 #### Действия `ACTION`
 
@@ -246,12 +246,19 @@ Current translator limits are source-defined as 250 `VAR_INPUT`, 250 `VAR_OUTPUT
 - Для совместимой контролируемой записи используй явный контракт одного owning `FUNCTION_BLOCK`: передавай новое значение через `VAR_INPUT` вместе с `WRITE_REQ`, проверяй диапазон и другие инварианты в основном алгоритме, обновляй внутренний `VAR` только при успехе и возвращай текущее значение, `WRITE_OK` и код ошибки через `VAR_OUTPUT`.
 - Для логирования выдавай отдельный статус, счетчик или импульс события и подключай его к подтвержденному механизму журналирования Studio/VCont вне ST property. Не заменяй `PROPERTY` пользовательской `FUNCTION`, `METHOD` или `ACTION`, поскольку эти конструкции также не поддерживаются текущим Studio path. Не держи `PROPERTY` cases как expected-positive `supported_runtime`.
 
-#### Несколько типов ФБ и наследование `EXTENDS`
+#### Композиция зависимых пользовательских ST FB и `EXTENDS`
 
-- Текущий Studio path работает с алгоритмом одного функционального блока и не поддерживает объявление нескольких top-level типов `FUNCTION_BLOCK` в одном ST payload или наследование вида `FUNCTION_BLOCK Child EXTENDS Parent`.
-- Не путай это ограничение с отсутствием самих ключевых слов `FUNCTION_BLOCK` / `END_FUNCTION_BLOCK`: они входят в optional editor wrapper, а Studio deploy path самостоятельно добавляет одну такую обертку вокруг текста алгоритма. В editor grammar отсутствует конструкция `EXTENDS` и нет модели для второго объявления ФБ в том же алгоритме.
-- Не склеивай родительский и дочерний пользовательские ФБ в один translator payload: текущий binary останавливает parsing на втором `FUNCTION_BLOCK` с диагностикой `unexpected 'FUNCTION_BLOCK'`, поэтому Lua не создается и VCont runtime не проверяется.
-- Для Studio-compatible реализации перенеси нужные состояние и логику в один owning `FUNCTION_BLOCK` либо используй композицию из отдельно созданных библиотечных ФБ и явных соединений только после проверки полного multi-type пути VCStudio -> ST/Lua -> VCont. Не держи multiple-FB или `EXTENDS` cases как expected-positive `supported_runtime`.
+- Разделяй две разные возможности. Один effective translator input поддерживает ровно один top-level `FUNCTION_BLOCK`; несколько объявлений в одном `source_code.st` остаются неподдерживаемыми. При этом Studio-проект может содержать несколько пользовательских ST FB типов и объявлять экземпляр одного типа внутри другого, например `C : CHILD33;` внутри `MAIN`.
+- Не склеивай зависимый и корневой типы в один translator payload. Текущий binary может вернуть process exit code `0`, но пишет `unexpected 'FUNCTION_BLOCK'`, оставляет `script.lua` пустым и должен считаться завершившимся с ошибкой.
+- Собери граф зависимостей по объявлениям экземпляров пользовательских FB типов. Транслируй каждый тип отдельным полным input `FUNCTION_BLOCK <TYPE> ... END_FUNCTION_BLOCK`; для Studio deploy сохраняй порядок от листьев к корню. Циклическую зависимость не пытайся упорядочить молча: останови deploy и покажи цикл.
+- В Lua родительского типа ожидай persisted handle вида `local C = VCont.GetOrCreateFB("CHILD33", "C", fb)`, затем присваивания входов, вызов `C()` и чтение выходов. Имя типа и имя экземпляра должны соответствовать исходному объявлению; отсутствие этого кода — повод проверить распознавание типа и codegen до загрузки.
+- Создай в VCont все требуемые `FBType` до назначения и `START` задачи. Канонический и безопасный порядок — зависимости, затем корневой тип, затем корневой runtime-экземпляр, `ASSIGN` и `START`. Обратный порядок `CREATE FBType` может работать, если все типы уже существуют к первому исполнению, но не закрепляй его как Studio contract.
+- Не создавай отдельный top-level runtime-экземпляр каждого зависимого типа без цели теста: вложенные экземпляры создаются лениво через `VCont.GetOrCreateFB(..., fb)` и принадлежат родительскому экземпляру. Несколько вложенных экземпляров с разными именами должны иметь изолированное состояние.
+- Проверяй композицию runtime-oracle, а не только переводом или ответами на `CREATE`: прочитай выход корневого экземпляра после исполнения. Для stateful цепочки выполни несколько циклов и проверь последовательность состояний; для глубокой цепочки проверь минимум три уровня `LEAF -> MIDDLE -> TOP`.
+- Отсутствующий зависимый тип может не сорвать `CREATE` родительского `FBType`, но во время исполнения VCont пишет `Lua Lib create FB, type <TYPE> not found`, вложенный handle становится `nil`, а выход родителя может остаться начальным. Такой случай классифицируй как неполную загрузку dependency closure, а не как успешную композицию.
+- В integration harness представляй каждый тип отдельным `translation_unit`, передавай Lua всех завершённых units в генераторы `fboot` и Studio-like command stream, а runtime-экземпляр и oracle привязывай к корневому типу.
+- Эта поддержка относится только к композиции отдельных обычных `FUNCTION_BLOCK`. Она не добавляет поддержку наследования `FUNCTION_BLOCK Child EXTENDS Parent`, `ABSTRACT`, `INTERFACE`/`IMPLEMENTS`, `METHOD`, пользовательских `FUNCTION` или POU `PROGRAM`; проверяй такие конструкции независимо.
+- Фактический Studio deploy log от 2026-08-05 подтвердил discovery `CHILD33, MAIN`, отдельную компиляцию обоих типов и child-first загрузку. На артефактах translator `7ee990a3` и VCont `2.1.0.27850` runtime-проверки подтвердили двух- и трёхуровневую композицию в `fboot` и Studio-like режимах, а также изоляцию stateful вложенных экземпляров.
 
 #### Пространства имён `NAMESPACE`
 

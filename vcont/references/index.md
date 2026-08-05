@@ -2,7 +2,7 @@
 
 Open this first when choosing which VCont reference to load.
 
-- `studio-vcont-contract.md`: Studio(front)/VCont(back) lifecycle, ownership boundary, generated artifacts, load/runtime command mapping, HSB boundary.
+- `studio-vcont-contract.md`: Studio(front)/VCont(back) lifecycle, ownership boundary, generated artifacts, load/runtime command mapping, dependent user ST FB types, HSB boundary.
 - `vc024sa-runtime-contract.md`: runtime-facing subset of VC024SA.B: connection, bootfile, task/order semantics, online effects, Modbus/OPC UA blocks and caveats.
 - `config.md`: `vcontcfg.json`, runtime DB/state persistence, auth/TLS, HSB settings, diagnostics.
 - `runtime-options.md`: `Options="name=value ..."` parameter grammar and defaults for Modbus, EtherNet/IP, KNX, and PROFIBUS runtime devices.
