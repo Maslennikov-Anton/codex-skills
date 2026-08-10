@@ -125,7 +125,7 @@ Current translator limits are source-defined as 250 `VAR_INPUT`, 250 `VAR_OUTPUT
 | Группа | Ограничения и важные границы |
 |---|---|
 | 1. Исходный текст | прагмы, non-ASCII identifiers, `_` в числовых литералах, Unicode в `STRING`/`WSTRING`/`WCHAR` |
-| 2. Типы и выражения | `TIME_TO_DINT`, long time types, mixed numeric conversion, `CASE` |
+| 2. Типы и выражения | `TIME_TO_DINT`, long time types, mixed numeric conversion, formal `SPLIT_*` bindings, mixed date/time arithmetic, `CASE` |
 | 3. Структура программы | SFC, `PROGRAM`, пользовательские `FUNCTION`, несколько top-level `FUNCTION_BLOCK` в одном input, `EXTENDS`, `CLASS`, `INTERFACE`/`IMPLEMENTS`, `ACTION`, `METHOD`, `PROPERTY`, `NAMESPACE`, `CONFIGURATION` |
 | 4. Библиотека ФБ | отсутствующий vendor-FB `SEMA` |
 | 5. Объявления и данные | общий `:=`, `VAR_IN_OUT`, references/pointers, `TYPE`/`STRUCT`/`UNION`, `RETAIN`/`PERSISTENT`, `CHAR`, `AT %...`, `VAR_GLOBAL`/`VAR_EXTERNAL`, массивы |
@@ -187,12 +187,38 @@ Current translator limits are source-defined as 250 `VAR_INPUT`, 250 `VAR_OUTPUT
 - Для длительности используй `TIME`, для времени суток — `TOD`/`TIME_OF_DAY`, для даты и времени — `DT`/`DATE_AND_TIME`, только если их диапазона и точности достаточно для сценария. После замены отдельно проверь граничные значения и единицы runtime oracle.
 - Не держи cases на `LTIME`, `LTOD`/`LTIME_OF_DAY` или `LDT`/`LDATE_AND_TIME` как expected-positive `supported_runtime`.
 
-#### Неявное преобразование смешанных числовых типов
+#### Неявные числовые преобразования
 
-- Не рассчитывай на автоматическое повышение типа в арифметических выражениях: текущий валидатор ST-редактора VCStudio требует совместимых типов операндов. Например, `Numerator : INT; OUT : REAL; OUT := Numerator / 4.0;` не является допустимым REAL-делением и должно диагностироваться как `Operator type mismatch`.
-- Тип переменной назначения не меняет тип уже вычисляемого выражения. Если требуется REAL-арифметика, явно преобразуй целочисленный операнд до операции, например `OUT := INT_TO_REAL(Numerator) / 4.0;`, и отдельно подтверди поддержку самой операции end-to-end.
-- Не считай результат `2` доказательством округления `2.25`: при обходе editor-validation текущий транслятор определяет выражение по левому `INT`-операнду и может сгенерировать Lua floor division `//`, поэтому дробное значение вообще не вычисляется.
-- Не держи implicit-promotion probes как expected-positive `supported_runtime`. Режим `studio` в integration harness проверяет Studio-like command load, но не запускает валидатор ST-редактора и сам по себе не доказывает editor acceptance.
+- Не рассчитывай на неявное числовое преобразование ни между операндами выражения, ни при присваивании результата переменной другого типа, ни при передаче фактического аргумента функции. Текущие валидатор ST-редактора VCStudio и bundled translator требуют совместимых типов на каждой такой границе.
+- Применяй явные `*_TO_*` функции как для расширения (`USINT_TO_INT`, `INT_TO_DINT`), так и для сужения (`LREAL_TO_REAL`). Тип переменной назначения не преобразует уже вычисленный результат: например, используй `OUT := INT_TO_DINT(A);`, а для `OUT : INT` — `OUT := USINT_TO_INT(DAY_OF_WEEK(D#2026-08-10));`.
+- Задавай тип литерала явно, если тип нетипизированного литерала не совпадает с сигнатурой функции: используй `DINT_TO_LINT(DINT#-123456)` вместо `DINT_TO_LINT(-123456)`.
+- Для REAL-арифметики преобразуй целочисленный операнд до операции, например `OUT := INT_TO_REAL(Numerator) / REAL#4.0;`. Запись `Numerator / 4.0` при `Numerator : INT` не становится REAL-делением из-за типа `OUT` и должна диагностироваться как несовместимая.
+- Не считай результат `2` доказательством округления `2.25`: при обходе editor-validation транслятор может определить выражение по левому `INT`-операнду и сгенерировать Lua floor division `//`, поэтому дробное значение вообще не вычисляется.
+- Не держи probes на неявное числовое преобразование как expected-positive `supported_runtime`. Режим `studio` в integration harness проверяет Studio-like command load, но не запускает валидатор ST-редактора и сам по себе не доказывает editor acceptance.
+
+#### Формальные привязки `SPLIT_DATE`, `SPLIT_DT` и `SPLIT_TOD`
+
+- Вызывай `SPLIT_DATE`, `SPLIT_DT` и `SPLIT_TOD` только с формальными привязками: вход через `IN := ...`, выходы через `YEAR => ...`, `MONTH => ...` и другие именованные output bindings. Позиционная форма `SPLIT_DATE(DateValue, YearValue, MonthValue, DayValue)` текущим bundled translator не поддерживается даже при точном совпадении типов.
+- Соблюдай точные типы выходных переменных: `YEAR : UINT`; `MONTH`, `DAY`, `HOUR`, `MINUTE`, `SECOND : USINT`; `MILLISECOND : UINT`. Укажи хотя бы один выход. Общая переменная `INT` не заменяет требуемый `UINT`/`USINT`; это дополнительно подпадает под ограничение на неявные числовые преобразования.
+- Используй канонические формы:
+
+```iecst
+SPLIT_DATE(IN := DateValue, YEAR => YearValue, MONTH => MonthValue, DAY => DayValue);
+SPLIT_DT(IN := DateTimeValue, YEAR => YearValue, MONTH => MonthValue, DAY => DayValue,
+    HOUR => HourValue, MINUTE => MinuteValue, SECOND => SecondValue);
+SPLIT_TOD(IN := TimeOfDayValue, HOUR => HourValue, MINUTE => MinuteValue,
+    SECOND => SecondValue, MILLISECOND => MillisecondValue);
+```
+
+- Если компоненты выводятся через interface-порты, задай портам те же типы. Если из компонентов строится `DINT`-код, сначала явно преобразуй каждый компонент, например `UINT_TO_DINT(YearValue)` и `USINT_TO_DINT(MonthValue)`, и используй совместимые типизированные множители.
+- Не держи позиционные вызовы `SPLIT_*` как expected-positive `supported_runtime`. В смешанном тесте сохрани цель декомпозиции, переписав вызов на formal bindings и не ослабляя oracle отдельных компонентов.
+
+#### Смешанная операторная арифметика даты и времени
+
+- Не используй операторную арифметику для смешанных пар temporal-типов или temporal- и числовых типов: `DATE + TIME`, `DT + TIME`, `DT - TIME`, `TOD + TIME`, `TIME * INT` и `TIME / INT` текущим Studio-bundled translator path не поддерживаются. Codegen завершается диагностикой `mixed date/time arithmetic must use an explicit IEC function` и не создаёт пригодный Lua artifact.
+- Не распространяй это ограничение автоматически на любую операцию с `TIME`: проверяй точную пару типов и оператор. Например, подтверждённая отдельным runtime-кейсом однородная операция `TIME - TIME` не доказывает поддержку перечисленных смешанных форм и не должна удаляться вместе с ними.
+- Не считай имя `ADD_DATE_TIME`, `ADD_DATE_AND_TIME_TIME`, `ADD_TOD_TIME`, `ADD_TIME_INT` или другой функции из текста диагностики доказательством доступного обхода. Используй такую функцию только после отдельного подтверждения editor grammar, bundled translation, VCont load и runtime semantics; в текущем compatibility contract end-to-end замена для перечисленных операторных форм не подтверждена.
+- Удали limitation-only тест, если его единственная цель — перечисленная смешанная арифметика; не переклассифицируй бывший expected-positive runtime-кейс в negative regression. В смешанном тесте убери неподдерживаемое выражение и сохрани только независимую поддерживаемую цель с самостоятельным oracle.
 
 #### Допустимый селектор `CASE`
 
@@ -452,7 +478,7 @@ Standard FB names recognized by the translator lexer include:
 - timers/latches/triggers: `TON`, `TOF`, `TP`, `SR`, `RS`, `R_TRIG`, `F_TRIG`;
 - counters: `CTU`, `CTD`, `CTUD` plus typed variants recognized by the lexer.
 
-Для фактического имени counter FB сверяй typelibrary, а не только lexer. В текущей VCStudio-библиотеке базовый `CTD` уже является `INT`-вариантом; не используй несуществующий alias `CTD_INT`. Суффиксный вариант допустим только при наличии точного `.fbt`, например `CTD_DINT`; распознанное lexer-ом имя без соответствующего runtime FB может перевестись в `VCont.GetOrCreateFB("<name>", ...)`, но сорвать исполнение всего Lua FB.
+Для фактического имени counter FB сверяй typelibrary, а не только lexer. В текущей VCStudio-библиотеке базовые `CTU`, `CTD` и `CTUD` уже являются `INT`-вариантами: их `PV` и `CV` имеют тип `INT`. Используй именно базовые имена; алиасы `CTU_INT`, `CTD_INT` и `CTUD_INT` в typelibrary отсутствуют и end-to-end не поддерживаются. Суффиксный вариант допустим только при наличии точного `.fbt`, например `CTU_DINT`, `CTD_DINT` и `CTUD_DINT`; распознанное lexer-ом имя без соответствующего runtime FB может перевестись в `VCont.GetOrCreateFB("<name>", ...)`, но сорвать исполнение всего Lua FB.
 
 Supported built-in function families are source-derived from `StructuredTextSupportedFunctions.java` and `operator_mapper.py`; high-value integration candidates include arithmetic/comparison (`ADD`, `SUB`, `MUL`, `DIV`, `MOD`, `EQ`, `NE`, `GT`, `GE`, `LT`, `LE`), strings (`CONCAT`, `LEN`, `FIND`, `LEFT`, `RIGHT`, `MID`, `INSERT`, `DELETE`, `REPLACE`), selection (`SEL`, `MUX`, `LIMIT`, `MAX`, `MIN`), bit/endian (`SHL`, `SHR`, `ROL`, `ROR`, `TO_BIG_ENDIAN`, `FROM_BIG_ENDIAN`), time split/conversion (`DAY_OF_WEEK`, `SPLIT_DATE`, `SPLIT_TOD`, `SPLIT_DT`), and confirmed `*_TO_*` conversions, excluding `CHAR_TO_*`, `*_TO_CHAR`, and other families covered by the known limitations above.
 
