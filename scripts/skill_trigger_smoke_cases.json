@@ -140,6 +140,10 @@
     "expected": "project-context"
   },
   {
+    "prompt": "добавь новую версию руководства в wiki проекта IdeaProjects: сохрани прежние утверждения и источники, отметь противоречия",
+    "expected": "project-context"
+  },
+  {
     "prompt": "реализуй Python CLI, добавь pytest тесты, типизацию, ruff и исправь production integration bug",
     "expected": "python-developer"
   },

@@ -152,6 +152,8 @@ Helpers используют Python >=3.11 stdlib; lifecycle helper предна
 
 ## Экспериментальные дополнения
 
+- [project-context / LLM Wiki](project-context/references/project-wiki.md): связанная wiki проекта с версиями sources, line citations, историей claims и явными stale/conflict flags. Read-only lint/query и write-once snapshot используют stdlib; семантическая достоверность требует review.
+- [loop-engineering / autoresearch](loop-engineering/references/autoresearch.md): сравнение кандидатов с фиксированными evaluator/inputs, исходными exit codes, ограниченным бюджетом и журналом keep/discard/failed/crash. Helper не меняет Git и не доказывает качество самого oracle.
 - [property-based-testing](property-based-testing/SKILL.md): свойства контракта, генераторы и минимальные контрпримеры; Python/Hypothesis reference.
 - [variant-analysis](variant-analysis/SKILL.md): поиск других проявлений известного дефекта с проверкой кандидатов.
 - [requirements-coverage-audit](requirements-coverage-audit/SKILL.md): документ → сценарий → исполнимый assertion; статическое покрытие отдельно от результата продукта.

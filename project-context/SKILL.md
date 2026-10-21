@@ -1,6 +1,6 @@
 ---
 name: project-context
-description: "Use for non-trivial /home/ant/IdeaProjects repo work needing orientation, trusted commands, dirty-worktree, push/test workflows, or local conventions; skip obvious scoped edits."
+description: "Ориентация в IdeaProjects repo: trusted commands, conventions, dirty worktree, test/push; вести/читать wiki проекта по версиям источников. Не для личной памяти и простых правок."
 ---
 
 # Project Context
@@ -14,6 +14,10 @@ skills.
 The compact source of truth is [references/workspace-map.md](references/workspace-map.md).
 For refreshing or extending the map, use
 [references/maintenance.md](references/maintenance.md).
+
+For a user-requested project knowledge base, source ingestion, or questions against an existing wiki, use
+[references/project-wiki.md](references/project-wiki.md). Keep claims tied to source versions; report stale/conflicting
+claims explicitly. Ordinary repo work does not authorize automatic wiki or personal-memory writes.
 
 ## Workflow
 

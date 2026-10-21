@@ -41,7 +41,7 @@ description: Ревьюить изменения в коде с фокусом �
 Проверяй каждое значимое изменение по пяти осям:
 
 1. Correctness: поведение, edge cases, error paths, regression risk.
-2. Simplicity/readability: лишняя сложность, naming, локальные conventions.
+2. Simplicity/readability: лишняя сложность, naming, локальные conventions; связь каждой правки с требованиями, ненужные настройки/абстракции и соседний refactor.
 3. Architecture: границы модулей, contracts, coupling, migration path.
 4. Security: auth/authz, secrets, injection, unsafe defaults, data exposure.
 5. Performance: unnecessary work, queries, memory, latency, scalability cliffs.
@@ -69,6 +69,8 @@ description: Ревьюить изменения в коде с фокусом �
 - Начинай с проблем, а не с похвалы.
 - Привязывай замечания к файлам и строкам, если это возможно.
 - Разделяй факты, выводы и предположения.
+- Проверяй значимые предположения по контракту; при нескольких допустимых вариантах не выдавай свой выбор за требование или дефект.
+- При локальной правке отличай созданные ею неиспользуемые элементы от прежнего dead code. Первые стоит убрать в её scope; прежние не включай в обязательную очистку без связи с задачей или доказанного риска.
 - Если проблем не найдено или ревью ограничено окружением, явно это отмечай.
 - Не принимай “small diff” как low risk без проверки behavior surface.
 - Не доверяй session history вместо review contract: review должен опираться на diff, файлы, требования и проверки.

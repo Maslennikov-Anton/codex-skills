@@ -50,6 +50,13 @@ slices и регулярно фиксировать evidence.
    завершить работу.
 6. Перед финальным ответом используй `verification-before-completion` для свежего evidence-backed claim.
 
+## Сравнение экспериментальных кандидатов
+
+Если цель измерима и кандидаты сравниваются одним evaluator, используй [autoresearch mode](references/autoresearch.md):
+baseline до правок, фиксированные evaluator/inputs/selection, порог улучшения и журнал решений. Не превращай обычное
+исследование или qualification с найденными дефектами в оптимизацию pass-rate. Helper выполняет один запуск за вызов,
+с лимитом кандидатов и timeout; `keep` — рекомендация для review, а не разрешение на commit/reset/push.
+
 ## Domain Policies
 
 Loop Engineering управляет итерациями, но не подменяет профильные правила предметной области. Если slice попадает в

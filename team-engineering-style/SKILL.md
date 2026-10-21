@@ -25,6 +25,7 @@ description: "Use only to define/update durable local engineering standards, tec
 ## Defaults
 
 - Agentic engineering lifecycle: refine/spec -> plan when useful -> small implementation slices -> test/debug -> self-review diff/evidence -> verify -> ship. Use `code-review-professional` only for requested, high-risk, shared-contract, or externally reviewed changes.
+- Сохраняй связь diff с запросом: убирай неиспользуемые элементы, созданные собственной правкой, а прежний соседний код меняй только при необходимости для задачи. Не добавляй возможности, настройки и уровни абстракции для неподтверждённых будущих требований.
 - Для новых/спорных библиотек и внешних API используй `source-driven-development`.
 - Для high-risk, security-sensitive, irreversible или дорогих ошибочных выводов используй `doubt-driven-development`.
 - Перед финальным claim о готовности, исправлении, успешных тестах, build/lint, commit, push или PR используй `verification-before-completion`.

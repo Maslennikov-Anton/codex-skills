@@ -172,6 +172,14 @@ This file is a compact map of Ant's local repositories and recurring commands. K
   - Allure report: `allure serve allure-results` or generate/open with Allure CLI.
 - Notes: Compose publishes Postgres on `localhost:15432` and service HTTPS on `localhost:9443`; `vcstudio-service` uses `network_mode: service:postgres`. GitLab CI has `check` and `test` stages; test starts Postgres service, runs `vcservice.jar`, waits via `scripts/wait_for_service.py`, then runs `python -m pytest -q`. Use `database-engineer` for schema and SQL work. `pytest.ini` writes Allure results by default with `-vvs`; markers include `smoke`, `contract`, `contract_stateful`, `stateful`.
 
+### `/home/ant/IdeaProjects/vcstudio-ui`
+
+- Purpose: Python/pytest UI and VCStudio/VCont regression scenarios with isolated product copies and Allure/TestOps delivery.
+- Stack: Python 3.12, pytest, JSON scenarios, Java/X11 bridge, Docker and GitLab CI.
+- Known workflows: `README.md` and `docs/ci.md`; documented unit gate `.venv/bin/pytest -q tests/unit`; check the current environment before running it.
+- Project wiki: [local index](/home/ant/project-wikis/vcstudio-ui/index.md), covering documented CI slots, regression config and UI/reporting evidence. Recheck local source pins with `python3 /home/ant/codex-skills/project-context/scripts/wiki.py lint /home/ant/project-wikis/vcstudio-ui --check-live` before treating it as current. Wiki is derived documentation, not a fresh product/CI result.
+- Notes: Product distributions, `.venv`, `.work`, Allure and generated reports stay local. Use `vcstudio`/`vcont` for domain behavior and test integrity before test/CI edits. Wiki ingestion follows [project-wiki.md](project-wiki.md); ordinary repo work only reads it.
+
 ### `/home/ant/IdeaProjects/st-lua-translator`
 
 - Purpose: Black-box autotests for `ST -> Lua` translator binary.
