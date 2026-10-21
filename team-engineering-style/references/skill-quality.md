@@ -24,7 +24,7 @@ Description должен отвечать на два вопроса:
 
 Пиши конкретные триггеры: файлы, инструменты, типы задач, пользовательские формулировки. Ставь самый важный trigger в начало description: список skills имеет ограниченный context budget, и длинные descriptions могут быть усечены. Не прячь условия использования только в body: агент увидит body уже после срабатывания.
 
-Проверяй description на 2-3 реалистичных user prompts. Если новый или измененный skill не всплывает по естественной формулировке задачи, меняй description, а не добавляй общий текст в body.
+Проверяй description на естественных positive prompts и близких нерелевантных запросах. Лексический smoke — быстрый структурный сигнал; фактический выбор оценивай по trace, отдельно от полезности результата, по `behavior-evaluations.md`.
 
 ## Progressive disclosure
 
@@ -54,5 +54,5 @@ Description должен отвечать на два вопроса:
 - Scope: skill не смешивает профессию, локальную политику, проектный workaround и разовую заметку.
 - Links: все `references/*.md` существуют и названы из `SKILL.md`.
 - External skills: не устанавливай community skills без read-only review `SKILL.md`, scripts и permission/tool behavior.
-- Trigger smoke: для важных изменений проверь sample prompts, чтобы ожидаемый skill попадал в top matches.
+- Trigger smoke: sample prompts и top matches проверяют лексику, не выбор модели. Для важных изменений нужны observed skill reads, near-miss/no-skill controls и независимая оценка результата.
 - Validation: `quick_validate.py`, `python3 scripts/audit_skills.py --strict --require-smoke-coverage` для repo-wide изменений, проверка ссылок и `git diff --check`.

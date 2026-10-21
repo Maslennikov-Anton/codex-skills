@@ -17,6 +17,7 @@ description: "Use for VCStudio GUI/project/docs and Studio-bundled ST-to-Lua tra
 5. Для интерфейса конкретного ФБ сначала открой `references/fb-typelibrary.md`, затем найди имя через `rg` в большом generated-каталоге `references/fb-typelibrary-catalog.md`.
 6. Для создания проекта, загрузки/мониторинга и настройки протоколов используй соответственно `references/project-workflow.md`, `references/loading-monitoring.md` и `references/communications.md`.
 7. Для исходников, сборки и product packaging используй `references/source-repo-map.md`.
+   Для version-sensitive фактов учитывай статус проверки и fingerprints в `references/source-provenance.json`: capture не равен семантической проверке справочника.
 
 ## Рабочие правила
 

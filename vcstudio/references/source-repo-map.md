@@ -10,13 +10,13 @@ custom `ru.isource.*` bundles, EMF-модели, DTO/JSON слоя или CI/rel
 `fb-typelibrary.md`. Для фактического runtime-поведения VCont переходи через
 `studio-vcont-contract.md` в `vcont` skill.
 
-## Current Verified Snapshot
+## Verified Build Metadata
 
-Проверено по исходникам на 2026-05-27:
+Build metadata перепроверены 2026-10-21 по commit `c181db76497963bfc58a31770ba26880655f93d4` локального repo. Это не проверка сборки или всего содержания reference (основная карта составлена 2026-05-27).
 
 - repo root: `/home/ant/IdeaProjects/vcstudio`;
-- parent Maven coordinates: `org.eclipse.fordiac:parent:1.22.8-SNAPSHOT`;
-- product version: `1.22.8.qualifier`;
+- parent Maven coordinates: `org.eclipse.fordiac:parent:1.22.13-SNAPSHOT`;
+- product version: `1.22.13.qualifier`;
 - Tycho version: `2.7.5`;
 - Java source/required execution environment: Java 17 for repo/custom bundles;
 - Eclipse target repository: `https://download.eclipse.org/releases/2021-06`;
@@ -28,9 +28,15 @@ custom `ru.isource.*` bundles, EMF-модели, DTO/JSON слоя или CI/rel
   `plugins/org.eclipse.fordiac.ide.product/target/products/`.
 
 `docs.md` in the repo is useful as an orientation note, but verify drift-prone
-facts against `pom.xml`, product files, manifests and CI. In the current local
-snapshot `docs.md` still mentions `1.22.7`, while the build/product files are
-`1.22.8`.
+facts against `pom.xml`, product files, manifests and CI. Прежнее сравнение с версией в `docs.md` не является актуальным доказательством.
+
+Paths и SHA256 проверенных файлов сохранены в `source-provenance.json`. Из корня skills repo:
+
+```bash
+python3 scripts/check_reference_sources.py vcstudio/references/source-provenance.json
+```
+
+Совпадение fingerprints подтверждает только неизменность файлов. При drift перечитай затронутый источник и перепроверь нужный claim; не обновляй hashes без содержательной проверки. Для другого checkout укажи `--source-root /path/to/vcstudio`.
 
 ## Build And Module Layout
 

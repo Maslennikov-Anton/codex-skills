@@ -50,6 +50,7 @@ description: "Use only to define/update durable local engineering standards, tec
 3. Обнови минимальный набор skills/reference/scripts.
 4. Проверь, что правило не дублирует существующее и не тащит одноразовую проектную специфику.
 5. Проверь YAML, ссылки на `references/`, размер `SKILL.md` и понятность `description`.
+   Для изменения выбора или поведения используй отдельные routing/outcome проверки; static audit не заменяет поведенческий прогон.
 6. Git commit/push делай только по запросу пользователя или когда это явно входит в текущую задачу.
 
 ## Quality Rules
@@ -67,6 +68,7 @@ description: "Use only to define/update durable local engineering standards, tec
 - `references/implementation-done-definition.md` -> done definition и post-implementation checks.
 - `references/role-selection-matrix.md` -> выбор роли или связки ролей.
 - `references/skill-quality.md` -> чеклист качества skills.
+- `references/behavior-evaluations.md` -> baseline/candidate, negative controls, trace и проверка артефактов.
 
 ## Формат ответа
 

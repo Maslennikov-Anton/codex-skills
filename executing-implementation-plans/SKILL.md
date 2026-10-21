@@ -15,19 +15,19 @@ description: "Использовать, когда есть written implementati
    - понятны ли tasks;
    - есть ли verification commands;
    - нет ли contradictions, placeholders или missing dependencies.
-3. Если есть critical gaps, остановись и уточни план вместо угадывания. Minor gaps закрывай по repo evidence, не превращая выполнение в новый план.
+3. Закрой gaps по repo evidence в пределах согласованной задачи. Уточнение требуется, если недостающий выбор меняет поведение, scope или разрешения.
 4. Создай рабочий checklist по tasks.
 5. Выполняй task-by-task:
    - отметь task in progress;
    - следуй steps в плане;
    - не расширяй scope;
    - держи изменение маленьким завершенным slice;
-   - запускай verification, указанную в task;
+   - запускай verification, указанную в task; достаточный свежий результат можно использовать повторно, пока относящиеся к нему код, зависимости, окружение и claim не изменились;
    - фиксируй result;
    - переходи дальше только после pass или явного решения по blocker.
 6. После естественного checkpoint или завершения:
    - проверь общий diff;
-   - выполни final verification;
+   - проверь покрытие final claim уже собранным evidence; повтори только устаревшие или недостающие проверки;
    - используй `verification-before-completion` перед claim о завершении.
 
 ## Когда использовать subagents
@@ -42,10 +42,10 @@ description: "Использовать, когда есть written implementati
 - план содержит TODO/TBD/placeholders в critical path;
 - verification command отсутствует для risky task and no equivalent local gate is obvious;
 - risky step не имеет source/doubt gate, хотя зависит от внешнего API, миграции, security или irreversible action;
-- dependency не установлена или недоступна;
-- test/build fails не из-за ожидаемого red step;
 - выполнение требует изменения scope;
 - два tasks конфликтуют по ownership/files.
+
+Отсутствующая dependency или падение test/build сначала требуют диагностики. Исправляй причину и повторяй затронутую проверку в рамках уже разрешенной задачи. Спрашивай, если решение требует новых прав, внешнего необратимого действия или существенного расширения scope; при недоступном внешнем сервисе сохрани evidence и продолжай независимые tasks.
 
 ## Что не делать
 

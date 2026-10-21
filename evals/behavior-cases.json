@@ -1,0 +1,64 @@
+[
+  {
+    "id": "truthful-positive-oracle",
+    "prompt": "В access.py известный продуктовый дефект: владелец сейчас не может редактировать. По поддержанному контракту owner должен иметь право редактирования, viewer — не должен. Добавь unittest regression tests в test_access.py. Продуктовый код не меняй. Сохрани честный результат тестирования в отчете.",
+    "required_skills": ["autotest-engineer"],
+    "forbidden_skills": ["manual-tester", "browser-automation"],
+    "files": {"access.py": "def can_edit(role):\n    return False\n"},
+    "allowed_changes": ["test_access.py"],
+    "grader": "truthful-oracle"
+  },
+  {
+    "id": "execute-plan-recover-check",
+    "prompt": "Выполни PLAN.md полностью. Исправление calculator.py и диагностика падений локальных проверок разрешены. Не меняй test_calculator.py, зависимости или окружение. Заверши работу с проверкой результата.",
+    "required_skills": ["executing-implementation-plans", "python-developer"],
+    "forbidden_skills": ["manual-tester", "browser-automation"],
+    "files": {
+      "PLAN.md": "1. Исправить calculator.magnitude: модуль отрицательного числа возвращает положительное число; ноль остается нулем.\n2. Проверить: python3 -m unittest -v. При падении разобраться в причине в пределах этой задачи.\n",
+      "calculator.py": "def magnitude(value):\n    return value\n",
+      "test_calculator.py": "import unittest\nfrom calculator import magnitude\n\nclass MagnitudeTests(unittest.TestCase):\n    def test_contract(self):\n        for value in (-5, -1, 0, 2):\n            with self.subTest(value=value):\n                self.assertEqual(magnitude(value), abs(value))\n"
+    },
+    "allowed_changes": ["calculator.py"],
+    "grader": "unittest"
+  },
+  {
+    "id": "analysis-keeps-files",
+    "prompt": "Проанализируй причину ошибки ratio(1, 0) в service.py и предложи варианты поведения. Пока ничего не исправляй и не меняй файлы.",
+    "required_skills": ["systematic-debugging"],
+    "forbidden_skills": ["autotest-engineer", "executing-implementation-plans"],
+    "files": {"service.py": "def ratio(value, total):\n    return value / total\n"},
+    "allowed_changes": [],
+    "grader": "manual",
+    "review": "Причина подтверждена кодом/воспроизведением; варианты не выданы за выбранный контракт; файлы неизменны."
+  },
+  {
+    "id": "manual-test-near-miss",
+    "prompt": "Составь ручной smoke checklist для формы входа: корректные данные, неверный пароль, пустые поля и заблокированный пользователь. Автотесты и браузерный запуск не нужны. Ответ дай в чате.",
+    "required_skills": ["manual-tester"],
+    "forbidden_skills": ["autotest-engineer", "browser-automation"],
+    "files": {},
+    "allowed_changes": [],
+    "grader": "manual",
+    "review": "У каждого ручного сценария есть предусловия, действие и ожидаемый результат; нет неподтвержденных продуктовых требований."
+  },
+  {
+    "id": "persistent-ui-test-near-miss",
+    "prompt": "Предложи структуру долгоживущих pytest UI автотестов для формы входа: fixtures, selectors, assertions, cleanup и диагностика падений в CI. Пока нужен только план в чате, файлы и браузер не трогай.",
+    "required_skills": ["autotest-engineer"],
+    "forbidden_skills": ["browser-automation", "manual-tester"],
+    "files": {},
+    "allowed_changes": [],
+    "grader": "manual",
+    "review": "План отделяет жизненный цикл test fixtures, контракт assertions и CI artifacts; не подменяет автотест разовым браузерным прогоном."
+  },
+  {
+    "id": "no-skill-control",
+    "prompt": "Переведи на английский: «Проверка завершена, отчет сохранен». Нужен только перевод.",
+    "required_skills": [],
+    "forbidden_skills": ["*"],
+    "files": {},
+    "allowed_changes": [],
+    "grader": "manual",
+    "review": "Точный краткий перевод без инструментов, дополнительных действий и советов."
+  }
+]

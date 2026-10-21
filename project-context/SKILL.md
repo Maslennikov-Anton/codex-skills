@@ -35,7 +35,7 @@ For refreshing or extending the map, use
 - Trust executable sources such as CI, Dockerfiles, scripts, and test config over stale README text when they conflict.
 - Never revert or overwrite dirty worktree changes discovered during orientation unless the user explicitly asks.
 - Keep source repos read-only during cross-repo map refreshes unless the task explicitly includes changing those repos.
-- Ask before running or changing high-impact operations such as Terraform apply/destroy/state, privileged installers, destructive Docker cleanup, cloud/IAM/secret changes, production releases, or external-system mutations.
+- Before high-impact operations (Terraform state/apply/destroy, privileged installers, destructive cleanup, cloud/IAM/secrets, releases, external mutations), check the action against existing user authorization. Ask only when the action or its impact exceeds that scope; a skill never grants additional permissions.
 - Treat workspace-map commands as starting points, not proof of success; final readiness claims still go through `verification-before-completion`.
 - Route memory storage/recall details to `para-memory-files` and GitLab auth/MR/pipeline/API operations to `gitlab-operations`.
 - Keep project-specific details in reference files so this skill stays small.

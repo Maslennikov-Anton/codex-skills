@@ -132,6 +132,16 @@ Markdown-отчет можно сохранить так:
 python3 scripts/audit_codex_sessions.py --days 30 --format markdown --output reports/codex-session-audit.md
 ```
 
+## Проверка skills
+
+```bash
+python3 scripts/audit_skills.py --strict --require-smoke-coverage
+python3 -m unittest discover -s scripts -p 'test_*.py'
+git diff --check
+```
+
+Статический аудит не измеряет фактический выбор skill моделью. Fixtures, scorer JSONL traces и сравнение before/candidate описаны в [поведенческих проверках](team-engineering-style/references/behavior-evaluations.md). Runtime-отчеты сохраняй вне репозитория, например в `/tmp/skill-eval-*`.
+
 ## Правило обновления
 
 Если меняется локальный стандарт работы, workflow команды или поведение skills, изменение нужно:

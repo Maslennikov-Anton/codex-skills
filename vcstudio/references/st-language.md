@@ -9,7 +9,13 @@
 
 ## Source Baseline
 
-Source-derived facts here come from local `/home/ant/IdeaProjects/vcstudio` branch `VCONT-2056`:
+Исторические source-derived facts ниже были составлены по локальному `/home/ant/IdeaProjects/vcstudio`, branch `VCONT-2056`. Точный исходный commit не сохранен: это неприкрепленная к версии база, а не доказательство поведения текущей сборки.
+
+На 2026-10-21 текущий checkout — `c181db76497963bfc58a31770ba26880655f93d4`; `data/st-lua/linux.dist/src` содержит только `tools/logging.conf`, а translator поставляется как `main.bin`. Наличие старого пути не подтверждает доступность исходников translator. SHA256 текущих grammar/wrapper/editor файлов и бинарника сохранены отдельно в `source-provenance.json` как **capture для обнаружения drift**, без повторной проверки всех языковых утверждений.
+
+До version-sensitive решения проверь конкретное правило по текущим Java/grammar источникам и воспроизведению через wrapper/translator/load/runtime. Используй эту карту для навигации и гипотез; не объявляй старые translator limitations актуальными только по совпадению hashes. Команда проверки capture — в `source-repo-map.md`.
+
+Источники исторической карты:
 
 - Studio ST editor grammar: `plugins/org.eclipse.fordiac.ide.model.structuredtext/.../StructuredText.xtext`;
 - ST loop synchronization: `TextLoopEditor.java`, `StFBSynchronizer.java`, `StVariableParser.java`;

@@ -25,6 +25,7 @@ description: >
    - `references/api-auth-and-usage.md` -> auth, Swagger discovery, test cases, defects, scenario operations, known-good helper workflows.
    - `references/scenario-models.md` -> manual scenario, UI/low-level step model.
    - `references/launch-lifecycle-and-troubleshooting.md` -> ingestion, project binding, странная статистика launch/test cases.
+   - `references/ingestion-verification.md` -> read-only сравнение локальной batch и server-side результатов/вложений через `scripts/verify_ingestion.py`.
 4. Для discovery endpoint-ов предпочитай Swagger UI целевого инстанса: `<base-url>/swagger-ui.html`.
 5. Перед изменением test case получай текущий объект; перед сменой статуса дополнительно получай workflow и допустимые статусы.
 6. Для defect workflow сначала проверь issue schema и внешнюю issue integration проекта. Без schema не обещай создание внешнего issue.
@@ -46,7 +47,6 @@ description: >
 Для повторяемых API-вызовов используй bundled script вместо ручной сборки `curl`:
 
 ```bash
-scripts/allure_testops_api.sh auth
 scripts/allure_testops_api.sh GET /api/rs/project '?page=0&size=10'
 scripts/allure_testops_api.sh defect-list 3
 scripts/allure_testops_api.sh testcase-get 1811

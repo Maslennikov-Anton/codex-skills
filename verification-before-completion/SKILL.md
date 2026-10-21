@@ -14,7 +14,7 @@ description: "Use before evidence-backed success claims after implementation, fi
 Перед success claim выполни:
 
 1. Определи, какая минимальная свежая команда или проверка реально доказывает claim.
-2. Запусти ее. Полный прогон нужен для release/shared/high-risk claim или когда narrow check не доказывает заявленное.
+2. Используй уже полученный свежий результат, если относящиеся к нему код, зависимости, окружение и claim не изменились; иначе запусти проверку. Полный прогон нужен для release/shared/high-risk claim или когда narrow check не доказывает заявленное. Обязательные repo gates сохраняются.
 3. Прочитай output и exit code.
 4. Сопоставь output с claim.
 5. Для bug fix проверь prove-it condition: исходный симптом воспроизведен и исчез, либо regression test покрывает именно его.

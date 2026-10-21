@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "source_root": "/home/ant/IdeaProjects/vcstudio",
+  "captured_at": "2026-10-21",
+  "captured_commit": "c181db76497963bfc58a31770ba26880655f93d4",
+  "references": [
+    {
+      "reference": "vcstudio/references/source-repo-map.md",
+      "semantic_review": "Build metadata listed under Verified Build Metadata rechecked; remaining historical map not fully revalidated",
+      "source_sha256": {
+        ".gitlab-ci.yml": "1ec88a7bd3702c1b6ef36b6522674d49cb22b648b6e475b6fdcda1888a7c5457",
+        ".mvn/extensions.xml": "1b6c5aaf8e67993ae8932904162eab09576fff90fce79006e813416a6fc95fcf",
+        "plugins/org.eclipse.fordiac.ide.product/org.eclipse.fordiac.ide.product": "e793b4470e893f96f51e5b066a41e4d61fa299abe7bc053641d6a4ab2b856f4d",
+        "plugins/org.eclipse.fordiac.ide.product/org.eclipse.fordiac.ide.product.build.target": "a5c251816a8edad2868d22ed37ccfc58d3dc2a7faca9d426a1cf732ebb8ba535",
+        "plugins/org.eclipse.fordiac.ide.product/org.eclipse.fordiac.ide.product.target": "e64a5dec5b417b23c70696985d0f236e541128ad43ecaab26e57439cfab9e518",
+        "plugins/org.eclipse.fordiac.ide.product/pom.xml": "2dced3bbceb7afa296276c8b508257e7292997d55e2d342f59d42c98eddb38a0",
+        "plugins/ru.isource.ide/META-INF/MANIFEST.MF": "afb33296a91b21af7839be964a6099bcd8de422560cf752ce5e5455506373643",
+        "pom.xml": "ee197dfc013be432da7c31e44d56ddfdf0871d3119f3006647ec6bb2340a4d4f"
+      }
+    },
+    {
+      "reference": "vcstudio/references/st-language.md",
+      "semantic_review": "Historical baseline has no exact commit; current fingerprints captured only, language behavior not revalidated",
+      "source_sha256": {
+        "data/st-lua/linux.dist/main.bin": "d5eee8f47032c35c4b256cc4aa5f0eda8e358b72d36c095c83fa3fa9749879cc",
+        "data/st-lua/linux.dist/src/tools/logging.conf": "65c690baf5402b0b0060c1db9e3ea3612a62d0c4eca6cea7e24bbc75c17c5442",
+        "plugins/org.eclipse.fordiac.ide.deployment.ui/src/org/eclipse/fordiac/ide/deployment/ui/helpers/StDeployHelper.java": "aba6a2a29dc3f23665ab69e4ebbca9b3d3328e000d51e9904890d77b7408cc1e",
+        "plugins/org.eclipse.fordiac.ide.model.structuredtext/src/org/eclipse/fordiac/ide/model/structuredtext/StructuredText.xtext": "d5b2045ea544998c9f7731e762b115c3a1700f045573d0037bdb5f1769885148",
+        "plugins/org.eclipse.fordiac.ide.model/src/org/eclipse/fordiac/ide/model/helpers/StFBSynchronizer.java": "79231f9a58ea4def1b6895b5c7eb77b22cc16e26a93ecab2f786e4c504732846",
+        "plugins/org.eclipse.fordiac.ide.model/src/org/eclipse/fordiac/ide/model/helpers/StVariableParser.java": "2d549217369b756b4877d9a6497d30f9fd2d49e04f9f74e6e85a94bad889e415",
+        "plugins/org.eclipse.fordiac.ide.systemmanagement.ui/src/org/eclipse/fordiac/ide/systemmanagement/ui/editors/TextLoopEditor.java": "06acdff7efe8958365039f5fe1874631715f1eb4043a72df2d8bc7ae0101a806"
+      }
+    }
+  ]
+}
