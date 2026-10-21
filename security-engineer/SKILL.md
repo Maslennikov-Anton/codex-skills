@@ -41,6 +41,8 @@ description: "Проектировать и проверять security: auth/au
 
 ## Артефакты
 
+Для отдельного аудита пакетов читай [references/dependency-audit.md](references/dependency-audit.md): collector/render, version-matched advisories и границы coverage. Источник и лицензия helpers: [references/dependency-audit-upstream.md](references/dependency-audit-upstream.md). Обычная security-задача не требует запуска dependency audit.
+
 - Threat model.
 - Список рисков и severity.
 - Рекомендации по hardening.

@@ -20,10 +20,13 @@ description: "Use before evidence-backed success claims after implementation, fi
 5. Для bug fix проверь prove-it condition: исходный симптом воспроизведен и исчез, либо regression test покрывает именно его.
 6. Если output не доказывает claim, сообщи фактический статус и gap.
 7. Только после этого формулируй claim с evidence.
+8. Для тестовых изменений проверь [test integrity](../autotest-engineer/references/test-integrity.md): baseline, силу oracle, selection и result mapping. Задача по тестированию может завершиться обнаруженными дефектами и failed tests; не добивайся green изменением ожидаемого поведения.
+9. Если создавал disposable временные файлы, выполни `artifact-lifecycle`: retained report и raw failure evidence сначала, очистка своих intermediates затем. Для оставленных run files укажи путь и причину сохранения.
 
 ## Что считать evidence
 
 - Tests pass: команда тестов завершилась exit 0, output показывает отсутствие failures.
+- Testing completed with defects: requested set выполнен, исходные статусы/exit codes сохранены, expected/actual и artifact identity приложены. Это не claim о pass или исправлении продукта.
 - Build succeeds: build command завершилась exit 0.
 - Linter clean: lint command завершилась exit 0 или явно показала 0 errors.
 - Bug fixed: исходный симптом воспроизведен и больше не проявляется, либо regression test проверяет именно этот симптом.

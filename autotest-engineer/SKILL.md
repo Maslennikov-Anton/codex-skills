@@ -11,6 +11,7 @@ description: "Разрабатывать код автотестов UI/API/inte
 
 1. Определи цель и уровень пирамиды: unit, API/service, UI/E2E.
 2. Зафиксируй oracle: корректное поведение, инвариант и сигнал при реальном дефекте.
+   Перед изменением тестов, selection или reporting прочитай [references/test-integrity.md](references/test-integrity.md): contract, working-tree baseline и review защит от ложного green.
 3. Спроектируй детерминированный сценарий: изолированные данные, явный setup/teardown, стабильные ожидания и селекторы.
 4. Реши, какие diagnostics и artifacts нужны при падении.
 5. Проверь test-signal quality: assertions не ослаблены, моки не скрывают нужный integration risk, positive/negative case отражает supported behavior или ожидаемый диагностический отказ.
@@ -32,10 +33,9 @@ description: "Разрабатывать код автотестов UI/API/inte
 
 - Не превращай positive supported case в negative/expected-failure только потому, что продукт сейчас не проходит проверку.
 - Negative case допустим только там, где отказ сам является правильным ожидаемым поведением.
-- Не используй `xfail`, quarantine, skip, weakened oracle или ослабленные assertions ради зеленого статуса, если repo
-  policy явно не разрешает такой механизм.
-- Если CI должен собрать JUnit/Allure и не падать job-ом при известных продуктовых дефектах, решай это на уровне
-  job wrapper/reporting, а не подменой смысла теста.
+- Не используй `xfail`, quarantine, skip, weakened oracle или ослабленные assertions ради зеленого статуса.
+  Существующая repo policy не разрешает скрывать новый supported defect без явного решения пользователя/изменения контракта.
+- Если ранее явно согласовано, что CI job оценивает полноту/публикацию, сохрани этот wrapper contract и исходные JUnit/Allure statuses. Самостоятельно вводить green wrapper при падении нельзя.
 - Временный bug report или failing-case summary не является заменой тестового oracle.
 - Красный тест допустим и полезен, если он честно показывает реальный дефект, сломанный контракт или неподдержанную
   границу, которую продукт должен поддерживать.
@@ -53,7 +53,7 @@ description: "Разрабатывать код автотестов UI/API/inte
 - Для bug fix используй prove-it pattern: сначала тест/воспроизведение ловит исходный симптом, затем проходит после исправления.
 - Не ослабляй assertions, data, mocks или setup ради зеленого статуса.
 - Oracle определяется согласованным контрактом, а не текущим результатом продукта. Supported positive case остается positive и красным при доказанном продуктовом дефекте.
-- Если прежний дефект больше не воспроизводится, исправь/удали reproducer или переведи его в supported regression coverage.
+- Если прежний дефект больше не воспроизводится, сохрани supported regression coverage; менять/удалять ошибочный oracle можно только с независимым основанием из контракта.
 - Тесты не являются bug inventory; аналитика по дефектам живет во временной сводке по текущим failing cases.
 - При flaky сначала отдели нестабильность от продуктового дефекта; не маркируй реальный дефект flaky без evidence.
 
@@ -64,5 +64,8 @@ description: "Разрабатывать код автотестов UI/API/inte
 ## Related Skills
 
 - `code-review-professional` -> review качества тестового решения и покрытия.
+- `property-based-testing` -> генераторы входов и проверка свойств контракта, когда отдельных примеров недостаточно.
+- `mutation-testing` -> проверка силы существующих Python-тестов через изменения кода и разбор surviving mutants.
+- `artifact-lifecycle` -> очистка своих disposable run files после сохранения отчёта и failure evidence.
 - `fuzzing-bug-hunter` -> поиск новых defect families вместо deterministic regression.
 - `team-engineering-style` -> изменение общих правил тестовых проектов или эволюции skills.

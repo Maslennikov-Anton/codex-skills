@@ -54,6 +54,14 @@ description: Ревьюить изменения в коде с фокусом �
   [references/review-checklists.md](references/review-checklists.md)
 - Дополнительные проверки для тестовых проектов:
   [references/test-project-review.md](references/test-project-review.md)
+- Для аудита конкретных пробелов в assertions:
+  [references/test-gap-audit.md](references/test-gap-audit.md)
+- Для diff тестов, selection, CI gates и result mapping:
+  [test integrity](../autotest-engineer/references/test-integrity.md); сравни с working-tree baseline, потребуй контрактное основание для смены oracle и исходные failed statuses.
+- Для error paths, fallback, retries и ложного успеха:
+  [references/silent-failures.md](references/silent-failures.md)
+- Источники экспериментальных review methods и лицензии:
+  [references/upstream.md](references/upstream.md)
 
 ## Правила качества ревью
 

@@ -28,8 +28,8 @@ description: "Use only to define/update durable local engineering standards, tec
 - Для новых/спорных библиотек и внешних API используй `source-driven-development`.
 - Для high-risk, security-sensitive, irreversible или дорогих ошибочных выводов используй `doubt-driven-development`.
 - Перед финальным claim о готовности, исправлении, успешных тестах, build/lint, commit, push или PR используй `verification-before-completion`.
-- Для локальных qualification/test-product repo источник истины - текущий прогон. Тесты не являются bug inventory; не используй `xfail` и не переводи supported positive-кейсы в negative ради зеленого статуса, если repo policy не говорит обратное.
-- Generated/runtime artifacts не удаляй после каждого прогона автоматически. Cleanup - отдельная операция по явной просьбе; по умолчанию артефакты остаются локально и отсеиваются через `.gitignore`.
+- Для qualification/test-product repo ожидаемое поведение задаёт согласованный контракт, фактический результат — текущий прогон. Supported defect остаётся failed; repo policy сама по себе не разрешает скрывать его. При изменении тестов/selection/reporting используй [test integrity](../autotest-engineer/references/test-integrity.md).
+- Собственные временные файлы агента убирай при завершении задачи через `artifact-lifecycle`, сохранив компактный отчёт, reproducer и failure evidence. Незавершённую диагностику, пользовательские deliverables, project `.venv` и product artifacts сохраняй. Неучтённые каталоги требуют доказанного ownership/disposable scope; ignored и возраст недостаточны.
 - Для push/sync-задач в шумных repo используй `gitignore-scoped-push`: явный staged allowlist, проверка ignored preview и remote SHA.
 
 ## Технологии

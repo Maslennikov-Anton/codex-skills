@@ -26,6 +26,7 @@ For refreshing or extending the map, use
 7. If the map is missing, stale, or contradicted by executable files, inspect local evidence first: `README*`, `pyproject.toml`, `package.json`, `pom.xml`, `build.gradle*`, `Makefile`, `.gitlab-ci.yml`, `.github/workflows`, `docker-compose*`, `compose.yaml`, Dockerfiles, `requirements*.txt`, `setup.py`, `pytest.ini`, Terraform files, `.env.example`, `scripts/`, and test config.
 8. Combine with the domain skill named in the map when the task needs protocol, framework, CI, security, database, or testing depth.
 9. When you learn a reusable stable fact, update the map only if the user requested skill/context maintenance or explicitly asked to remember/sync it.
+10. Before creating disposable analysis/test workspaces use `artifact-lifecycle`; finish by retaining minimal evidence and cleaning owned intermediates. For tests/config/reporting changes apply [test integrity](../autotest-engineer/references/test-integrity.md) before editing, including a working-tree baseline.
 
 ## Guardrails
 

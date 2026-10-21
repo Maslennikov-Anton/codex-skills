@@ -1,0 +1,4 @@
+interface:
+  display_name: "Профилирование и замеры"
+  short_description: "CPU, память и проверяемое сравнение before/after."
+  default_prompt: "Используй $performance-benchmark, чтобы найти bottleneck и измерить одинаковую нагрузку до и после изменения."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Требования и покрытие"
+  short_description: "Связь требований, сценариев и проверяемых assertions."
+  default_prompt: "Используй $requirements-coverage-audit, чтобы сверить требования документа со сценариями и исполнимыми ожиданиями."

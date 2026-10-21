@@ -1,0 +1,4 @@
+interface:
+  display_name: "Правила Semgrep"
+  short_description: "Правила для известных дефектов с safe controls."
+  default_prompt: "Используй $semgrep-rule-creator, чтобы создать проверяемое Semgrep правило для известной причины ошибки."

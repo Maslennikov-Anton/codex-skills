@@ -1,0 +1,4 @@
+interface:
+  display_name: "Мутационное тестирование"
+  short_description: "Проверка силы Python-тестов через мутации"
+  default_prompt: "Используй $mutation-testing для проверки силы тестов на узком участке Python-кода."

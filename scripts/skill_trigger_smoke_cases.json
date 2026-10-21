@@ -178,5 +178,53 @@
   {
     "prompt": "разбери VCStudio .vcsys, ST editor, ST-to-Lua limitations, UserLibrary и загрузку через monitoring UI",
     "expected": "vcstudio"
+  },
+  {
+    "prompt": "напиши property-based tests с Hypothesis: генераторы входов, инварианты и roundtrip, разбери минимальные контрпримеры",
+    "expected": "property-based-testing"
+  },
+  {
+    "prompt": "причина бага уже доказана: ищи варианты в других файлах, обобщение поиска и triage совпадений той же root cause",
+    "expected": "variant-analysis"
+  },
+  {
+    "prompt": "сверь requirements coverage audit: требования документа, traceability сценариев и assertions, missing partial contradicted coverage",
+    "expected": "requirements-coverage-audit"
+  },
+  {
+    "prompt": "проанализируй историю результатов CI Allure: retry rescue, cross-run variability, повторяемые падения и длительности",
+    "expected": "test-results-analysis"
+  },
+  {
+    "prompt": "создай и проверь Semgrep rule для известного bug pattern, positive negative fixtures и AST taint precision",
+    "expected": "semgrep-rule-creator"
+  },
+  {
+    "prompt": "измерь performance benchmark Linux Python CPU memory: profiling, одинаковая нагрузка before after, шум и scaling",
+    "expected": "performance-benchmark"
+  },
+  {
+    "prompt": "проверь mutation testing Python через mutmut: surviving mutants, слабые assertions и эквивалентные мутации",
+    "expected": "mutation-testing"
+  },
+  {
+    "prompt": "выполни dependency updates обновления зависимостей: changelog, совместимость runtime, lockfile и порядок пакетов",
+    "expected": "dependency-updates"
+  },
+  {
+    "prompt": "gitlab-operations проверь GitLab CI rules needs artifacts и CI Lint API",
+    "expected": "gitlab-operations"
+  },
+  {
+    "prompt": "systematic-debugging локализуй зависание Linux процесса и segfault через strace gdb core",
+    "expected": "systematic-debugging"
+  },
+  {
+    "prompt": "security-engineer проведи dependency risks аудит зависимостей и известных уязвимостей по конкретным версиям",
+    "expected": "security-engineer"
+  },
+  {
+    "prompt": "убери мусор агента: временные папки анализа, scratch, disposable venv и clones, сохрани отчёт и failure evidence",
+    "expected": "artifact-lifecycle"
   }
 ]

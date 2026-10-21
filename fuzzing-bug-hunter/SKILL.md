@@ -55,6 +55,8 @@ description: "Искать новые defect families через matrix/grammar 
 ## Related Skills
 
 - `autotest-engineer` -> stable regression tests по найденным дефектам.
+- `property-based-testing` -> проверка заданного свойства на генерируемых входах.
+- `variant-analysis` -> поиск других проявлений уже доказанной root cause.
 - `systematic-debugging` -> доказательство root cause.
 - `code-review-professional` -> review fuzz/repro artifacts.
 - `team-engineering-style` -> закрепление устойчивого процесса fuzzing.

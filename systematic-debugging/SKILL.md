@@ -35,6 +35,7 @@ description: "Доказывать root cause багов, падений тес�
 - Не начинай с правки кода, если нет reproduction command или явной причины, почему воспроизведение невозможно.
 - Не смешивай несколько гипотез в одну правку.
 - Stop-the-line: unexpected failure нельзя обходить, если он может менять вывод о correctness.
+- Для падения теста прочитай [test integrity](../autotest-engineer/references/test-integrity.md). Докажи, где ошибка: продукт, harness или окружение. Текущее поведение продукта не является основанием переписать oracle; доказанный supported defect остаётся failed.
 - Для многослойных систем логируй вход и выход на каждой границе, а не только место падения.
 - Если уже было несколько неудачных fix-попыток, пересмотри саму архитектурную гипотезу, а не продолжай наращивать патчи.
 - При глубоком стеке вызовов ищи источник плохого значения вверх по цепочке, а не лечи последнее место, где оно проявилось.
@@ -43,6 +44,8 @@ description: "Доказывать root cause багов, падений тес�
 ## Карта reference-файлов
 
 - `references/root-cause-investigation.md` -> подробная техника расследования, работа с multi-component systems и шаблон проверки гипотез
+- `references/native-process-debugging.md` -> зависания/segfault Linux, syscall trace, core и stack dumps; читать для process-level симптомов
+- `references/native-upstream.md` -> provenance и лицензия инструментального дополнения
 
 ## Формат ответа
 
@@ -60,5 +63,7 @@ description: "Доказывать root cause багов, падений тес�
 Если задача еще не про root cause, а про поиск новых багов, скрытых ограничений и расширение failure surface через системный fuzzing, используй `fuzzing-bug-hunter`.
 
 Если после расследования нужно превратить уже доказанный дефект в стабильный regression test, используй `autotest-engineer`.
+
+Если причина доказана и задача — найти такие же ошибки в других местах, используй `variant-analysis`.
 
 Если причина зависит от external API/framework behavior, используй `source-driven-development`.

@@ -58,6 +58,12 @@ description: >
   [references/api-mode.md](references/api-mode.md)
 - `.gitlab-ci.yml` patterns:
   [references/ci-cd-patterns.md](references/ci-cd-patterns.md)
+- Компиляция CI YAML, rules/needs и пределы lint simulation:
+  [references/ci-config-validation.md](references/ci-config-validation.md)
+- Cache/artifacts, reporting, runner capacity и измеряемая оптимизация:
+  [references/ci-data-flow.md](references/ci-data-flow.md)
+- Источник расширенного CI handbook и лицензия:
+  [references/ci-upstream.md](references/ci-upstream.md)
 - Troubleshooting:
   [references/troubleshooting.md](references/troubleshooting.md)
 

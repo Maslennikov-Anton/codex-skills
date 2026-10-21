@@ -1,0 +1,4 @@
+interface:
+  display_name: "Artifact Lifecycle"
+  short_description: "Уборка временных файлов агента с сохранением evidence"
+  default_prompt: "Используй $artifact-lifecycle, чтобы убрать свои временные файлы и сохранить отчёт и доказательства падений."

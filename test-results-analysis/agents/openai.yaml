@@ -1,0 +1,4 @@
+interface:
+  display_name: "История тестов"
+  short_description: "История Allure: падения, retries и сравнимые прогоны."
+  default_prompt: "Используй $test-results-analysis, чтобы проанализировать сравнимые прогоны Allure и отделить retry rescue от устойчивых падений."
