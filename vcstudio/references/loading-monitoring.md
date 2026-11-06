@@ -39,10 +39,7 @@ Offline operations доступны без подключения к resource:
 - initial values записываются в controller database;
 - последующее подключение обеспечивает cold start.
 
-Успешность проверяется в `Консоль загрузки`:
-
-- в конце списка команд есть `START` для всех задач resource/application/loop;
-- отсутствуют ошибки.
+Подтверждай успешные ответы VCont на команды загрузки, включая `START` всех нужных задач, и отсутствие ошибок. В версиях с подробной `Консоль загрузки` эти команды видны там; при кратком журнале используй реальные запросы/ответы контроллера, как описано ниже.
 
 ## Online Load And Delete Control Loop
 
@@ -50,7 +47,7 @@ Offline operations доступны без подключения к resource:
 
 Запуск: контекстное меню loop в `Структура системы` или context menu внутри editor области loop.
 
-Успешность: в `Консоль загрузки` есть `START` для всех задач loop и нет ошибок.
+Успешность: VCont подтвердил `START` всех задач loop и не вернул ошибок. Источник — подробная консоль, если она доступна, либо фактический обмен.
 
 Source evidence: branch `VCONT-2056`, `NewHierarchyDeploymentService.java`, `StDeployHelper.java`,
 `EthernetDeviceManagementCommunicationHandler.java`, `TLSPSKDeviceManagementCommunicationHandler.java`,
@@ -98,17 +95,24 @@ TCP/TLS framing:
 
 - connect to resource `ip:port`;
 - send two IEC strings in order: destination, then XML request;
-- each string is tag byte `0x50`, then length, then UTF-8 bytes;
+- in the shipped 1.25.2 build verified on 2026-11-06, each IDE string is `0x50`, uint16 big-endian **quality**, length, UTF-8 bytes; `sendREQ` writes quality zero separately in both destination and request;
 - default non-extended length uses 2-byte `writeShort`; extended length uses 4-byte `writeInt`;
-- current VCStudio source routes this through `ExtraPreferences.isUseExtendedLength()` in both Ethernet and TLS-PSK handlers; `USE_EXTENDED_LENGTH` defaults to `true` in `ExtraPreferencesInitializer`;
+- Studio routes the length width through `ExtraPreferences.isUseExtendedLength()` in both Ethernet and TLS-PSK handlers; `USE_EXTENDED_LENGTH` defaults to `true` in `ExtraPreferencesInitializer`;
+- the quality field is independent of length width: current regular/extended IDE headers have 5/7 bytes; earlier builds without quality used 3/5 bytes. Confirm both properties on the supplied binaries;
 - extended mode changes even small packets: `sendREQ` contains two length-prefixed strings, so the frame grows by 4 bytes versus regular mode;
-- `sendPublicKey()` uses the same length-width switch; raw `sendBytes()` file uploads still write the supplied bytes without adding this IEC string envelope;
+- the inspected Ethernet `sendPublicKey()` uses the length-width switch but does **not** add the separate quality field before the key; raw `sendBytes()` uploads write supplied bytes without an IDE envelope. Inspect these special paths separately;
 - regular mode fits VCont builds expecting 2-byte string lengths; extended mode fits VCont builds compiled with large `CIEC_STRING` / 4-byte ASN.1 string lengths;
-- when Studio cannot load/connect after this change, first verify Studio and VCont agree on this length mode before debugging XML command semantics;
-- response is one IEC string containing XML response;
+- when Studio cannot load/connect, verify quality-field presence and length width in Studio, VCont, protocol clients and every capture/fault relay before debugging XML semantics. A stale relay can abort before forwarding the first request;
+- response is one IEC string containing XML response; shipped Ethernet/TLS-PSK `handleResponse` skips a separate 16-bit quality field before reading length;
 - when auth is enabled Studio first sends `<Request Action="AUTH"><Auth Token="<jwt>"/></Request>`.
 
-`Онлайн удалить КУ` удаляет algorithm control loop из runtime. Успешность: в `Консоль загрузки` есть `DELETE` для всех задач loop и нет ошибок.
+Artifact scope: Studio archive SHA256 `915b105e175bb597536a8262cc01b79e59ab616a493f5ce1d1686e75a0f7f572`, bundle `1.25.2.202610210625`, paired with VCont 2.1.1.39714. The local source checkout `c181db764` predates the quality field: verify shipped handler bytecode with `javap -c -p` (`writeByte(80)`, separate `writeShort(0)`, `writeStringLength`; response `readShort`, `readStringLength`). Do not infer protocol revision from bundle version alone. Runtime evidence identifies `serializeQuality`/`deserializeQuality`, two big-endian bytes, valid codes 0..3; meanings of nonzero codes remain unverified. The `vcont` skill's `references/protocol.md` contains the runtime details.
+
+The same shipped Studio can print only `Deployment started / processing / completed` instead of the old XML console transcript. These lines do not prove which blocks, assignments or tasks reached VCont. For an exact deployment check retain actual wire requests **and matching successful responses**, or inspect runtime inventory and values before teardown; do not replace those checks with only a success-message substring.
+
+The shipped `messages*.properties` also defines `Deploy_ConnectionEstablished=Connection established: {0} ({1})`; older command-log checks may expect `Connection to ... is ok`. Adapt only the connection wording while preserving the exact command, matching response ID, successful response and error rejection.
+
+`Онлайн удалить КУ` удаляет algorithm control loop из runtime. Подтверждай нужные `DELETE` и успешные ответы без ошибок через подробную консоль либо фактический обмен.
 
 ## Runtime Command Mapping
 
@@ -135,7 +139,7 @@ Online operations доступны при подключенном resource че
 
 ## vcont.fboot
 
-Boot file - набор команд, с помощью которого Runtime создает database. Набор команд идентичен командам, отправляемым при `Загрузка`, и виден в `Консоль загрузки`.
+Boot file — набор команд, с помощью которого Runtime создает database. Состав проверяй по самому файлу и командам загрузки; краткая консоль новых сборок не показывает весь XML.
 
 При старте controller читает boot file и создает описанные algorithms.
 

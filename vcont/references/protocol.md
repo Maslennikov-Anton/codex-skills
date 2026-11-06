@@ -15,37 +15,45 @@
 
 Перечень команд основан на IEC 61499-1-2012 и расширен продуктовой версией VCont.
 
-## TCP/ASN.1 framing и расширенная длина
+## TCP/TLS framing: качество и длина строки
 
-Studio отправляет IDE-команды как ASN.1-like IEC strings поверх TCP/TLS: tag `0x50`, затем длина, затем bytes. В `sendREQ` идут две строки подряд: `destination` и XML `request`; ответ VCont - одна такая строка с XML response.
+`sendREQ` передаёт две строки: destination и XML request. Ответ — одна строка с XML response. При диагностике проверяй **две независимые настройки формата**: наличие поля качества и ширину длины. Правильной ширины длины недостаточно для совместимости.
 
-Есть два несовместимых режима длины строки:
+| Формат строки | Байты до UTF-8 payload | Заголовок при length=4 |
+| --- | --- | --- |
+| Прежний, без качества | `50 + length + payload` | 5 байт |
+| С качеством | `50 + quality:uint16be + length + payload` | 7 байт |
 
-- regular: 2-byte unsigned/big-endian length, исторический формат, предел payload одной строки около `65535` bytes;
-- large/extended: 4-byte unsigned/big-endian length, формат для больших загрузочных пакетов и больших `CIEC_STRING`.
+В сборках, проверенных 6 ноября 2026, Studio пишет `quality=0` (`writeShort(0)`) **перед длиной в каждой из двух строк**, а TCP- и TLS-PSK `handleResponse` читают и пропускают это поле. Например, `abc` в extended mode: `50 00 00 00 00 00 03 61 62 63`. Весь sendREQ вырос на 4 байта относительно прежнего extended-формата.
 
-Совместимость должна совпадать с обеих сторон:
+Это поле **качества данных**, а не расширение длины, TLS-префикс или произвольный padding. В VCont подтверждены `serializeQuality`/`deserializeQuality`: 2 байта big-endian, принимаются коды 0..3; значения >3 отвергаются. Названия и прикладная семантика кодов 1..3 этим исследованием не установлены — не присваивай им значения good/bad по догадке. Перехватчик должен сохранять исходные байты и код качества; получение quality само по себе не доказывает загрузку или корректность значения.
 
-| Studio mode | VCont build | Result |
-|---|---|---|
-| regular / `UseExtendedLength=false` | regular, `mBytesHeader=2` | compatible |
-| extended / `UseExtendedLength=true` | large, `LARGE_CIEC_STRING`, `mBytesHeader=4` | compatible |
-| extended Studio | regular VCont | incompatible: runtime reads the wrong length width and the stream shifts |
-| regular Studio | large VCont | incompatible: runtime waits/parses a 4-byte length from a 2-byte frame |
+Ширина **самого length** по-прежнему выбирается отдельно:
 
-Runtime-side implementation markers:
+- regular: 2 байта unsigned big-endian, до 65535 байт payload; с quality заголовок 5 байт;
+- extended/large: 4 байта unsigned big-endian; с quality заголовок 7 байт;
+- `ExtraPreferences.isUseExtendedLength()` в Studio должен соответствовать `mBytesHeader` / `LARGE_CIEC_STRING` в VCont;
+- длина считается по UTF-8 **байтам**, не по числу символов. Tag/quality/length не входят в длину payload.
 
-- `src/core/cominfra/fbdkasn1layer.h`: `mBytesHeader` is `4` under `LARGE_CIEC_STRING`, otherwise `2`;
-- `src/core/cominfra/fbdkasn1layer.cpp`: `serializeValueString`/`deserializeValueString` must read/write 4 bytes in large builds;
-- `src/core/datatypes/forte_any_string.h`: large builds store string `size`/`capacity` as `TForteUInt32` rather than `TForteUInt16`.
+Из формата следует ещё одна ловушка: при quality=0 новая regular-строка (quality 2 + length 2) совпадает с прежней extended-строкой (length 4) для payload до 65535 байт. Один успешный короткий QUERY не определяет версию формата; проверяй сериализатор/bytecode конкретных артефактов.
 
-When diagnosing a specific `.deb` or runtime artifact, do not rely only on the current source checkout. Verify the artifact:
+Устаревший клиент `50 + uint32 length` на новой сборке может ждать ответ до таймаута: runtime ждёт недостающие данные пакета. Такой же перехватчик может завершиться `unexpected ... frame tag` до отправки первой команды и вызвать `Connection reset / Deployment failed` в Studio. Не трактуй это как продуктовый отказ загрузки, пока не проверен посредник.
 
-- `dpkg-deb -x <vcont.deb> /tmp/vcont-extract`;
-- `nm -C /tmp/vcont-extract/usr/local/sbin/vcont/vcont | rg 'serializeValueString|deserializeValueString'`;
-- `objdump -d --demangle --start-address=<addr> --stop-address=<addr+range> ...` and check whether string serialization/deserialization advances by `0x4` and uses 32-bit byte swaps (`bswap`) for the length.
+### Проверенная область и источники
 
-Known trap: some source snapshots around `VCONT-1627` contain a suspicious large-mode `deserializeValueString` expression masking shifted bytes with `0xFF00`. Treat source and shipped binary as separate evidence; if a shipped binary disassembles to true 32-bit length handling, it may not match the local checkout.
+Подтверждено на VCStudio 1.25.2, bundle `1.25.2.202610210625`, и VCont 2.1.1.39714 (build 2026-11-06 09:16:33):
+
+- Studio tar.gz SHA256 `915b105e175bb597536a8262cc01b79e59ab616a493f5ce1d1686e75a0f7f572`;
+- VCont deb SHA256 `c3fd6c5138001827135feee1f4bebef465b2538d9c97d55067badf21ed9c9194`;
+- runtime executable SHA256 `e8452c73bae0ba7f47b7c7af38b785a3fb00db99fd75daa35f9c4636de40b2ba`.
+
+Локальные checkout VCont `0a3de2f7` и Studio `c181db764` этого поля ещё не содержат. Номер bundle/имя deb не определяют формат: проверяй поставленные артефакты.
+
+Для повторной проверки распакуй deb в owned scratch без установки, найди `serializeQuality`, `deserializeQuality`, `serializeDataPoint`, `serializeValueString` и `deserializeValueString` через `nm -C`, затем изучи адреса через `objdump -d --demangle`. В поставленном Studio JAR используй `javap -c -p` для `EthernetDeviceManagementCommunicationHandler` и `TLSPSKDeviceManagementCommunicationHandler`: в `sendREQ` после `writeByte(80)` будет отдельный `writeShort(0)` перед `writeStringLength`; в `handleResponse` — отдельный `readShort` перед `readStringLength`.
+
+Проверяй исключения отдельно: у исследованного Ethernet `sendPublicKey()` нет дополнительного quality-поля в отправляемом ключе, а `sendBytes()` пишет сырые байты. Не добавляй IDE-заголовок к загрузке файла/ключа автоматически.
+
+Сохраняй предельный размер, чтение фрагментов TCP и общий deadline. Для другого артефакта выбирай подтверждённый формат явно; не делай эвристический fallback после таймаута. Известная ошибка маски `0xFF00` в некоторых source snapshots `VCONT-1627` также требует проверки конкретного бинарника.
 
 ## Загрузка программы через fboot
 

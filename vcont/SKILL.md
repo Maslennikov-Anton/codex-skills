@@ -30,6 +30,7 @@ description: "Use for VCont runtime behavior: vcontcfg, fboot/XML load commands,
    Для вложенного пользовательского ST FB проверяй, что все зависимые `FBType` созданы до `START`: успешный `CREATE` родительского типа не доказывает разрешение зависимости во время `execute`.
 9. Сохраняй терминологию: VCont/ВК, VCStudio, VCSystem, PLC/PlcId, HSB_MAIN, HSB_RESERVE, HSB_STANDALONE, `HSBSTATUS`, `MAIN`, `RESERVE`, `STANDALONE`, `NONE`, heartbeat, таск, луп, контур управления, ФБ, internal build, licensed/runtime license, Trial Lite, Demo / Trial Full, no-license, `license.bin`, `data.bin`, `ControllerId`, `VARS`, `CopiesMBServer`.
 10. Факты из `references/` считай продуктовыми требованиями, а не доказательством поведения текущих бинарников. Реализацию проверяй отдельно по бинарникам, конфигам, логам или тестам.
+11. При сбое IDE-обмена проверь обе части framing по `references/protocol.md`: отдельное 16-битное поле качества и ширину length. Поставленные Studio/VCont могут отличаться от локального source checkout; учитывай формат клиентов, перехватчиков и fault relay.
 
 ## Core Model
 

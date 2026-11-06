@@ -31,5 +31,19 @@
         "plugins/org.eclipse.fordiac.ide.systemmanagement.ui/src/org/eclipse/fordiac/ide/systemmanagement/ui/editors/TextLoopEditor.java": "06acdff7efe8958365039f5fe1874631715f1eb4043a72df2d8bc7ae0101a806"
       }
     }
+  ],
+  "artifact_verifications": [
+    {
+      "reference": "vcstudio/references/loading-monitoring.md",
+      "verified_at": "2026-11-06",
+      "scope": "IDE string framing in shipped Ethernet and TLS-PSK bytecode; local captured source predates quality field",
+      "studio_bundle": "1.25.2.202610210625",
+      "studio_archive_sha256": "915b105e175bb597536a8262cc01b79e59ab616a493f5ce1d1686e75a0f7f572",
+      "vcont_version": "2.1.1.39714",
+      "vcont_deb_sha256": "c3fd6c5138001827135feee1f4bebef465b2538d9c97d55067badf21ed9c9194",
+      "ide_header": "tag 0x50, uint16be quality, uint16be/uint32be UTF-8 byte length",
+      "nonzero_quality_code_meanings": "not verified",
+      "special_paths": "Ethernet sendPublicKey has no separate quality field; sendBytes stays raw"
+    }
   ]
 }
