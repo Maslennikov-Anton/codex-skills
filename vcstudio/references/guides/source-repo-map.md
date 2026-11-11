@@ -30,10 +30,10 @@ Build metadata перепроверены 2026-10-21 по commit `c181db76497963
 `docs.md` in the repo is useful as an orientation note, but verify drift-prone
 facts against `pom.xml`, product files, manifests and CI. Прежнее сравнение с версией в `docs.md` не является актуальным доказательством.
 
-Paths и SHA256 проверенных файлов сохранены в `source-provenance.json`. Из корня skills repo:
+Paths и SHA256 проверенных файлов сохранены в `../sources/source-provenance.json`. Из корня skills repo:
 
 ```bash
-python3 scripts/check_reference_sources.py vcstudio/references/source-provenance.json
+python3 scripts/check_reference_sources.py vcstudio/references/sources/source-provenance.json
 ```
 
 Совпадение fingerprints подтверждает только неизменность файлов. При drift перечитай затронутый источник и перепроверь нужный claim; не обновляй hashes без содержательной проверки. Для другого checkout укажи `--source-root /path/to/vcstudio`.
@@ -237,7 +237,7 @@ Type library loading and palette integration:
 - `typelibrary/Create*PaletteEntry.java`
 
 For concrete block pin/event/type information, use
-`fb-typelibrary.md` and `fb-typelibrary-catalog.md`; do not infer pins from
+`fb-typelibrary.md` and `../sources/fb-typelibrary-catalog.md`; do not infer pins from
 Java class names.
 
 ## Deployment, Online Edit, Monitoring

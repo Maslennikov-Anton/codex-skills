@@ -2,6 +2,8 @@
 
 This reference is a self-contained distilled knowledge base for the current `VC024SA.B Руководство разработчика VCStudio` PDF (`Руководство_правки_июнь.pdf`, metadata source `VC024SA.B Руководство разработчика по VCStudio_Ред_7_05_26(1).docx`, created 2026-06-25). The full VC024SA.B extract lives in the `vcstudio` skill. The `vcont` skill keeps a runtime-facing subset in its own `vc024sa-runtime-contract.md`. For exact wording, table rows, figure captions, or rare Studio details, use `vc024sa-complete.md`.
 
+For the newer project snapshots (`backup`, tab `Восстановление`), local users/security and recovery, use [backup-restore.md](../guides/backup-restore.md). The Eclipse history instructions below describe VC024SA.B and must not replace those newer workflows.
+
 ## Document Identity And Revisions
 
 - System: `VC SYSTEM`.
@@ -43,13 +45,13 @@ Hardware/software requirements from the document:
 - VCStudio project is a set of devices, resources, and control logic schemes with one common address space.
 - At program opening the user chooses the project directory/workspace.
 - Only one project can be open in one VCStudio instance.
-- Default login/password in the document: `admin` / `admin`.
+- Default login/password in the document: `admin` / `admin`; not a universal password for existing projects or recovery. See [file-mode-security.md](../guides/file-mode-security.md) for local project users.
 - New project flow: start VCStudio -> authorize -> `Новый проект` -> choose template -> enter project name and folder -> `Создать`.
 - Existing project flow: start VCStudio -> authorize -> `Обзор` or project dropdown -> select `.vcsys` file -> `Открыть`.
-- Archive files are not cleaned automatically:
+- VC024SA.B describes archive files as not cleaned automatically (new snapshots have separate retention rules):
   - Studio system messages: `/project_name/.metadata/.log`.
-  - Backup/history: `/workspace_name/.metadata/.plugins/org.eclipse.core.resources/.history/`.
-- Backups are also created on project save. Restore flow: toolbar `История изменений` -> choose backup date -> `Заменить`; double-clicking a backup opens text comparison against the current `.vcsys`.
+  - Eclipse history: `/workspace_name/.metadata/.plugins/org.eclipse.core.resources/.history/`.
+- VC024SA.B history: backups are created on project save. Restore flow: toolbar `История изменений` -> choose backup date -> `Заменить`; double-clicking a backup opens text comparison against the current `.vcsys`. For the separate `backup` snapshot store, use [backup-restore.md](../guides/backup-restore.md).
 
 ## UI Areas And Common Commands
 
@@ -265,7 +267,7 @@ Monitoring:
 - Input event counter means how many events arrived and how many times block logic executed.
 - Output event port counter simply increments previous value by one.
 
-Service / restore:
+Service / restore in VC024SA.B (Eclipse history; newer snapshots/security: [backup-restore.md](../guides/backup-restore.md)):
 
 - Backups are created when saving the project.
 - Restore flow: toolbar `История изменений` -> choose date -> `Заменить`.

@@ -1,7 +1,7 @@
 interface:
   display_name: "VCStudio"
-  short_description: "VCStudio, ST->Lua, загрузка и мониторинг"
-  default_prompt: "Используй $vcstudio для работы с проектом VCStudio, ST->Lua-транслятором, его ограничениями, загрузкой в VCont и мониторингом."
+  short_description: "VCStudio: проекты, безопасность, recovery, ST->Lua"
+  default_prompt: "Используй $vcstudio для работы с проектами VCStudio, снимками, безопасностью и recovery, ST->Lua, загрузкой в VCont и мониторингом."
 
 policy:
   allow_implicit_invocation: true

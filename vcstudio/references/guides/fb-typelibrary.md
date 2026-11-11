@@ -4,12 +4,12 @@
 локального репозитория `/home/ant/IdeaProjects/vcstudio` и как пользоваться
 полным встроенным catalog.
 
-Полный self-contained snapshot лежит в `fb-typelibrary-catalog.md`. Не открывай
+Полный self-contained snapshot лежит в `../sources/fb-typelibrary-catalog.md`. Не открывай
 его целиком без необходимости: файл большой. Для конкретного блока сначала ищи
 по имени:
 
 ```bash
-rg -n '^[-] `EIPDIAG`|EIPDIAG' /home/ant/codex-skills/vcstudio/references/fb-typelibrary-catalog.md
+rg -n '^[-] `EIPDIAG`|EIPDIAG' /home/ant/codex-skills/vcstudio/references/sources/fb-typelibrary-catalog.md
 ```
 
 ## Source
@@ -100,7 +100,7 @@ rg -n '^[-] `EIPDIAG`|EIPDIAG' /home/ant/codex-skills/vcstudio/references/fb-typ
 
 ## Guardrails
 
-- Не угадывай pin names. Сначала ищи тип ФБ в `fb-typelibrary-catalog.md`.
+- Не угадывай pin names. Сначала ищи тип ФБ в `../sources/fb-typelibrary-catalog.md`.
 - `Comment` в `.fbt` часто краткий или пустой; semantics проверяй по VC024SA,
   generated `vcont.fboot`, runtime logs и тестам.
 - `InterfaceOnly` не означает, что блок не работает. Это значит, что в repo
@@ -144,7 +144,7 @@ Catalog/document discrepancy to preserve: the current PDF documents
 `MBSERIALDIAG` and `MBDEVICERTU`, but the local catalog snapshot has no
 `MBSERIALDIAG`, and local `.fbt` files for `MBDEVICERTU`/`MBDEVICERTUTCP`
 declare `FBType Name="MBDEVICETCP"` in their XML. For exact pin names, prefer
-`fb-typelibrary-catalog.md`; for product-document wording, preserve the PDF
+`../sources/fb-typelibrary-catalog.md`; for product-document wording, preserve the PDF
 names and mark the mismatch.
 
 OPC UA / Common communication:

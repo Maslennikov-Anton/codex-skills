@@ -9,6 +9,15 @@ The current PDF lists these supported communication surfaces:
 - OPC UA;
 - ETHERNET IP, listed but not expanded in the extracted communication chapter.
 
+## Навигация Studio 1.25.2
+
+При обновлении Modbus-сценария для `1.25.2.202610210625` сначала открой в редакторе ресурса вкладку `Коммуникации`, затем вложенную вкладку `Modbus TCP`. По умолчанию в `Коммуникации` выбран `OPC UA`, поэтому один клик по родительской вкладке ещё не открывает таблицу `Modbus TCP Client`. Это правка UI-навигации, исходные сетевые ожидания сохраняются.
+
+Вложенные протокольные вкладки: `OPC UA`, `Modbus TCP`, `Modbus Serial`,
+`Ethernet IP`, `KNX`, `Profibus`. Дальнейшие короткие пути вида
+`Resource editor -> Modbus TCP` читай внутри вкладки `Коммуникации`;
+подписи и правила таблиц ниже сохраняются.
+
 ## Общий Modbus Workflow
 
 Для Modbus algorithms:

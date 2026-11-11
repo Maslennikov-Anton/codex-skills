@@ -272,7 +272,7 @@ def run_repository_contract_checks(root: Path) -> list[str]:
 
     contract_paths = (
         root / "vcont" / "references" / "studio-vcont-contract.md",
-        root / "vcstudio" / "references" / "studio-vcont-contract.md",
+        root / "vcstudio" / "references" / "guides" / "studio-vcont-contract.md",
     )
     if all(path.exists() for path in contract_paths):
         if contract_paths[0].read_bytes() != contract_paths[1].read_bytes():
@@ -282,8 +282,8 @@ def run_repository_contract_checks(root: Path) -> list[str]:
 
     modbus_paths = (
         root / "vcont" / "references" / "vc024sa-runtime-contract.md",
-        root / "vcstudio" / "references" / "communications.md",
-        root / "vcstudio" / "references" / "vc024sa-key-facts.md",
+        root / "vcstudio" / "references" / "guides" / "communications.md",
+        root / "vcstudio" / "references" / "sources" / "vc024sa-key-facts.md",
     )
     if all(path.exists() for path in modbus_paths):
         row_sets: list[tuple[str, ...]] = []

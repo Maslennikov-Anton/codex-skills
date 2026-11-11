@@ -6,6 +6,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -110,6 +111,56 @@ class WorkspaceTests(unittest.TestCase):
         finally:
             proc.terminate(); proc.wait(timeout=5)
         self.assertTrue(self.run.exists())
+
+    def test_process_cwd_match_survives_a_disappearing_descriptor(self):
+        proc = subprocess.Popen(
+            [sys.executable, '-c', "import time; print('ready', flush=True); time.sleep(20)"],
+            cwd=self.scratch, stdout=subprocess.PIPE, text=True,
+        )
+        real_readlink = workspace.os.readlink
+
+        def disappearing_descriptor(path, *args, **kwargs):
+            if str(path).startswith(f'/proc/{proc.pid}/fd/'):
+                raise FileNotFoundError(str(path))
+            return real_readlink(path, *args, **kwargs)
+
+        try:
+            self.assertEqual(proc.stdout.readline().strip(), 'ready')
+            with patch.object(workspace.os, 'readlink', side_effect=disappearing_descriptor):
+                with self.assertRaisesRegex(ValueError, 'active process'):
+                    self.finish(True)
+            self.assertTrue(self.run.exists())
+        finally:
+            proc.terminate()
+            proc.wait(timeout=5)
+            proc.stdout.close()
+
+    def test_open_workspace_file_survives_an_unrelated_descriptor_race(self):
+        proc = subprocess.Popen(
+            [sys.executable, '-c',
+             "import sys,time; f=open(sys.stdin.readline().strip()); print('ready', flush=True); time.sleep(20)"],
+            cwd=self.base, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True,
+        )
+        real_readlink = workspace.os.readlink
+
+        def disappearing_descriptor(path, *args, **kwargs):
+            if str(path) == f'/proc/{proc.pid}/fd/0':
+                raise FileNotFoundError(str(path))
+            return real_readlink(path, *args, **kwargs)
+
+        try:
+            proc.stdin.write(str(self.scratch / 'intermediate.bin') + '\n')
+            proc.stdin.flush()
+            self.assertEqual(proc.stdout.readline().strip(), 'ready')
+            with patch.object(workspace.os, 'readlink', side_effect=disappearing_descriptor):
+                with self.assertRaisesRegex(ValueError, 'active process'):
+                    self.finish(True)
+            self.assertTrue(self.run.exists())
+        finally:
+            proc.terminate()
+            proc.wait(timeout=5)
+            proc.stdin.close()
+            proc.stdout.close()
 
     def test_real_command_failure_exit_code_is_preserved(self):
         self.assertEqual(workspace.execute(self.root, self.info['id'],

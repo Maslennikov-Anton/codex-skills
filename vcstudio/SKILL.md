@@ -1,38 +1,61 @@
 ---
 name: vcstudio
-description: "Use for VCStudio GUI/project/docs and Studio-bundled ST-to-Lua translator tasks: .vcsys, hierarchy, library, ST editor, translator limitations, load/monitoring UI, Studio-generated fboot; skip runtime-only VCont debug."
+description: "Use for VCStudio GUI/projects/docs: .vcsys, backups/restore, local security/recovery, hierarchy, libraries, bundled ST-to-Lua translator, load/monitoring UI and Studio-generated fboot; skip runtime-only VCont debug."
 ---
 
 # VCStudio
 
-Используй skill для проектирования и сопровождения VCStudio: проекты `.vcsys`, ресурсы, приложения, контуры, задачи, библиотека ФБ, Structured Text, загрузка в VCont, мониторинг и Studio-конфигурация Modbus/OPC UA.
+Работа с IDE, моделью `.vcsys`, библиотекой ФБ, ST→Lua, локальной
+безопасностью, снимками, загрузкой и мониторингом через Studio.
+VCStudio отвечает за модель, интерфейс и генерацию конфигурации;
+VCont — за исполнение, runtime database, логи, boot, лицензирование и протоколы.
 
-## Быстрая маршрутизация
+## Как пользоваться
 
-1. Открой `references/index.md` и выбери минимальный набор тематических файлов.
-2. Для ST-кода, генерации тестов и ST->Lua compatibility обязательно открой `references/st-language.md`.
-   Для пользовательских ST-блоков, содержащих экземпляры других пользовательских ST-блоков, используй раздел `Композиция зависимых пользовательских ST FB`: не объединяй типы в один translator input.
-3. Для границы Studio/VCont, фактического исполнения, логов и runtime oracle начни с `references/studio-vcont-contract.md`; runtime-only диагностику передай skill `vcont`.
-4. Для редкой или спорной детали руководства сначала используй `references/vc024sa-key-facts.md`, затем `references/vc024sa-section-map.md`; `references/vc024sa-complete.md` открывай только в нужном диапазоне.
-5. Для интерфейса конкретного ФБ сначала открой `references/fb-typelibrary.md`, затем найди имя через `rg` в большом generated-каталоге `references/fb-typelibrary-catalog.md`.
-6. Для создания проекта, загрузки/мониторинга и настройки протоколов используй соответственно `references/project-workflow.md`, `references/loading-monitoring.md` и `references/communications.md`.
-7. Для исходников, сборки и product packaging используй `references/source-repo-map.md`.
-   Для version-sensitive фактов учитывай статус проверки и fingerprints в `references/source-provenance.json`: capture не равен семантической проверке справочника.
+1. В [карте тем](references/index.md) выбери руководство по задаче.
+   `guides/` содержит рабочие процедуры; `sources/` — полные источники,
+   каталог ФБ и сведения о версиях; `evidence/` — датированные проверки.
+   Загружай только нужные темы. Большие источники читай по поиску/разделу.
+2. Различай file/DB mode, создание/открытие проекта и версию артефакта.
+   По запросу пользователя выбери нужный результат: откат модели,
+   сброс пользователей или перенос содержимого — разные операции.
+3. Разделяй требование, уточняющий комментарий, наблюдение конкретной сборки
+   и неподтверждённую гипотезу. Факт реализации не заменяет согласованный
+   контракт. При расхождении сохрани оба и точные версию/хеш/шаг/результат;
+   capture исходников не равен семантической проверке.
+4. Не меняй продуктовый репозиторий для справочного ответа. Перед разрешённой
+   правкой проверь dirty worktree. Для чисто runtime-задачи используй `vcont`;
+   для связки начни с [контракта Studio/VCont](references/guides/studio-vcont-contract.md).
 
-## Рабочие правила
+## Что нельзя пропустить
 
-- Разделяй пять уровней доказательства: ST editor grammar, Studio interface/wrapper, ST->Lua translation, VCont load и runtime behavior. Parse, exit code `0` или созданный Lua сами по себе не доказывают поддержку конструкции.
-- Для Studio-compatible ST проверяй весь путь `VCStudio -> ST->Lua -> Lua FBType -> VCont`; наблюдай результат через Studio-like Watch. Direct `READ` допустим только как явно помеченный runtime oracle.
-- Перед созданием или исправлением ST всегда сверяй `Known ST->Lua Translator Limitations`; не сохраняй известное ограничение как expected-positive тест.
-- Различай один translator input и весь Studio-проект: один input содержит один top-level `FUNCTION_BLOCK`, но проект может содержать граф зависимых пользовательских ST FB, если каждый тип транслируется отдельно и все типы загружаются до запуска задач.
-- В автоматизации сохраняй модель `Resource -> Application -> Loop`: назначай каждый контур periodic/event task, учитывай порядок ФБ и завершай загрузку `START` для соответствующих задач. Online load не должен сбрасывать текущие значения на начальные.
-- В GUI-инструкциях используй точные русские подписи из Studio. При расхождении документации с текущей сборкой предпочитай generated `vcont.fboot`, логи, typelibrary и воспроизводимое поведение.
-- Для TCP/TLS-обмена проверь `references/loading-monitoring.md`: в новых артефактах есть отдельное 16-битное поле качества перед длиной IDE-строки. Проверяй поставленный JAR и runtime, включая формат всех посредников; одного совпадения extended length недостаточно.
-- У актуального руководства устарело оглавление после вставки раздела ST; для разделов `6.7+` используй фактические заголовки из section map/body.
-- Не изменяй локальный репозиторий VCStudio или runtime только для ответа на справочный вопрос. Изменения делай лишь по явному запросу пользователя и с проверкой dirty worktree.
+- **Доступ и целостность.** Новый file-mode проект открывается под admin;
+  повторно открываемый защищённый файл требует входа. `admin/admin` — начальные
+  данные, не общий пароль. Не редактируй защищённый `.vcsys` извне и не переноси
+  security-атрибуты. Recovery сбрасывает пользователей, снимок возвращает версию,
+  перенос модели создаёт отдельную копию. Подробности — в карте тем.
+- **ST.** Перед генерацией/исправлением читай [путь ST](references/guides/st-language.md)
+  и [ограничения](references/guides/st-limitations.md). Проверяй применимые слои:
+  editor grammar → interface/wrapper → translation → load → runtime.
+  Exit 0 или Lua-файл не доказывают поддержку. Один translator input содержит
+  один top-level FB; зависимые пользовательские типы компилируются отдельно
+  и загружаются до задач. Наблюдай результат через Studio-like Watch;
+  direct READ помечай как отдельный runtime oracle.
+- **Модель и загрузка.** Сохраняй `Resource → Application → Loop`, назначение
+  periodic/event task, порядок ФБ и START соответствующих задач.
+  Online load не должен сбрасывать текущие значения в начальные.
+  В TCP/TLS учитывай отдельное 16-битное качество перед длиной IDE-строки,
+  включая клиент, capture и relay; точные границы — в
+  [loading-monitoring.md](references/guides/loading-monitoring.md).
+- **Документы и проверки.** Используй точные русские подписи UI и реальные
+  интерфейсы ФБ. В VC024SA.B нумерация оглавления после ST отстаёт от тела:
+  для `6.7+` нужна карта разделов. Старую историю Eclipse не подставляй вместо
+  новых снимков `backup`. Исправляй неверный тест по независимому контракту;
+  поддержанный дефект сохраняет положительное ожидание и failed.
 
-## Граница ответственности
+## Как пополнять
 
-- VCStudio владеет моделью проекта, редактором, генерацией конфигурации и пользовательскими load/monitoring операциями.
-- VCont владеет исполнением, runtime database, логами, boot behavior, лицензированием и фактической семантикой протоколов.
-- Полный текст текущего руководства встроен в references; внешний PDF/DOCX не нужен. Reference-факты являются документационным контрактом, а свойства конкретной версии подтверждай локальными артефактами.
+Сохраняй знание по правилам в конце [карты тем](references/index.md):
+рабочая процедура — в одном тематическом руководстве, полный источник — внутри
+skill, факт проверки — с датой и границами. Внешние PDF/DOC/DOCX, старый чат
+и отчёт не должны быть обязательны для работы или сверки формулировок.

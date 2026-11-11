@@ -95,17 +95,30 @@ def active_processes(run):
     """Own-UID cwd/fd/argv references, without reading environments or logging argv."""
     needle = str(run)
     active = []
+
+    def references_run(value):
+        return value == needle or value.startswith(needle + '/')
+
     for proc in Path('/proc').iterdir():
         if not proc.name.isdigit() or int(proc.name) == os.getpid():
             continue
         try:
             if proc.stat().st_uid != os.getuid():
                 continue
-            refs = [os.readlink(proc / 'cwd')]
-            refs += [os.readlink(fd) for fd in (proc / 'fd').iterdir()]
-            argv = (proc / 'cmdline').read_bytes().decode(errors='replace')
-            if any(r == needle or r.startswith(needle + '/') for r in refs) or needle in argv:
+            if references_run(os.readlink(proc / 'cwd')):
                 active.append(int(proc.name))
+                continue
+            if needle in (proc / 'cmdline').read_bytes().decode(errors='replace'):
+                active.append(int(proc.name))
+                continue
+            for fd in (proc / 'fd').iterdir():
+                try:
+                    target = os.readlink(fd)
+                except (FileNotFoundError, ProcessLookupError):
+                    continue
+                if references_run(target):
+                    active.append(int(proc.name))
+                    break
         except (FileNotFoundError, ProcessLookupError):
             continue
         except PermissionError as exc:

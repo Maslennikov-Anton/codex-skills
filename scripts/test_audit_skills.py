@@ -78,7 +78,7 @@ class AuditSkillsTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             left = root / "vcont" / "references" / "studio-vcont-contract.md"
-            right = root / "vcstudio" / "references" / "studio-vcont-contract.md"
+            right = root / "vcstudio" / "references" / "guides" / "studio-vcont-contract.md"
             left.parent.mkdir(parents=True)
             right.parent.mkdir(parents=True)
             left.write_text("left\n", encoding="utf-8")
