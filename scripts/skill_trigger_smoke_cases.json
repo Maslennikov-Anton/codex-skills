@@ -230,5 +230,13 @@
   {
     "prompt": "убери мусор агента: временные папки анализа, scratch, disposable venv и clones, сохрани отчёт и failure evidence",
     "expected": "artifact-lifecycle"
+  },
+  {
+    "prompt": "спланируй маркетинг сайта для целевых заявок: аудитория и конкуренты, позиционирование, офферы, каналы и кампании",
+    "expected": "digital-marketer"
+  },
+  {
+    "prompt": "проведи SEO-аудит: проверь индексацию в Яндексе и Google, собери семантику, подбери посадочные страницы и перелинковку",
+    "expected": "seo-specialist"
   }
 ]
